@@ -959,8 +959,11 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
       const point = event.points[0];
       const sourceEpoch = source.data?.[point.curveNumber]?.x?.[point.pointNumber] ?? point.x;
       const pointIndex = nearestTimeIndex(target.data[0].x, sourceEpoch);
+      const targetEpochMs = new Date(target.data[0].x[pointIndex]).getTime();
+      if (!Number.isFinite(targetEpochMs)) return;
       syncingHover = true;
-      try { window.Plotly.Fx.hover(target, [{ curveNumber: 0, pointNumber: pointIndex }], ['xy']); }
+      // Plotly needs a linear UTC date value to draw both the tooltip and spike.
+      try { window.Plotly.Fx.hover(target, { xval: targetEpochMs }, ['xy']); }
       finally { syncingHover = false; }
     }
 
@@ -1107,7 +1110,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
     const common = {
       xaxis: { title: { text: 'Epoch UTC' }, type: 'date', automargin: true,
         gridcolor: palette.grid, zerolinecolor: palette.grid, showspikes: true,
-        spikemode: 'across', spikesnap: 'cursor', spikecolor: palette.crosshair, spikethickness: 1 },
+        spikemode: 'across', spikesnap: 'data', spikecolor: palette.crosshair, spikethickness: 1 },
       paper_bgcolor: palette.paper, plot_bgcolor: palette.paper,
       font: { color: palette.text, family: 'system-ui, sans-serif', size: 12 },
       hoverlabel: { bgcolor: palette.paper, font: { color: palette.text }, bordercolor: palette.grid },

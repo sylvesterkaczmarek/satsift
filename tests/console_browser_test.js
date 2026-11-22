@@ -188,3 +188,56 @@ test('dark and light charts, orbit context and the inspector remain accessible o
   await expect.poll(() => page.evaluate(() => document.getElementById('orbitViewer').layout.paper_bgcolor)).toBe('#ffffff');
   expect(errors).toEqual([]);
 });
+
+
+test('pointer hover links UTC crosshairs and clears both charts without event recursion', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await openConsole(page);
+  await page.evaluate(() => {
+    window.__consoleHoverCounts = { orbitChart: 0, rateChart: 0 };
+    for (const id of Object.keys(window.__consoleHoverCounts)) {
+      document.getElementById(id).on('plotly_hover', () => { window.__consoleHoverCounts[id]++; });
+    }
+  });
+  const epochAt = async (id, index) => page.evaluate(({ id, index }) =>
+    Date.parse(document.getElementById(id).data[0].x[index]), { id, index });
+  const hoverEpochs = async id => page.evaluate(id =>
+    (document.getElementById(id)._hoverdata || []).map(point =>
+      Date.parse(document.getElementById(id).data[point.curveNumber].x[point.pointNumber])), id);
+  const crosshairOffsets = async (id, epoch) => page.evaluate(({ id, epoch }) => {
+    const chart = document.getElementById(id);
+    const axis = chart._fullLayout.xaxis;
+    const expectedX = axis._offset + axis.l2p(epoch);
+    return [...chart.querySelectorAll('.spikeline')].filter(line => {
+      const style = getComputedStyle(line);
+      return style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0
+        && Math.abs(Number(line.getAttribute('y2')) - Number(line.getAttribute('y1'))) > 0;
+    }).map(line => Math.abs(Number(line.getAttribute('x1')) - expectedX));
+  }, { id, epoch });
+  const selectedEpoch = await epochAt('orbitChart', 5);
+  await page.locator('#orbitChart .scatterlayer .trace').first().locator('.point').nth(5).hover({ force: true });
+  await expect.poll(() => hoverEpochs('rateChart')).toContain(selectedEpoch);
+  await expect.poll(async () => (await crosshairOffsets('orbitChart', selectedEpoch)).some(offset => offset < 2)).toBe(true);
+  await expect.poll(async () => (await crosshairOffsets('rateChart', selectedEpoch)).some(offset => offset < 2)).toBe(true);
+
+  await page.locator('#consoleObject').hover();
+  await expect.poll(() => hoverEpochs('orbitChart')).toEqual([]);
+  await expect.poll(() => hoverEpochs('rateChart')).toEqual([]);
+  await expect(page.locator('#orbitChart .spikeline')).toHaveCount(0);
+  await expect(page.locator('#rateChart .spikeline')).toHaveCount(0);
+
+  // The first rate sample is null, so the fifth rendered point is record 5.
+  await page.locator('#rateChart .scatterlayer .trace').first().locator('.point').nth(4).hover({ force: true });
+  await expect.poll(() => hoverEpochs('orbitChart')).toContain(selectedEpoch);
+  await expect.poll(async () => (await crosshairOffsets('orbitChart', selectedEpoch)).some(offset => offset < 2)).toBe(true);
+  await expect.poll(async () => (await crosshairOffsets('rateChart', selectedEpoch)).some(offset => offset < 2)).toBe(true);
+  await page.locator('#consoleObject').hover();
+  await expect.poll(() => hoverEpochs('orbitChart')).toEqual([]);
+  await expect.poll(() => hoverEpochs('rateChart')).toEqual([]);
+  const counts = await page.evaluate(() => window.__consoleHoverCounts);
+  expect(counts.orbitChart).toBeGreaterThan(0);
+  expect(counts.rateChart).toBeGreaterThan(0);
+  expect(counts.orbitChart + counts.rateChart).toBeLessThan(20);
+  expect(errors).toEqual([]);
+});
