@@ -50,6 +50,279 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
   let inputRevision = 0;
   let inputLoadSequence = 0;
   let started = false;
+  let selectedEventIndex = -1;
+  let syncingHover = false;
+  let consoleTheme = 'dark';
+
+  function plotPalette() {
+    return consoleTheme === 'light'
+      ? { paper: '#ffffff', text: '#172d40', muted: '#4e6275', grid: '#ccd7e1', measurement: '#076980',
+          candidate: '#77500f', band: 'rgba(8,123,148,0.12)', calibration: 'rgba(8,123,148,0.09)',
+          gap: 'rgba(82,104,122,0.16)', crosshair: '#52687a' }
+      : { paper: '#101e2f', text: '#e6edf5', muted: '#a6b7ca', grid: '#2b4056', measurement: '#73d4e6',
+          candidate: '#f5cf83', band: 'rgba(87,204,226,0.13)', calibration: 'rgba(87,204,226,0.08)',
+          gap: 'rgba(155,176,195,0.14)', crosshair: '#a8bfd1' };
+  }
+
+  function applyTheme(theme, persist) {
+    consoleTheme = theme === 'light' ? 'light' : 'dark';
+    document.documentElement?.setAttribute('data-theme', consoleTheme);
+    const toggle = byId('themeToggle');
+    if (toggle) {
+      toggle.textContent = consoleTheme === 'dark' ? 'Light theme' : 'Dark theme';
+      toggle.setAttribute('aria-label', 'Switch to ' + (consoleTheme === 'dark' ? 'light' : 'dark') + ' theme');
+      toggle.setAttribute('aria-pressed', String(consoleTheme === 'light'));
+    }
+    if (persist) {
+      try { window.localStorage?.setItem('satsift-theme', consoleTheme); } catch (_) { /* Storage may be unavailable. */ }
+    }
+    if (!window.Plotly) return;
+    const palette = plotPalette();
+    ['orbitChart', 'rateChart'].forEach(id => {
+      const chart = byId(id);
+      if (!chart?.data) return;
+      const update = {
+        paper_bgcolor: palette.paper, plot_bgcolor: palette.paper, 'font.color': palette.text,
+        'xaxis.gridcolor': palette.grid, 'yaxis.gridcolor': palette.grid,
+        'xaxis.zerolinecolor': palette.grid, 'yaxis.zerolinecolor': palette.grid,
+        'xaxis.spikecolor': palette.crosshair,
+        'hoverlabel.bgcolor': palette.paper, 'hoverlabel.font.color': palette.text,
+        'hoverlabel.bordercolor': palette.grid,
+        shapes: lastAnalysis && !lastAnalysis.error ? chartEvidenceShapes(lastAnalysis) : []
+      };
+      window.Plotly.relayout(chart, update).catch(() => {});
+      chart.data.forEach((trace, index) => {
+        const color = trace.name === 'Candidate epoch' ? palette.candidate
+          : trace.name === 'Excluded gap' ? palette.muted : palette.measurement;
+        const restyle = { 'line.color': color, 'marker.color': color };
+        if (trace.fill) restyle.fillcolor = palette.band;
+        window.Plotly.restyle(chart, restyle, [index]).catch(() => {});
+      });
+    });
+    const viewer = byId('orbitViewer');
+    if (viewer?.data) {
+      const update = { paper_bgcolor: palette.paper, plot_bgcolor: palette.paper,
+        'font.color': palette.text, 'scene.bgcolor': palette.paper };
+      ['x', 'y', 'z'].forEach(axis => {
+        update['scene.' + axis + 'axis.gridcolor'] = palette.grid;
+        update['scene.' + axis + 'axis.zerolinecolor'] = palette.grid;
+      });
+      window.Plotly.relayout(viewer, update).catch(() => {});
+      viewer.data.forEach((trace, index) => {
+        if (trace.type !== 'scatter3d') return;
+        const color = trace.name === 'Final event record' || trace.name === 'Selected epoch'
+          ? palette.candidate : palette.measurement;
+        const restyle = { 'line.color': color, 'marker.color': color, 'marker.line.color': palette.paper };
+        if (trace.name === 'Element epochs') restyle['marker.color'] = [[palette.measurement, palette.candidate]];
+        window.Plotly.restyle(viewer, restyle, [index]).catch(() => {});
+      });
+    }
+  }
+
+  function initialiseConsole() {
+    let preference = 'dark';
+    try { preference = window.localStorage?.getItem('satsift-theme') || 'dark'; } catch (_) { /* Use the default theme. */ }
+    applyTheme(preference, false);
+    byId('themeToggle')?.addEventListener('click', () => applyTheme(consoleTheme === 'dark' ? 'light' : 'dark', true));
+    byId('previousEvent')?.addEventListener('click', () => selectEvent(selectedEventIndex - 1));
+    byId('nextEvent')?.addEventListener('click', () => selectEvent(selectedEventIndex + 1));
+    byId('focusEventCharts')?.addEventListener('click', focusSelectedEvent);
+    renderConsoleSummary(null);
+    resetEventInspector();
+  }
+
+  function renderConsoleSummary(analysis) {
+    const valid = analysis && !analysis.error;
+    const latest = valid ? analysis.records[analysis.records.length - 1] : null;
+    const inferredRegime = valid ? detection.inferOrbitProfile(analysis.records) : null;
+    const values = {
+      consoleObject: valid ? analysis.objectName || 'Unnamed object' : 'No analysed object',
+      consoleNorad: valid ? analysis.objectId || 'Unresolved' : 'n/a',
+      consoleRegime: valid ? inferredRegime : 'n/a',
+      consoleEpoch: latest ? formatEpochUs(orbitalInput.recordEpochUs(latest)) : 'n/a',
+      consoleQuality: valid ? analysis.qualityStatus : analysis?.error ? 'Input invalid' : 'Awaiting analysis',
+      consoleSource: valid ? analysis.sourceLabel + ' · ' + provenanceSummary(analysis.dataProvenance) : 'No analysed source'
+    };
+    Object.entries(values).forEach(([id, value]) => {
+      const element = byId(id);
+      if (element) {
+        element.textContent = value;
+        element.title = id === 'consoleRegime' && valid
+          ? inferredRegime + ' inferred from the orbital history; ' + analysis.profileName + ' screening profile selected' : value;
+      }
+    });
+    const quality = byId('consoleQuality');
+    if (quality) quality.setAttribute('data-state', valid ? analysis.hardQualityErrors.length ? 'err'
+      : analysis.qualityWarnings.length ? 'warn' : 'ok' : analysis?.error ? 'err' : 'neutral');
+  }
+
+  function resetEventInspector(message) {
+    selectedEventIndex = -1;
+    const title = byId('eventInspectorTitle');
+    const body = byId('eventInspectorBody');
+    if (title) title.textContent = 'Event inspector';
+    if (body) body.innerHTML = '<p class="inspector-note">' + escapeHtml(message ||
+      'Run a screening analysis, then select a candidate event to review its records and supporting signals.') + '</p>';
+    ['previousEvent', 'nextEvent', 'focusEventCharts'].forEach(id => {
+      if (byId(id)) byId(id).disabled = true;
+    });
+  }
+
+  function primaryCalibrationIndices(analysis, epochIndex) {
+    const indices = [];
+    for (let index = epochIndex - 1; index > 0 && indices.length < analysis.window; index--) {
+      if (analysis.pairEligible[index] && Number.isFinite(analysis.featureValues.aRate[index])) indices.push(index);
+    }
+    return indices.reverse();
+  }
+
+  function chartEvidenceShapes(analysis) {
+    const palette = plotPalette();
+    const selected = analysis.events[selectedEventIndex] || null;
+    // Keep the candidate lines first for existing accessible chart consumers.
+    const shapes = analysis.events.map(event => ({
+      type: 'line', name: 'Candidate ' + event.id, x0: fmtTime(event.strongest.t), x1: fmtTime(event.strongest.t),
+      y0: 0, y1: 1, yref: 'paper', layer: 'above',
+      line: { color: palette.candidate, width: event === selected ? 2.5 : 1, dash: event === selected ? 'solid' : 'dot' }
+    }));
+    const rect = (name, first, last, fillcolor) => ({
+      type: 'rect', name, x0: fmtTime(analysis.times[first]), x1: fmtTime(analysis.times[last]),
+      y0: 0, y1: 1, yref: 'paper', layer: 'below', fillcolor, line: { width: 0 }
+    });
+    const firstEvaluated = analysis.evaluated.findIndex(Boolean);
+    const lastCalibrationIndex = firstEvaluated < 0 ? analysis.times.length - 1 : firstEvaluated - 1;
+    if (!selected && lastCalibrationIndex > 0) {
+      shapes.push(rect('Initial calibration', 0, lastCalibrationIndex, palette.calibration));
+    }
+    if (selected) {
+      const indices = primaryCalibrationIndices(analysis, selected.strongest.idx);
+      let start = 0;
+      for (let index = 0; index < indices.length; index++) {
+        if (index === indices.length - 1 || indices[index + 1] !== indices[index] + 1) {
+          shapes.push(rect('Selected event calibration', indices[start] - 1, indices[index], palette.calibration));
+          start = index + 1;
+        }
+      }
+      const first = Math.max(0, selected.contextBeforeIndex);
+      shapes.push(rect('Selected event interval', first, selected.contextAfterIndex, palette.band));
+    }
+    for (let index = 1; index < analysis.times.length; index++) {
+      if (analysis.pairEligible[index] || !Number.isFinite(analysis.rows[index].dt)) continue;
+      const first = index - 1;
+      while (index + 1 < analysis.times.length && !analysis.pairEligible[index + 1] && Number.isFinite(analysis.rows[index + 1].dt)) index++;
+      shapes.push(rect('Excluded data gap', first, index, palette.gap));
+    }
+    return shapes;
+  }
+
+  function updateChartEvidence() {
+    if (!lastAnalysis || lastAnalysis.error) return;
+    const selected = lastAnalysis.events[selectedEventIndex] || null;
+    const hint = byId('chartContextHint');
+    if (hint) hint.textContent = selected
+      ? selected.id + ' selected. Shading marks its grouped interval and the preceding ' + lastAnalysis.window +
+        ' eligible primary-rate pairs used for calibration. Other signals may have different available histories. All epochs are UTC.'
+      : 'Shading marks initial calibration and excluded data gaps. Candidate lines show the strongest flagged epoch in each group. All epochs are UTC.';
+    if (!window.Plotly) return;
+    const shapes = chartEvidenceShapes(lastAnalysis);
+    ['orbitChart', 'rateChart'].forEach(id => {
+      const chart = byId(id);
+      if (chart?.data) window.Plotly.relayout(chart, { shapes }).catch(() => {});
+    });
+  }
+
+  function renderEventInspector(event, index) {
+    const title = byId('eventInspectorTitle');
+    const body = byId('eventInspectorBody');
+    if (!body || !lastAnalysis) return;
+    if (title) title.textContent = event.id + ' · ' + (index + 1) + ' of ' + lastAnalysis.events.length;
+    const flag = event.strongest;
+    const profile = common.PROFILE_LIBRARY[lastAnalysis.profileName];
+    const before = lastAnalysis.records[event.contextBeforeIndex];
+    const after = lastAnalysis.records[event.contextAfterIndex];
+    const pair = (label, value) => '<div><dt>' + escapeHtml(label) + '</dt><dd>' + escapeHtml(value) + '</dd></div>';
+    const sourceRecord = (label, record) => {
+      if (!record) return '';
+      const payload = record.line1 && record.line2
+        ? [record.name, record.line1, record.line2].filter(Boolean).join('\n')
+        : JSON.stringify(orbitalInput.recordToOmm(record), null, 2);
+      return '<details class="inspector-records"><summary>' + escapeHtml(label) +
+        '</summary><p class="small mono">' + escapeHtml(formatEpochUs(orbitalInput.recordEpochUs(record))) +
+        '</p><pre tabindex="0" aria-label="' + escapeHtml(label) + '">' + escapeHtml(payload) + '</pre></details>';
+    };
+    const scores = Object.entries(flag.featureScores).filter(([, score]) => Number.isFinite(score));
+    const scoreRows = scores.map(([feature, score]) => '<tr><th scope="row">' +
+      escapeHtml(FEATURE_LABELS[feature] || feature) + '</th><td class="mono">' + escapeHtml(fmtNum(score, 2)) +
+      '×</td><td>' + (score > 1 ? 'Breach' : 'Within band') + '</td></tr>').join('');
+    const warnings = lastAnalysis.qualityWarnings.length
+      ? '<ul class="inspector-warning">' + lastAnalysis.qualityWarnings.map(item => '<li>' + escapeHtml(item) + '</li>').join('') + '</ul>'
+      : '<p class="inspector-note">No data-quality warning was raised for this run.</p>';
+    body.innerHTML =
+      '<p class="inspector-note">Candidate screening evidence. Scores describe departures from empirical bands; they are not probabilities of a maneuver.</p>' +
+      '<dl class="inspector-metrics">' +
+      pair('Direction', event.direction) + pair('Grouped interval UTC', fmtTime(event.start) + ' to ' + fmtTime(event.end)) +
+      pair('Strongest epoch UTC', fmtTime(flag.t)) + pair('Flagged observations', String(event.pointCount)) +
+      pair('Net semi-major-axis change', fmtNum(event.netDeltaA, 4) + ' km') +
+      pair('Strongest pair change', fmtNum(flag.dA, 4) + ' km') +
+      pair('Strongest pair rate', fmtNum(flag.dARate, 4) + ' km/day') +
+      pair('Primary empirical band', fmtNum(flag.baseline - flag.halfWidth, 4) + ' to ' +
+        fmtNum(flag.baseline + flag.halfWidth, 4) + ' km/day') +
+      pair('SGP4 position residual', flag.sgp4Residual ? fmtNum(flag.sgp4Residual.positionKm, 4) + ' km' : 'Unavailable') +
+      pair('Screening score', fmtNum(event.score, 2) + '× · ' + event.tier) + '</dl>' +
+      '<details class="inspector-signals" open><summary>Signals at the strongest epoch</summary>' +
+      '<div class="table-wrap" tabindex="0" role="region" aria-label="Signal evidence"><table><thead><tr>' +
+      '<th scope="col">Signal</th><th scope="col">Band ratio</th><th scope="col">Outcome</th></tr></thead><tbody>' +
+      scoreRows + '</tbody></table></div><p class="inspector-note">A ratio above 1 exceeds that signal\'s empirical band. ' +
+      'The event also needs to pass the existing corroboration and magnitude gates.</p></details>' +
+      '<details class="inspector-thresholds"><summary>Screening settings</summary><dl class="inspector-metrics">' +
+      pair('Orbit profile', lastAnalysis.profileName) + pair('Mode', lastAnalysis.detectorModeUsed) +
+      pair('Calibration history', lastAnalysis.window + ' eligible pairs per signal') +
+      pair('Alpha', fmtNum(lastAnalysis.alpha, 2)) +
+      pair('Minimum primary change', fmtNum(lastAnalysis.minAbsDeltaA, 4) + ' km') +
+      pair('Minimum screening score', fmtNum(profile.scoreThreshold, 2) + '×') +
+      pair('Corroborated state gate', fmtNum(profile.stateGateKm, 2) + ' km') +
+      pair('Required state-support signals', String(profile.supportRequired)) +
+      pair('Maximum usable pair gap', fmtNum(lastAnalysis.maximumUsableGap, 3) + ' days') + '</dl></details>' +
+      '<details class="inspector-provenance"><summary>Source and quality</summary><p class="inspector-note">' +
+      escapeHtml(lastAnalysis.sourceLabel) + '</p><p class="inspector-note">' +
+      escapeHtml(provenanceSummary(lastAnalysis.dataProvenance)) + '</p>' + warnings + '</details>' +
+      sourceRecord('Pre-event source record', before) + sourceRecord('Final grouped-event source record', after) +
+      (flag.idx - 1 !== event.contextBeforeIndex
+        ? sourceRecord('Strongest-pair prior source record', lastAnalysis.records[flag.idx - 1]) : '') +
+      (flag.idx !== event.contextAfterIndex
+        ? sourceRecord('Strongest-epoch source record', lastAnalysis.records[flag.idx]) : '');
+  }
+
+  function selectEvent(index) {
+    if (!lastAnalysis || lastAnalysis.error || !Number.isInteger(index) || index < 0 || index >= lastAnalysis.events.length) return;
+    selectedEventIndex = index;
+    const event = lastAnalysis.events[index];
+    renderEventInspector(event, index);
+    byId('flagTableBody').querySelectorAll('[data-event-index]').forEach(button => {
+      const selected = Number(button.getAttribute('data-event-index')) === index;
+      button.setAttribute('aria-pressed', String(selected));
+      button.closest?.('tr')?.classList.toggle('event-selected', selected);
+    });
+    if (byId('previousEvent')) byId('previousEvent').disabled = index === 0;
+    if (byId('nextEvent')) byId('nextEvent').disabled = index === lastAnalysis.events.length - 1;
+    if (byId('focusEventCharts')) byId('focusEventCharts').disabled = false;
+    updateChartEvidence();
+    queueOrbitComparisonForEvent(event);
+  }
+
+  function focusSelectedEvent() {
+    const event = lastAnalysis?.events?.[selectedEventIndex];
+    if (!event || !window.Plotly) return;
+    const before = lastAnalysis.records[event.contextBeforeIndex].t.getTime();
+    const after = lastAnalysis.records[event.contextAfterIndex].t.getTime();
+    const padding = Math.max((after - before) * 0.5, lastAnalysis.medianDt * DAY_MS, 60000);
+    const range = [new Date(before - padding).toISOString(), new Date(after + padding).toISOString()];
+    syncingCharts = true;
+    Promise.all(['orbitChart', 'rateChart'].map(id => {
+      const chart = byId(id);
+      return chart?.data ? window.Plotly.relayout(chart, { 'xaxis.range': range, 'xaxis.autorange': false }) : Promise.resolve();
+    })).catch(() => {}).finally(() => { syncingCharts = false; });
+  }
 
   function beginInputLoad() {
     return { sequence: ++inputLoadSequence, revision: inputRevision, raw: byId('tles').value };
@@ -69,6 +342,12 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
     const element = byId('status');
     element.textContent = text;
     element.className = 'badge ' + (kind || 'neutral');
+    const consoleState = byId('consoleState');
+    if (consoleState) {
+      consoleState.textContent = text;
+      consoleState.title = text;
+      consoleState.setAttribute('data-state', kind || 'neutral');
+    }
   }
 
   function setRunButtonState(state) {
@@ -297,6 +576,9 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
 
   function resetOutputOnly(statusText) {
     lastAnalysis = null;
+    resetEventInspector();
+    renderConsoleSummary(null);
+    if (byId('chartContextHint')) byId('chartContextHint').textContent = 'All epochs are UTC. Load a history to review its orbital-change evidence.';
     setAnalysisExportEnabled(false);
     setCopyFlagsEnabled(false);
 
@@ -647,6 +929,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
         chart.removeAllListeners('plotly_relayout');
         chart.removeAllListeners('plotly_hover');
         chart.removeAllListeners('plotly_unhover');
+        chart.removeAllListeners('plotly_click');
       }
     });
 
@@ -665,24 +948,34 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
       if (!command) return;
 
       syncingCharts = true;
-      window.Plotly.relayout(target, command).finally(() => { syncingCharts = false; });
+      window.Plotly.relayout(target, command).catch(() => {}).finally(() => { syncingCharts = false; });
     }
 
     orbit.on('plotly_relayout', update => relayRange(rate, update));
     rate.on('plotly_relayout', update => relayRange(orbit, update));
 
     function relayHover(source, target, event) {
-      if (!event || !event.points || !event.points.length || !target.data || !target.data.length) return;
+      if (syncingHover || !event || !event.points || !event.points.length || !target.data?.[0]?.x?.length) return;
       const point = event.points[0];
       const sourceEpoch = source.data?.[point.curveNumber]?.x?.[point.pointNumber] ?? point.x;
-      const pointIndex = nearestTimeIndex(target.data[0].x || [], sourceEpoch);
-      window.Plotly.Fx.hover(target, [{ curveNumber: 0, pointNumber: pointIndex }], ['xy']);
+      const pointIndex = nearestTimeIndex(target.data[0].x, sourceEpoch);
+      syncingHover = true;
+      try { window.Plotly.Fx.hover(target, [{ curveNumber: 0, pointNumber: pointIndex }], ['xy']); }
+      finally { syncingHover = false; }
     }
 
     orbit.on('plotly_hover', event => relayHover(orbit, rate, event));
     rate.on('plotly_hover', event => relayHover(rate, orbit, event));
     orbit.on('plotly_unhover', () => window.Plotly.Fx.unhover(rate));
     rate.on('plotly_unhover', () => window.Plotly.Fx.unhover(orbit));
+    [orbit, rate].forEach(chart => chart.on('plotly_click', event => {
+      const point = event?.points?.[0];
+      if (!lastAnalysis?.events?.length || !point) return;
+      const epoch = chart.data?.[point.curveNumber]?.x?.[point.pointNumber] ?? point.x;
+      const index = nearestTimeIndex(lastAnalysis.times, epoch);
+      const eventIndex = lastAnalysis.events.findIndex(candidate => candidate.flags.some(flag => flag.idx === index));
+      if (eventIndex >= 0) selectEvent(eventIndex);
+    }));
   }
 
   function renderAccessibleChartData(analysis) {
@@ -739,23 +1032,16 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
     }
     if (lastAnalysis !== analysis) return;
 
-    const candidateShapes = analysis.events.map(event => ({
-      type: 'line',
-      x0: fmtTime(event.strongest.t),
-      x1: fmtTime(event.strongest.t),
-      y0: 0,
-      y1: 1,
-      yref: 'paper',
-      line: { color: '#dc2626', width: 1, dash: 'dot' }
-    }));
+    const palette = plotPalette();
+    const candidateShapes = chartEvidenceShapes(analysis);
 
     const orbitData = [{
       x: analysis.times.map(fmtTime),
       y: analysis.semiMajorAxes,
       mode: 'lines+markers',
       name: 'Semi-major axis',
-      line: { width: 1.8 },
-      marker: { size: 5 },
+      line: { width: 1.8, color: palette.measurement },
+      marker: { size: 4, color: palette.measurement },
       customdata: analysis.deltaA,
       hovertemplate: '%{x} UTC<br>a = %{y:.4f} km<br>Δa = %{customdata:.4f} km<extra></extra>'
     }];
@@ -767,8 +1053,8 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
       y: eligibleRate,
       mode: 'lines+markers',
       name: 'Eligible Δa/Δt',
-      line: { width: 1.4 },
-      marker: { size: 5 },
+      line: { width: 1.4, color: palette.measurement },
+      marker: { size: 4, color: palette.measurement },
       customdata: analysis.deltaA,
       hovertemplate: '%{x} UTC<br>Δa/Δt = %{y:.4f} km/day<br>Δa = %{customdata:.4f} km<extra></extra>'
     }];
@@ -779,7 +1065,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
         y: analysis.bandLower,
         mode: 'lines',
         name: 'Band lower',
-        line: { width: 0.5 },
+        line: { width: 0.5, color: palette.measurement },
         hoverinfo: 'skip',
         showlegend: false
       });
@@ -788,9 +1074,9 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
         y: analysis.bandUpper,
         mode: 'lines',
         name: 'Rolling empirical band',
-        line: { width: 0.5 },
+        line: { width: 0.5, color: palette.measurement },
         fill: 'tonexty',
-        fillcolor: 'rgba(99, 102, 241, 0.15)',
+        fillcolor: palette.band,
         hoverinfo: 'skip'
       });
     }
@@ -801,7 +1087,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
         y: excludedRate,
         mode: 'markers',
         name: 'Excluded gap',
-        marker: { size: 8, symbol: 'circle-open' },
+        marker: { size: 8, symbol: 'circle-open', color: palette.muted },
         customdata: analysis.rows.map(row => row.dt),
         hovertemplate: '%{x} UTC<br>Excluded pair gap = %{customdata:.2f} days<extra></extra>'
       });
@@ -813,14 +1099,20 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
         y: analysis.flags.map(flag => flag.dARate),
         mode: 'markers',
         name: 'Candidate epoch',
-        marker: { size: 11, symbol: 'x', color: '#dc2626' },
+        marker: { size: 10, symbol: 'x', color: palette.candidate },
         hovertemplate: '%{x} UTC<br>Δa/Δt = %{y:.4f} km/day<extra>Candidate</extra>'
       });
     }
 
     const common = {
-      xaxis: { title: { text: 'Epoch UTC' }, type: 'date', automargin: true },
+      xaxis: { title: { text: 'Epoch UTC' }, type: 'date', automargin: true,
+        gridcolor: palette.grid, zerolinecolor: palette.grid, showspikes: true,
+        spikemode: 'across', spikesnap: 'cursor', spikecolor: palette.crosshair, spikethickness: 1 },
+      paper_bgcolor: palette.paper, plot_bgcolor: palette.paper,
+      font: { color: palette.text, family: 'system-ui, sans-serif', size: 12 },
+      hoverlabel: { bgcolor: palette.paper, font: { color: palette.text }, bordercolor: palette.grid },
       hovermode: 'x unified',
+      uirevision: analysis.runId,
       shapes: candidateShapes
     };
 
@@ -829,7 +1121,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
       margin: { l: 72, r: 28, t: 58, b: 48 },
       title: { text: 'Semi-major axis over time', x: 0.02, xanchor: 'left', font: { size: 15 } },
       showlegend: false,
-      yaxis: { title: { text: 'Semi-major axis [km]' }, zeroline: false, automargin: true }
+      yaxis: { title: { text: 'Semi-major axis [km]' }, zeroline: false, automargin: true, gridcolor: palette.grid }
     });
 
     const ratePromise = safePlot('rateChart', rateData, {
@@ -837,13 +1129,14 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
       margin: { l: 72, r: 28, t: 86, b: 48 },
       title: { text: 'Sampling-normalised change and empirical band', x: 0.02, xanchor: 'left', y: 0.98, font: { size: 15 } },
       legend: { orientation: 'h', x: 0, y: 1.20, xanchor: 'left', yanchor: 'top' },
-      yaxis: { title: { text: 'Δa/Δt [km/day]' }, zeroline: true, automargin: true }
+      yaxis: { title: { text: 'Δa/Δt [km/day]' }, zeroline: true, automargin: true, gridcolor: palette.grid, zerolinecolor: palette.grid }
     });
 
     if (orbitPromise && ratePromise) {
       await Promise.all([orbitPromise, ratePromise]);
       if (lastAnalysis !== analysis) return;
       bindChartSynchronization();
+      updateChartEvidence();
       byId('resetChartZoom').disabled = false;
     }
   }
@@ -893,7 +1186,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
         : fmtTime(event.start) + '<br><span class="muted">to ' + fmtTime(event.end) + '</span>';
       return `
         <tr>
-          <td><button class="table-action" type="button" data-event-index="${index}">${escapeHtml(event.id)}</button></td>
+          <td><button class="table-action" type="button" data-event-index="${index}" aria-pressed="false" aria-controls="eventInspector">${escapeHtml(event.id)}</button></td>
           <td class="mono">${interval}</td>
           <td>${escapeHtml(event.direction)}</td>
           <td>${escapeHtml(fmtNum(event.netDeltaA, 4))} km</td>
@@ -907,10 +1200,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
       button.addEventListener('click', function () {
         const index = Number(this.getAttribute('data-event-index'));
         const event = lastAnalysis && lastAnalysis.events ? lastAnalysis.events[index] : null;
-        if (event) {
-          byId('orbitDetails').open = true;
-          queueOrbitComparisonForEvent(event);
-        }
+        if (event) selectEvent(index);
       });
     });
 
@@ -935,6 +1225,8 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
     byId('flagCopyHint').textContent = '';
     byId('exportHint').textContent = '';
     renderFlagTable([]);
+    resetEventInspector();
+    renderConsoleSummary(analysis);
     setCopyFlagsEnabled(false);
 
     if (analysis.error) {
@@ -950,6 +1242,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
       setStatus('err', analysis.errorKind === 'too-few' ? 'Too few valid snapshots' : 'Input validation failed');
       setChartMessage('No validated screening analysis is available for this input.');
       clearOrbitContext('No orbit context is available for this input.');
+      resetEventInspector('No validated analysis is available. Correct the input, then run screening again.');
       setAnalysisExportEnabled(false);
       setRunButtonState('error');
       byId('candidateEventsCard').hidden = true;
@@ -1026,13 +1319,19 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
 
     setAnalysisExportEnabled(true);
     setRunButtonState('current');
-    if (analysis.strongestEvent) queueOrbitComparisonForEvent(analysis.strongestEvent);
-    else queueSingleOrbit(
-      analysis.records[Math.floor(analysis.records.length / 2)],
-      analysis.interpretable
-        ? 'No candidate event selected. Showing one mid-series element set for visual context.'
-        : 'This run abstained. Showing one mid-series element set for visual context only.'
-    );
+    if (analysis.strongestEvent) selectEvent(analysis.events.indexOf(analysis.strongestEvent));
+    else {
+      resetEventInspector(analysis.interpretable
+        ? 'No candidate event passed the current screening criteria. Review the evidence charts and data quality.'
+        : 'This run abstained. Candidate events are suppressed until the history and data-quality requirements are satisfied.');
+      updateChartEvidence();
+      queueSingleOrbit(
+        analysis.records[Math.floor(analysis.records.length / 2)],
+        analysis.interpretable
+          ? 'No candidate event selected. Showing one mid-series element set for visual context.'
+          : 'This run abstained. Showing one mid-series element set for visual context only.'
+      );
+    }
   }
 
   function run() {
@@ -1176,19 +1475,20 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
   }
 
   function orbitPlotLayout(title) {
+    const palette = plotPalette();
     return {
       title: { text: title, x: 0.02, xanchor: 'left', font: { size: 15 } },
       margin: { l: 0, r: 0, t: 52, b: 0 },
-      paper_bgcolor: '#020617',
-      plot_bgcolor: '#020617',
-      font: { color: '#e2e8f0' },
+      paper_bgcolor: palette.paper,
+      plot_bgcolor: palette.paper,
+      font: { color: palette.text },
       legend: { orientation: 'h', x: 0, y: 1.03 },
       scene: {
         aspectmode: 'data',
-        bgcolor: '#020617',
-        xaxis: { title: { text: 'ECI x [km]' }, gridcolor: '#334155', zerolinecolor: '#475569' },
-        yaxis: { title: { text: 'ECI y [km]' }, gridcolor: '#334155', zerolinecolor: '#475569' },
-        zaxis: { title: { text: 'ECI z [km]' }, gridcolor: '#334155', zerolinecolor: '#475569' },
+        bgcolor: palette.paper,
+        xaxis: { title: { text: 'ECI x [km]' }, gridcolor: palette.grid, zerolinecolor: palette.grid },
+        yaxis: { title: { text: 'ECI y [km]' }, gridcolor: palette.grid, zerolinecolor: palette.grid },
+        zaxis: { title: { text: 'ECI z [km]' }, gridcolor: palette.grid, zerolinecolor: palette.grid },
         camera: { eye: { x: 1.45, y: 1.45, z: 1.0 } }
       }
     };
@@ -1267,12 +1567,12 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
       {
         type: 'scatter3d', mode: 'lines', name: 'Pre-event record',
         x: beforeOrbit.x, y: beforeOrbit.y, z: beforeOrbit.z,
-        line: { width: 5, color: '#22d3ee' }, hovertemplate: 'Pre-event orbit<extra></extra>'
+        line: { width: 5, color: plotPalette().measurement }, hovertemplate: 'Pre-event orbit<extra></extra>'
       },
       {
         type: 'scatter3d', mode: 'lines', name: 'Final event record',
         x: afterOrbit.x, y: afterOrbit.y, z: afterOrbit.z,
-        line: { width: 5, color: '#fb923c' }, hovertemplate: 'Final event orbit<extra></extra>'
+        line: { width: 5, color: plotPalette().candidate }, hovertemplate: 'Final event orbit<extra></extra>'
       },
       {
         type: 'scatter3d', mode: 'markers+text', name: 'Element epochs',
@@ -1280,7 +1580,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
         y: [beforeOrbit.point.y, afterOrbit.point.y],
         z: [beforeOrbit.point.z, afterOrbit.point.z],
         text: ['Pre-event', 'Final event'], textposition: 'top center',
-        marker: { size: 5, color: ['#22d3ee', '#fb923c'], line: { color: '#ffffff', width: 1 } },
+        marker: { size: 5, color: [plotPalette().measurement, plotPalette().candidate], line: { color: plotPalette().paper, width: 1 } },
         hovertemplate: '%{text} element epoch<extra></extra>'
       }
     ];
@@ -1322,13 +1622,13 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
       {
         type: 'scatter3d', mode: 'lines', name: 'Approximate orbit',
         x: orbit.x, y: orbit.y, z: orbit.z,
-        line: { width: 5, color: '#22d3ee' }, hovertemplate: 'Approximate orbit<extra></extra>'
+        line: { width: 5, color: plotPalette().measurement }, hovertemplate: 'Approximate orbit<extra></extra>'
       },
       {
         type: 'scatter3d', mode: 'markers+text', name: 'Selected epoch',
         x: [orbit.point.x], y: [orbit.point.y], z: [orbit.point.z],
         text: [record.name || record.satId || 'Selected epoch'], textposition: 'top center',
-        marker: { size: 6, color: '#ef4444', line: { color: '#ffffff', width: 1 } },
+        marker: { size: 6, color: plotPalette().candidate, line: { color: plotPalette().paper, width: 1 } },
         hovertemplate: '%{text}<extra></extra>'
       }
     ];
@@ -1364,7 +1664,12 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
     const target = byId('executiveSummary').classList.contains('visible')
       ? byId('executiveSummary')
       : byId('resultBox');
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (window.innerWidth >= 1100 && typeof target.getBoundingClientRect === 'function') {
+      const rect = target.getBoundingClientRect();
+      if (rect.top >= 0 && rect.top < window.innerHeight * 0.6) return;
+    }
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+    target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' });
   }
 
   function demoLabel(kind) {
@@ -2407,6 +2712,7 @@ globalThis.SMDModules["interface"] = function createInterface(common, orbitalInp
   function start() {
     if (started) return;
     started = true;
+    initialiseConsole();
     byId('run').addEventListener('click', () => { run(); scrollToResults(); });
     byId('reset').addEventListener('click', () => resetOutputOnly('Output reset. Input retained.'));
     byId('heroHistoryButton').addEventListener('click', () => {
