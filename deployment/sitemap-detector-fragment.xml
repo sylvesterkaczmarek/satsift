@@ -1,13 +1,7 @@
-<!-- Merge these four <url> entries into the site-root sitemap.xml. -->
-<url>
-  <loc>https://www.sylvesterkaczmarek.com/satellite-maneuver-detector</loc>
-</url>
-<url>
-  <loc>https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/docs</loc>
-</url>
-<url>
-  <loc>https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/benchmark</loc>
-</url>
-<url>
-  <loc>https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/accessibility</loc>
-</url>
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://www.sylvesterkaczmarek.com/satsift/</loc></url>
+  <url><loc>https://www.sylvesterkaczmarek.com/satsift/docs</loc></url>
+  <url><loc>https://www.sylvesterkaczmarek.com/satsift/benchmark</loc></url>
+  <url><loc>https://www.sylvesterkaczmarek.com/satsift/accessibility</loc></url>
+</urlset>

@@ -159,7 +159,7 @@ class LocalServerTest(unittest.TestCase):
 
     def test_root_opens_workbench(self):
         with urlopen(self.base) as response:
-            self.assertEqual(response.url, self.base + preview.PREFIX)
+            self.assertEqual(response.url, self.base + preview.PREFIX + "/")
             self.assertIn(b"Satellite Maneuver", response.read())
 
 

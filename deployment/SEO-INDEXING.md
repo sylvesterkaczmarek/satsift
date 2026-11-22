@@ -1,54 +1,50 @@
 # SatSift indexing contract
 
-The detector repository owns the four public HTML documents and the site-level Apache routing template. The main sylvesterkaczmarek.com website owns the root `robots.txt` and root `sitemap.xml`, so those two files must be merged at the website root when this release is deployed.
+SatSift owns four public HTML documents and its Apache route blocks. The website owns the root `robots.txt` and `sitemap.xml`. Deployment merges the reviewed SatSift policy into those files while preserving unrelated pages, crawler groups and comments.
 
-## Indexable public HTML URLs
+## Canonical public pages
 
-Exactly these detector URLs are intended to be indexable:
+| Page | Canonical URL |
+| --- | --- |
+| Workbench | https://www.sylvesterkaczmarek.com/satsift/ |
+| Documentation | https://www.sylvesterkaczmarek.com/satsift/docs |
+| Benchmark status | https://www.sylvesterkaczmarek.com/satsift/benchmark |
+| Accessibility | https://www.sylvesterkaczmarek.com/satsift/accessibility |
 
-- `https://www.sylvesterkaczmarek.com/satellite-maneuver-detector`
-- `https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/docs`
-- `https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/benchmark`
-- `https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/accessibility`
+The workbench root has a trailing slash. The three subpages do not. Every document declares `index, follow`, one exact canonical URL, a matching OpenGraph URL, the SatSift site name, a Twitter summary card and valid JSON-LD identifying its canonical page. Active navigation and asset URLs use `/satsift/`.
 
-Each corresponding repository HTML file declares `index, follow` and a self-referencing clean canonical URL.
+## Previous public URLs
 
-## Non-indexable detector resources
+The previous `/satellite-maneuver-detector` root and its documentation, benchmark and accessibility pages redirect with HTTP 301 to the corresponding canonical URL. This includes their trailing-slash and `.html` forms. Redirects preserve query strings and do not redirect unrelated similarly named website paths.
 
-Do not add any of the following to the sitemap:
+Previous history, manifest, template and browser-asset URLs remain direct compatibility routes. They preserve HTTP methods, request bodies and queries. Previously deployed content-addressed modules remain available for cached browser documents. These compatibility routes are deliberate and must not be removed by a broad text replacement.
 
-- `/satellite-maneuver-detector/history`
-- `/satellite-maneuver-detector/benchmark/manifest`
-- `/satellite-maneuver-detector/benchmark/template`
-- any `.js`, `.json` or `.php` resource
-- any `/tools/satellite-maneuver-detector/...` physical path
-- private Space-Track configuration or cache paths
+The site keeps its existing private storage layout. Direct requests for physical application paths remain forbidden. The public URL migration does not move or expose the retained history cache.
 
-`deployment/site-root.htaccess` emits `X-Robots-Tag: noindex, nofollow, nosnippet` for the clean history/JSON machine endpoints and deployed JavaScript assets. Direct physical `/tools/satellite-maneuver-detector/...` requests are forbidden.
+## Resources outside the sitemap
 
-## Legacy URLs
+History responses, benchmark JSON, JavaScript and `dependency-notices.txt` carry `X-Robots-Tag: noindex, nofollow, nosnippet`. They do not belong in the sitemap. Neither do physical application paths, credentials, caches or source files.
 
-The site-level rewrite template explicitly redirects these legacy forms with HTTP 301:
+The complete licence bundle is an intentional public download. Its name does not grant access to other `.txt`, `.md`, `.json` or source files.
 
-- `/satellite-maneuver-detector.html` -> `/satellite-maneuver-detector`
-- `/satellite-maneuver-detector/docs.html` -> `/satellite-maneuver-detector/docs`
-- `/satellite-maneuver-detector/benchmark.html` -> `/satellite-maneuver-detector/benchmark`
-- `/satellite-maneuver-detector/accessibility.html` -> `/satellite-maneuver-detector/accessibility`
+## Robots policy
 
-Legacy `.html` detector URLs must not appear in `sitemap.xml`.
+`deployment/robots-detector-snippet.txt` supplies the SatSift policy for the existing `User-agent: *` group. The deployer removes superseded owned rules and inserts the current policy exactly once. Multiple wildcard groups, a wildcard group shared with other adjacent User-agent headers, or malformed managed markers stop deployment.
 
-## Root robots.txt integration
+Both public page namespaces stay crawlable so search engines can see the permanent redirects. History and benchmark machine endpoints remain specifically disallowed in both namespaces. The physical application namespace remains disallowed and is also denied by Apache.
 
-Merge `deployment/robots-detector-snippet.txt` into the existing `User-agent: *` policy. Remove any broader `Disallow: /satellite-maneuver-detector/` rule, because it would also block the public docs, benchmark and accessibility pages. Keep the specific disallows for the history and JSON machine endpoints and the physical `/tools` namespace.
+JavaScript required for page rendering remains crawlable. Its separate noindex header prevents the resource from becoming a standalone search result. The root declaration remains:
 
-The root robots file should contain the normal sitemap declaration:
+```text
+Sitemap: https://www.sylvesterkaczmarek.com/sitemap.xml
+```
 
-`Sitemap: https://www.sylvesterkaczmarek.com/sitemap.xml`
+## Sitemap policy
 
-Do not block the clean JavaScript assets required to render the page; crawler rendering should be able to fetch them even though the assets themselves carry `X-Robots-Tag: noindex`.
+`deployment/sitemap-detector-fragment.xml` is a valid XML document used as the reviewed list of four owned URLs. It is an input to the merge, never a replacement for the website's complete sitemap. The deployer removes stale old or new SatSift entries and inserts only the four canonical pages. Unrelated URLs and XML comments survive.
 
-## Root sitemap.xml integration
+Repeated robots, sitemap and routing merges produce identical bytes. Legacy managed marker names are migrated only when their exact known delimiters are present. Unknown, duplicate or ambiguous application rules outside the owned blocks require review.
 
-Merge the four entries from `deployment/sitemap-detector-fragment.xml` into the existing site sitemap. Remove any obsolete detector `.html` entry and any detector API, JSON, PHP, JavaScript or physical `/tools` entry if present.
+## Verification
 
-The detector fragment is intentionally not a complete standalone sitemap because replacing the site's root sitemap would remove unrelated website pages.
+`tests/indexing_config_test.py` checks canonical, social and structured metadata, active links, route declarations and the sitemap inputs. `tests/apache_route_boundary_test.py` exercises actual Apache redirects, queries, retained machine routes, private-path denial and rollback behaviour. `tools/verify_production.py` checks the deployed pages, exact asset and notice hashes, actual redirect chains, root robots policy and sitemap.

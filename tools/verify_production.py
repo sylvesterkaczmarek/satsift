@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read-only verification of the public Workbench 3.4.9 deployment."""
+"""Read-only verification of the public SatSift deployment."""
 
 from __future__ import annotations
 
@@ -23,9 +23,11 @@ from browser_assets import browser_assets
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BASE_URL = "https://www.sylvesterkaczmarek.com"
-PUBLIC_PREFIX = "/satellite-maneuver-detector"
+PUBLIC_PREFIX = "/satsift"
+LEGACY_PREFIX = "/satellite-maneuver-detector"
+WORKBENCH_VERSION = json.loads((ROOT / "package.json").read_text())["version"]
 EXPECTED_PUBLIC_URLS = (
-    DEFAULT_BASE_URL + PUBLIC_PREFIX,
+    DEFAULT_BASE_URL + PUBLIC_PREFIX + "/",
     DEFAULT_BASE_URL + PUBLIC_PREFIX + "/docs",
     DEFAULT_BASE_URL + PUBLIC_PREFIX + "/benchmark",
     DEFAULT_BASE_URL + PUBLIC_PREFIX + "/accessibility",
@@ -51,6 +53,7 @@ class Response:
     headers: dict[str, str]
     body: bytes
     final_url: str
+    redirects: tuple[tuple[int, str], ...] = ()
 
 
 class CanonicalParser(HTMLParser):
@@ -80,21 +83,30 @@ def fetch_url(url: str, timeout: float = 15.0) -> Response:
     request = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "satellite-maneuver-deployment-verifier/1.0",
+            "User-Agent": "SatSift-deployment-verifier/1.1",
             "Cache-Control": "no-cache",
             "Pragma": "no-cache",
         },
         method="GET",
     )
+    redirects: list[tuple[int, str]] = []
+    class RecordRedirects(urllib.request.HTTPRedirectHandler):
+        max_redirections = 5
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            redirects.append((code, newurl))
+            return super().redirect_request(req, fp, code, msg, headers, newurl)
+    opener = urllib.request.build_opener(
+        urllib.request.HTTPSHandler(context=ssl.create_default_context()), RecordRedirects()
+    )
     try:
-        response = urllib.request.urlopen(request, timeout=timeout, context=ssl.create_default_context())
+        response = opener.open(request, timeout=timeout)
     except urllib.error.HTTPError as exc:
         response = exc
     body = response.read(MAX_RESPONSE_BYTES + 1)
     if len(body) > MAX_RESPONSE_BYTES:
         return Response(0, {}, b"response exceeded verifier safety limit", response.geturl())
     headers = {key.lower(): value.strip() for key, value in response.headers.items()}
-    return Response(int(response.status), headers, body, response.geturl())
+    return Response(int(response.status), headers, body, response.geturl(), tuple(redirects))
 
 
 def text(response: Response) -> str:
@@ -121,7 +133,7 @@ def check_canonical(report: Report, response: Response, expected: str, label: st
     parser = CanonicalParser()
     parser.feed(text(response))
     report.check(response.status == 200, f"{label}: clean route returns HTTP 200")
-    report.check(response.final_url.rstrip("/") == expected.rstrip("/"), f"{label}: response remains on the expected public origin")
+    report.check(response.final_url == expected and not response.redirects, f"{label}: response remains on the expected public origin")
     report.check(parser.canonicals == [expected], f"{label}: canonical URL is exact")
 
 
@@ -135,7 +147,7 @@ def verify(
     report = Report()
 
     paths = {
-        "workbench": "",
+        "workbench": "/",
         "docs": "/docs",
         "benchmark": "/benchmark",
         "accessibility": "/accessibility",
@@ -181,7 +193,7 @@ def verify(
     satellite_asset_path = content_versioned_path("satellite-6.0.2.min.js", expected_satellite)
 
     workbench = text(pages["workbench"])
-    report.check("Workbench 3.4.9" in workbench, "workbench: version 3.4.9 is live")
+    report.check("SatSift " + WORKBENCH_VERSION in workbench, "workbench: version " + WORKBENCH_VERSION + " is live")
     report.check("Detector method 0.4" in workbench, "workbench: detector method 0.4 is live")
     report.check(
         assets[-1]["url"] in workbench,
@@ -210,7 +222,7 @@ def verify(
     required_app_markers = {
         "release and detector versions": (
             "const METHOD_VERSION = 'v0.4';",
-            "const WORKBENCH_VERSION = '3.4.9';",
+            "const WORKBENCH_VERSION = '" + WORKBENCH_VERSION + "';",
         ),
         "UTC-safe OMM parser": (
             "function parseOmmEpochUtc(value)",
@@ -230,7 +242,7 @@ def verify(
         ),
         "lazy Plotly loader": (
             "function ensurePlotlyLoaded()",
-            "PLOTLY_ASSET_URL = '/satellite-maneuver-detector/plotly-3.3.1.min.js'",
+            "PLOTLY_ASSET_URL = '/satsift/plotly-3.3.1.min.js",
         ),
     }
     for label, markers in required_app_markers.items():
@@ -261,6 +273,44 @@ def verify(
         "noindex" in satellite_response.headers.get("x-robots-tag", "").lower(),
         "satellite.js: machine asset carries noindex policy",
     )
+
+    for filename, mime in (("plotly-3.3.1.min.js", "javascript"),
+                           ("dependency-notices.txt", "text/plain")):
+        url = base + PUBLIC_PREFIX + "/" + filename
+        response = fetcher(url)
+        report.check(response.status == 200 and response.final_url == url and not response.redirects,
+                     filename + ": canonical distribution resource returns HTTP 200 directly")
+        report.check(hashlib.sha256(response.body).digest() == hashlib.sha256((repo / filename).read_bytes()).digest(),
+                     filename + ": deployed SHA-256 matches the complete repository resource")
+        report.check(mime in response.headers.get("content-type", "").lower(),
+                     filename + ": correct media type is present")
+        report.check("noindex" in response.headers.get("x-robots-tag", "").lower(),
+                     filename + ": machine resource carries noindex policy")
+        check_security_headers(report, response, filename, https=https)
+
+    # Verify the actual redirect chain, not merely a successful final page.
+    for suffix in ("", "/", ".html", "/docs", "/docs.html", "/benchmark", "/accessibility"):
+        destination = suffix.removesuffix(".html")
+        canonical = base + PUBLIC_PREFIX + (destination if destination and destination != "/" else "/")
+        query = "?source=legacy%2Fbookmark"
+        response = fetcher(base + LEGACY_PREFIX + suffix + query)
+        report.check(response.status == 200 and response.final_url == canonical + query
+                     and response.redirects == ((301, canonical + query),),
+                     "legacy page " + (suffix or "root") + ": one permanent redirect preserves the query")
+    bare = fetcher(base + PUBLIC_PREFIX)
+    report.check(bare.status == 200 and bare.final_url == base + PUBLIC_PREFIX + "/"
+                 and bare.redirects == ((301, base + PUBLIC_PREFIX + "/"),),
+                 "workbench: missing trailing slash redirects once to the canonical root")
+
+    for suffix, expected in (("/benchmark/manifest", (repo / "public-evidence-manifest-v0.1.json").read_bytes()),
+                             ("/benchmark/template", (repo / "benchmark-template.json").read_bytes()),
+                             ("/satellite-6.0.2.min.js", expected_satellite),
+                             ("/" + assets[0]["target"], (repo / assets[0]["source"]).read_bytes())):
+        url = base + LEGACY_PREFIX + suffix
+        response = fetcher(url)
+        report.check(response.status == 200 and response.final_url == url and not response.redirects
+                     and hashlib.sha256(response.body).digest() == hashlib.sha256(expected).digest(),
+                     "legacy resource " + suffix + ": exact resource remains directly available")
 
     benchmark = text(pages["benchmark"])
     benchmark_markers = (
@@ -305,6 +355,15 @@ def verify(
         isinstance(history_payload, dict) and history_payload.get("ok") is False,
         "history: error response is structured JSON",
     )
+    legacy_history_url = base + LEGACY_PREFIX + "/history?norad=invalid&start=2026-01-01&end=2026-01-02"
+    legacy_history = fetcher(legacy_history_url)
+    try:
+        legacy_error = json.loads(legacy_history.body)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        legacy_error = None
+    report.check(legacy_history.status == 400 and legacy_history.final_url == legacy_history_url
+                 and not legacy_history.redirects and isinstance(legacy_error, dict) and legacy_error.get("ok") is False,
+                 "legacy history: safe invalid request retains direct structured HTTP 400 behaviour")
     history_text = text(history).lower()
     report.check(
         not any(secret in history_text for secret in ("password", "identity=", "private key", "space_track_password")),
@@ -336,6 +395,10 @@ def verify(
         if line.strip() and not line.lstrip().startswith("#")
     ]
     required_robots = (
+        "Allow: /satsift",
+        "Disallow: /satsift/history",
+        "Disallow: /satsift/benchmark/manifest",
+        "Disallow: /satsift/benchmark/template",
         "Allow: /satellite-maneuver-detector",
         "Disallow: /satellite-maneuver-detector/history",
         "Disallow: /satellite-maneuver-detector/benchmark/manifest",
@@ -350,7 +413,7 @@ def verify(
         "robots.txt: detector indexing policy is current",
     )
     report.check(
-        "Disallow: /satellite-maneuver-detector/" not in active_robots,
+        all(line not in active_robots for line in ("Disallow: /satsift/", "Disallow: /satellite-maneuver-detector/")),
         "robots.txt: public detector child pages are not broadly blocked",
     )
 
@@ -370,7 +433,7 @@ def verify(
     )
     forbidden_locs = [
         loc for loc in locs
-        if ("/satellite-maneuver-detector" in loc or "/tools/satellite-maneuver-detector" in loc)
+        if (re.search(r"/(?:satsift|satellite-maneuver-detector)(?:[./?]|$)", loc) or "/tools/satellite-maneuver-detector" in loc)
         and loc not in EXPECTED_PUBLIC_URLS
     ]
     report.check(not forbidden_locs, "sitemap.xml: no stale, machine, or physical detector URLs are indexed")

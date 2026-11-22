@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import importlib.util
 import hashlib
+import json
 import shutil
 import io
 import os
@@ -36,6 +37,7 @@ EXPECTED_PUBLIC_FILES = (
     "public-evidence-manifest-v0.1.json",
     "plotly-3.3.1.min.js",
     "satellite-6.0.2.min.js",
+    "dependency-notices.txt",
     "app/common.js", "app/orbital-input.js", "app/benchmark.js",
     "app/packages.js", "app/detection.js", "app/interface.js",
 )
@@ -227,6 +229,44 @@ def test_remote_script_transport() -> None:
 
 
 
+def test_complete_notice_bundle() -> None:
+    from build_browser_notices import bundle_bytes, source_files
+    expected = bundle_bytes(ROOT)
+    check((ROOT / deploy.NOTICE_BUNDLE).read_bytes() == expected, "distributed notice bundle is stale")
+    sources = source_files(ROOT)
+    check(len(json.loads(sources['licenses/PLOTLY-COMPONENTS.json'])['components']) == 400,
+          "the complete reviewed component inventory was not retained")
+    for name, content in sources.items():
+        check(('Source: ' + name + '\n').encode() in expected and content in expected,
+              'complete original notice bytes are missing: ' + name)
+    with tempfile.TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        shutil.copytree(ROOT / 'licenses', root / 'licenses')
+        for name in ('LICENSE', 'NOTICE', 'THIRD-PARTY-NOTICES.md', 'plotly-3.3.1.min.js'):
+            shutil.copy2(ROOT / name, root / name)
+        check(bundle_bytes(root) == expected, 'bundle is not reproducible in a separate source directory')
+        inventory_path = root / 'licenses/PLOTLY-COMPONENTS.json'
+        inventory = json.loads(inventory_path.read_text())
+        notice = root / inventory['components'][0]['notices'][0]['path']
+        original = notice.read_bytes()
+        notice.write_bytes(original + b'changed fixture')
+        try:
+            bundle_bytes(root)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('altered retained notice passed its recorded digest')
+        notice.write_bytes(original)
+        inventory['components'][0]['notices'][0]['path'] = '../outside-private.txt'
+        inventory_path.write_text(json.dumps(inventory))
+        try:
+            bundle_bytes(root)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('inventory traversal path entered a public bundle')
+
+
 def test_allowlist_and_dry_run_commands() -> None:
     check(deploy.PUBLIC_APP_FILES == EXPECTED_PUBLIC_FILES, "public deployment allowlist changed")
     deploy.validate_allowlist(ROOT)
@@ -245,7 +285,7 @@ def test_allowlist_and_dry_run_commands() -> None:
             site_files[name] = path
         app_staging = deploy.stage_public_assets(ROOT, staging / "application")
         commands = deploy.rsync_commands(ROOT, site_files, None, dry_run=True, app_staging=app_staging)
-        check(len(commands) == 20, "deployment plan must contain seventeen app and three site-root writes")
+        check(len(commands) == 21, "deployment plan must contain eighteen app and three site-root writes")
         for command in commands:
             check("--dry-run" in command, "dry-run plan contains a writing rsync command")
             check(not any(flag in command for flag in ("--delete", "--delete-excluded", "--relative", "--no-implied-dirs")),
@@ -265,12 +305,12 @@ def test_allowlist_and_dry_run_commands() -> None:
                   "staged content filename does not match the exact immutable destination")
         absent_commands = deploy.rsync_commands(ROOT, site_files, None, dry_run=True,
                                                 app_staging=app_staging, module_directory_exists=False)
-        check(len(absent_commands) == 13, "first migration must simulate only destinations whose parents exist")
+        check(len(absent_commands) == 14, "first migration must simulate only destinations whose parents exist")
         check(not any(command[-1] in immutable_destinations for command in absent_commands),
               "first-install dry run attempted a transfer into an absent directory")
         execute_commands = deploy.rsync_commands(ROOT, site_files, None, dry_run=False,
                                                  app_staging=app_staging, module_directory_exists=False)
-        check(len(execute_commands) == 20, "real first installation omitted approved immutable assets")
+        check(len(execute_commands) == 21, "real first installation omitted approved immutable assets")
         check(all("--dry-run" not in command for command in execute_commands), "execute plan retained dry-run")
     unusual_config = Path("/tmp/config with ' quote")
     transport = deploy.rsync_transport(unusual_config)
@@ -359,6 +399,15 @@ def test_site_file_merges() -> None:
     check(merged.count(deploy.MANAGED_BEGIN) == 1, "managed .htaccess block was not added exactly once")
     updated = deploy.merge_htaccess(merged.replace("Workbench", "obsolete"), managed)
     check(updated.count(deploy.MANAGED_BEGIN) == 1, "managed .htaccess update duplicated the block")
+    check(deploy.merge_htaccess(merged, managed) == merged, "repeated htaccess merge changed bytes")
+    old_markers = merged
+    for old, current in deploy.LEGACY_MARKERS.items():
+        old_markers = old_markers.replace(current, old)
+    check(deploy.merge_htaccess(old_markers, managed) == merged, "recognised legacy markers were not migrated")
+    expect_deployment_error(
+        lambda: deploy.merge_htaccess(merged + old_markers, managed),
+        "mixed current and legacy managed blocks were accepted",
+    )
     expect_deployment_error(
         lambda: deploy.merge_htaccess("RewriteRule ^satellite-maneuver-detector old-target [L]\n", managed),
         "ambiguous unmarked detector routing was accepted",
@@ -382,10 +431,26 @@ def test_site_file_merges() -> None:
     check("User-agent: ExampleBot\nDisallow: /" in merged_robots, "other crawler group was removed")
     check(merged_robots.count(deploy.ROBOTS_BEGIN) == 1, "robots managed block count is wrong")
     check(merged_robots.count(f"Sitemap: {deploy.SITEMAP_URL}") == 1, "sitemap declaration count is wrong")
+    check(deploy.merge_robots(merged_robots) == merged_robots, "robots merge is not byte-idempotent")
+    one_group = deploy.merge_robots("User-agent: *\nDisallow: /private/\n\n")
+    check(deploy.merge_robots(one_group) == one_group, "single-group robots merge grew blank lines")
+    old_robots = one_group.replace(deploy.ROBOTS_BEGIN, "# BEGIN satellite-maneuver-detector managed policy").replace(deploy.ROBOTS_END, "# END satellite-maneuver-detector managed policy")
+    check(deploy.merge_robots(old_robots) == one_group, "old robots markers were not migrated")
+    check("Allow: /satellite-maneuver-detector" in merged_robots, "crawlers cannot discover legacy redirects")
+    unrelated_robots = deploy.merge_robots("User-agent: *\nDisallow: /satsift-unrelated/\n")
+    check("Disallow: /satsift-unrelated/" in unrelated_robots, "similarly prefixed unrelated robots rule was removed")
     expect_deployment_error(
         lambda: deploy.merge_robots("User-agent: *\nDisallow:\nUser-agent: *\nDisallow: /duplicate\n"),
         "ambiguous duplicate wildcard robots groups were accepted",
     )
+
+    for shared in (
+        "User-agent: *\nUser-agent: ExampleBot\nDisallow: /private\n\nUser-agent: OtherBot\nDisallow: /other\n",
+        "User-agent: ExampleBot\n# shared group\nUser-agent: *\nDisallow: /private\n",
+        "User-agent: *\n\nUser-agent: ExampleBot\nDisallow: /private\n",
+    ):
+        expect_deployment_error(lambda: deploy.merge_robots(shared),
+                                'shared wildcard group was split and unrelated policy changed')
 
     sitemap = b'''<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -395,6 +460,7 @@ def test_site_file_merges() -> None:
   <url><loc>https://www.sylvesterkaczmarek.com/satellite-maneuver-detector.html</loc></url>
 </urlset>'''
     merged_sitemap = deploy.merge_sitemap(sitemap).decode()
+    check(deploy.merge_sitemap(merged_sitemap.encode()).decode() == merged_sitemap, "sitemap merge is not byte-idempotent")
     check("/unrelated" in merged_sitemap, "unrelated sitemap URL was removed")
     check("unrelated comment must survive" in merged_sitemap, "unrelated sitemap XML comment was removed")
     check("satellite-maneuver-detector-article" in merged_sitemap, "similarly prefixed unrelated URL was removed")
@@ -420,7 +486,7 @@ def test_backup_restore_and_hash_contract() -> None:
         check(calls[-1][0][-1] == "sh", "backup does not use fixed-shell stdin transport")
         backup_command = calls[-1][1]["input_bytes"].decode()
         subprocess.run(["sh", "-n", "-c", backup_command], check=True)
-        check(backup_command.count("cp -p --") == 13, "backup does not cover every mutable deployment target")
+        check(backup_command.count("cp -p --") == 14, "backup does not cover every mutable deployment target")
         check("sha256sum" in backup_command, "site-root optimistic-concurrency check is missing")
         check("retained-routes.htaccess" in backup_command, "compatible rollback routing was not backed up")
         check(str(deploy.REMOTE_LOCK_PATH) in backup_command, "remote deployment lock is missing")
@@ -428,7 +494,7 @@ def test_backup_restore_and_hash_contract() -> None:
         check(calls[-1][0][-1] == "sh", "rollback does not use fixed-shell stdin transport")
         restore_command = calls[-1][1]["input_bytes"].decode()
         subprocess.run(["sh", "-n", "-c", restore_command], check=True)
-        check(restore_command.count("cp -p --") == 13, "rollback does not restore every mutable deployment target")
+        check(restore_command.count("cp -p --") == 14, "rollback does not restore every mutable deployment target")
         expected = {deploy.REMOTE_APP_ROOT / "index.html": "c" * 64}
         deploy.verify_remote_hashes(None, expected)
         check("sha256sum" in calls[-1][1]["input_bytes"].decode(), "post-upload hash verification is missing")
@@ -458,6 +524,9 @@ def test_new_immutable_assets_and_rollback() -> None:
                 content = ('previous installation ' + name).encode()
                 (app / name).write_bytes(content)
                 originals[app / name] = content
+            if previous_assets:
+                (app / deploy.NOTICE_BUNDLE).write_bytes(b'previous licence bundle')
+                originals[app / deploy.NOTICE_BUNDLE] = b'previous licence bundle'
             old_routes = (deploy.retain_immutable_routes(previous_htaccess, template)
                           if previous_assets else previous_htaccess)
             site_hashes = {}
@@ -524,6 +593,8 @@ def test_new_immutable_assets_and_rollback() -> None:
                 for path, content in originals.items():
                     if path.name != '.htaccess':
                         check(path.read_bytes() == content, 'original mutable bytes were not restored')
+                if not previous_assets:
+                    check(not (app / deploy.NOTICE_BUNDLE).exists(), 'rollback did not restore initial absence of the notice target')
                 restored_routes = (site / '.htaccess').read_bytes()
                 check(restored_routes == expected_rollback_routes, 'compatible routing was not restored')
                 cleaned, retained = deploy._separate_immutable_routes(restored_routes.decode(), required=True)
@@ -675,6 +746,7 @@ def main() -> None:
     test_repository_guards()
     test_alias_guard()
     test_remote_script_transport()
+    test_complete_notice_bundle()
     test_allowlist_and_dry_run_commands()
     test_direct_rsync_dry_run_leaves_files_and_directories_unchanged()
     test_remote_path_resolution()
