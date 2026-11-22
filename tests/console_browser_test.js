@@ -2,6 +2,7 @@
 
 const { test, expect } = require('@playwright/test');
 const fs = require('node:fs/promises');
+const AxeBuilder = require('@axe-core/playwright').default;
 
 const WORKBENCH = process.env.SATSIFT_TEST_ROUTE || '/satsift/';
 
@@ -25,6 +26,9 @@ test('console context and selected event agree with the downloadable evidence', 
   page.on('pageerror', error => errors.push(error.message));
   await openConsole(page);
   const evidence = await savedEvidence(page);
+  await page.locator('#downloadBundle').hover();
+  const hoveredAccessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+  expect(hoveredAccessibility.violations.map(item => ({ id: item.id, nodes: item.nodes.map(node => node.target) }))).toEqual([]);
   await expect(page.locator('#consoleNorad')).toHaveText(evidence.object_id);
   await expect(page.locator('#consoleObject')).toContainText('DEMO');
   await expect(page.locator('#consoleSource')).toContainText(/synthetic/i);
@@ -48,6 +52,7 @@ test('console context and selected event agree with the downloadable evidence', 
 });
 
 test('selected event focus, linked zoom and theme changes preserve the analysed run', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await openConsole(page);
   const original = await savedEvidence(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -63,6 +68,9 @@ test('selected event focus, linked zoom and theme changes preserve the analysed 
   await expect.poll(() => page.evaluate(() => document.getElementById('orbitChart').layout.paper_bgcolor)).toBe('#ffffff');
   expect(await page.evaluate(() => document.getElementById('orbitChart').layout.xaxis.range)).toEqual(beforeTheme.orbit);
   expect((await savedEvidence(page)).run_id).toBe(original.run_id);
+  await page.locator('#chartCard h2').scrollIntoViewIfNeeded();
+  const lightAccessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+  expect(lightAccessibility.violations.map(item => ({ id: item.id, nodes: item.nodes.map(node => node.target) }))).toEqual([]);
 
   const range = original.rows.slice(2, 6).map(row => row.epoch_utc);
   await page.evaluate(async values => {
@@ -170,7 +178,6 @@ test('keyboard event navigation updates the inspector and chart selection togeth
 });
 
 test('dark and light charts, orbit context and the inspector remain accessible on mobile', async ({ page }) => {
-  const AxeBuilder = require('@axe-core/playwright').default;
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
   await openConsole(page);
