@@ -1,0 +1,23 @@
+{
+  "schema": "smd-confirmatory-preconfirmatory-freeze-v1",
+  "frozen_code_commit": "2c394d4d9362c65560a2a08827b4e1a96f23ed87",
+  "frozen_code_tree": "b89b6ead78824e31ebdb41d4cf1fe1569f6ab1a1",
+  "benchmark_manifest_sha256": "a0d72bd15ea579ec2373a5a0cd96c1cf0790bd361b15803f722c740b5e6f7d88",
+  "benchmark_recipe_sha256": "19512dd380cbd9a56c5cccbf376110d20d5dd8eb0f65f90dae5552d424f9a2c5",
+  "comparison_result_sha256": "092df5a126d85fb7b58e5a0f682acdee1da39860359be943f102f26a986ddb43",
+  "physics_result_sha256": "b4422b7a2c01a2940513bc6fcef25963e454732792bac6cb17e2183bfd44898e",
+  "benchmark_version": "1.0",
+  "confirmatory_objects": 12,
+  "confirmatory_truth_intervals": 41,
+  "confirmatory_verified_quiet_controls": 2,
+  "method_count": 16,
+  "gate": {
+    "minimum_true_positives": 1,
+    "minimum_recall_exclusive": 0.2,
+    "maximum_false_events_per_covered_object_month": 1.0,
+    "require_positive_covered_quiet_exposure": true,
+    "require_f1_strictly_greater_than_best_risk_compliant_principal_comparator": true,
+    "maximum_median_absolute_detection_delay_hours": 24.0
+  },
+  "confirmatory_accessed": false
+}

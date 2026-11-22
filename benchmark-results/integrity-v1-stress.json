@@ -1,0 +1,2086 @@
+{
+  "schema": "smd-integrity-security-v1-stress-results",
+  "paper_track": "AI-integrity-security",
+  "method": "selective-ml-v1.0 + sequential-evidence-v1.0 + maneuver-physics-v1.0 + integrity-abstention-v1.0",
+  "confirmatory_partition_accessed": false,
+  "detector_v0_4_modified": false,
+  "frozen_parameters": {
+    "base_score_threshold": 17.822733355396952,
+    "development_support_threshold": 15937.989955517674,
+    "final_support_threshold": 1.2019241655473716,
+    "q0": 0.24444444444444446,
+    "development_wealth_threshold": 1.730962511467316,
+    "final_wealth_threshold": 1.01,
+    "risk_budget_false_events_per_covered_object_month": 1.0
+  },
+  "physics_reference": {
+    "development_pu_sequential_wealth_mean_percentile": 0.8660130718954249,
+    "development_tp": 0,
+    "development_fn": 36,
+    "final_aqua_coverage_fraction": 0.5277777777777778,
+    "final_aqua_false_events": 0
+  },
+  "qualified_regimes": [
+    "LEO"
+  ],
+  "stress_condition_count": 12,
+  "stress_conditions": {
+    "clean": {
+      "condition": "clean",
+      "attack_class": "baseline",
+      "expected_response": "baseline",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 4,
+        "hard_case_abstention_fraction": 0.2222222222222222,
+        "cases_with_recoverable_alerts": 5,
+        "recoverable_alert_case_fraction": 0.2777777777777778,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "poor_propagation": 3
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": 0.8660130718954249,
+        "pu_scorable_truth_intervals": 21,
+        "row_abstention_fraction": 0.7222222222222222,
+        "hard_case_abstention_fraction": 0.0,
+        "reason_counts": {
+          "conditional_distribution_unavailable": 5,
+          "irregular_or_gapped_sampling": 2,
+          "out_of_distribution_object": 44
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 44,
+            "rows_scored": 0,
+            "rows_abstained": 44,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "out_of_distribution_object": 44
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 31,
+            "rows_scored": 3,
+            "rows_abstained": 28,
+            "row_abstention_fraction": 0.9032258064516129,
+            "physics_abstentions": 27,
+            "physically_feasible_rows": 1,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 105,
+            "rows_scored": 21,
+            "rows_abstained": 84,
+            "row_abstention_fraction": 0.8,
+            "physics_abstentions": 81,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 90,
+            "rows_scored": 51,
+            "rows_abstained": 39,
+            "row_abstention_fraction": 0.43333333333333335,
+            "physics_abstentions": 36,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": 0.0
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 72,
+        "rows_scored": 37,
+        "rows_abstained": 35,
+        "row_abstention_fraction": 0.4861111111111111,
+        "physics_abstentions": 30,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": false,
+        "case_reasons": [],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "conditional_distribution_unavailable": 3,
+          "out_of_distribution_object": 2
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.5138888888888888,
+        "covered_verified_quiet_object_months": 0.2501856079306411,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": 0.0,
+        "empirical_q0_under_stress": 0.028205128205128206,
+        "recalibrated_wealth_threshold": 1.01,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": 0.0,
+        "q0_delta_vs_clean": 0.0,
+        "false_event_rate_delta_vs_clean": 0.0
+      }
+    },
+    "adversarial_false_maneuver": {
+      "condition": "adversarial_false_maneuver",
+      "attack_class": "adversarial-integrity",
+      "expected_response": "no-false-event-or-abstain",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 4,
+        "hard_case_abstention_fraction": 0.2222222222222222,
+        "cases_with_recoverable_alerts": 5,
+        "recoverable_alert_case_fraction": 0.2777777777777778,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "poor_propagation": 3
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": 0.8660130718954249,
+        "pu_scorable_truth_intervals": 21,
+        "row_abstention_fraction": 0.7222222222222222,
+        "hard_case_abstention_fraction": 0.0,
+        "reason_counts": {
+          "conditional_distribution_unavailable": 5,
+          "irregular_or_gapped_sampling": 2,
+          "out_of_distribution_object": 44
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__adversarial_false_maneuver",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 44,
+            "rows_scored": 0,
+            "rows_abstained": 44,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "out_of_distribution_object": 44
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__adversarial_false_maneuver",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 31,
+            "rows_scored": 3,
+            "rows_abstained": 28,
+            "row_abstention_fraction": 0.9032258064516129,
+            "physics_abstentions": 27,
+            "physically_feasible_rows": 1,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__adversarial_false_maneuver",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 105,
+            "rows_scored": 21,
+            "rows_abstained": 84,
+            "row_abstention_fraction": 0.8,
+            "physics_abstentions": 81,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__adversarial_false_maneuver",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 90,
+            "rows_scored": 51,
+            "rows_abstained": 39,
+            "row_abstention_fraction": 0.43333333333333335,
+            "physics_abstentions": 36,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": 0.0
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__adversarial_false_maneuver",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 72,
+        "rows_scored": 36,
+        "rows_abstained": 36,
+        "row_abstention_fraction": 0.5,
+        "physics_abstentions": 31,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": false,
+        "case_reasons": [],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "conditional_distribution_unavailable": 3,
+          "out_of_distribution_object": 2
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.5,
+        "covered_verified_quiet_object_months": 0.24342383474332646,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": 0.0,
+        "empirical_q0_under_stress": 0.02894736842105263,
+        "recalibrated_wealth_threshold": 1.01,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": -0.01388888888888884,
+        "q0_delta_vs_clean": 0.0007422402159244258,
+        "false_event_rate_delta_vs_clean": 0.0
+      }
+    },
+    "adversarial_maneuver_suppression": {
+      "condition": "adversarial_maneuver_suppression",
+      "attack_class": "adversarial-integrity",
+      "expected_response": "preserve-ranking-or-abstain",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 4,
+        "hard_case_abstention_fraction": 0.2222222222222222,
+        "cases_with_recoverable_alerts": 5,
+        "recoverable_alert_case_fraction": 0.2777777777777778,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "poor_propagation": 3
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": 0.8492647058823529,
+        "pu_scorable_truth_intervals": 32,
+        "row_abstention_fraction": 0.6407407407407407,
+        "hard_case_abstention_fraction": 0.0,
+        "reason_counts": {
+          "conditional_distribution_unavailable": 5,
+          "irregular_or_gapped_sampling": 2,
+          "out_of_distribution_object": 44
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__adversarial_maneuver_suppression",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 44,
+            "rows_scored": 0,
+            "rows_abstained": 44,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "out_of_distribution_object": 44
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__adversarial_maneuver_suppression",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 31,
+            "rows_scored": 18,
+            "rows_abstained": 13,
+            "row_abstention_fraction": 0.41935483870967744,
+            "physics_abstentions": 12,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__adversarial_maneuver_suppression",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 105,
+            "rows_scored": 26,
+            "rows_abstained": 79,
+            "row_abstention_fraction": 0.7523809523809524,
+            "physics_abstentions": 76,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__adversarial_maneuver_suppression",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 90,
+            "rows_scored": 53,
+            "rows_abstained": 37,
+            "row_abstention_fraction": 0.4111111111111111,
+            "physics_abstentions": 34,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": -0.016748366013071947
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__adversarial_maneuver_suppression",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 72,
+        "rows_scored": 37,
+        "rows_abstained": 35,
+        "row_abstention_fraction": 0.4861111111111111,
+        "physics_abstentions": 30,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": false,
+        "case_reasons": [],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "conditional_distribution_unavailable": 3,
+          "out_of_distribution_object": 2
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.5138888888888888,
+        "covered_verified_quiet_object_months": 0.2501856079306411,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": 0.0,
+        "empirical_q0_under_stress": 0.028205128205128206,
+        "recalibrated_wealth_threshold": 1.01,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": 0.0,
+        "q0_delta_vs_clean": 0.0,
+        "false_event_rate_delta_vs_clean": 0.0
+      }
+    },
+    "catalogue_regime_change": {
+      "condition": "catalogue_regime_change",
+      "attack_class": "regime-integrity",
+      "expected_response": "abstain",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 18,
+        "hard_case_abstention_fraction": 1.0,
+        "cases_with_recoverable_alerts": 5,
+        "recoverable_alert_case_fraction": 0.2777777777777778,
+        "reason_counts": {
+          "catalogue_identity_or_regime_change": 18,
+          "insufficient_history": 4,
+          "poor_propagation": 3
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": null,
+        "pu_scorable_truth_intervals": 0,
+        "row_abstention_fraction": 1.0,
+        "hard_case_abstention_fraction": 1.0,
+        "reason_counts": {
+          "catalogue_identity_or_regime_change": 274
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__catalogue_regime_change",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 44,
+            "rows_scored": 0,
+            "rows_abstained": 44,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "catalogue_identity_or_regime_change"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "catalogue_identity_or_regime_change": 44
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__catalogue_regime_change",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 31,
+            "rows_scored": 0,
+            "rows_abstained": 31,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "catalogue_identity_or_regime_change"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "catalogue_identity_or_regime_change": 31
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__catalogue_regime_change",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 105,
+            "rows_scored": 0,
+            "rows_abstained": 105,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "catalogue_identity_or_regime_change"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "catalogue_identity_or_regime_change": 105
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__catalogue_regime_change",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 90,
+            "rows_scored": 0,
+            "rows_abstained": 90,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "catalogue_identity_or_regime_change"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "catalogue_identity_or_regime_change": 90
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": null
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__catalogue_regime_change",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 72,
+        "rows_scored": 0,
+        "rows_abstained": 72,
+        "row_abstention_fraction": 1.0,
+        "physics_abstentions": 0,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": true,
+        "case_reasons": [
+          "catalogue_identity_or_regime_change"
+        ],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "catalogue_identity_or_regime_change": 72
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.0,
+        "covered_verified_quiet_object_months": 0.0,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": null,
+        "empirical_q0_under_stress": null,
+        "recalibrated_wealth_threshold": null,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": -0.5138888888888888,
+        "q0_delta_vs_clean": null,
+        "false_event_rate_delta_vs_clean": null
+      }
+    },
+    "corrected_duplicate": {
+      "condition": "corrected_duplicate",
+      "attack_class": "catalogue-integrity",
+      "expected_response": "recover-with-audit",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 4,
+        "hard_case_abstention_fraction": 0.2222222222222222,
+        "cases_with_recoverable_alerts": 18,
+        "recoverable_alert_case_fraction": 1.0,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "poor_propagation": 3
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 18
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": 0.8660130718954249,
+        "pu_scorable_truth_intervals": 21,
+        "row_abstention_fraction": 0.7222222222222222,
+        "hard_case_abstention_fraction": 0.0,
+        "reason_counts": {
+          "conditional_distribution_unavailable": 5,
+          "irregular_or_gapped_sampling": 2,
+          "out_of_distribution_object": 44
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 4
+        },
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__corrected_duplicate",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 44,
+            "rows_scored": 0,
+            "rows_abstained": 44,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "catalogue_correction_resolved"
+            ],
+            "row_reason_counts": {
+              "out_of_distribution_object": 44
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__corrected_duplicate",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 31,
+            "rows_scored": 3,
+            "rows_abstained": 28,
+            "row_abstention_fraction": 0.9032258064516129,
+            "physics_abstentions": 27,
+            "physically_feasible_rows": 1,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "catalogue_correction_resolved"
+            ],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__corrected_duplicate",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 105,
+            "rows_scored": 21,
+            "rows_abstained": 84,
+            "row_abstention_fraction": 0.8,
+            "physics_abstentions": 81,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "catalogue_correction_resolved"
+            ],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__corrected_duplicate",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 90,
+            "rows_scored": 51,
+            "rows_abstained": 39,
+            "row_abstention_fraction": 0.43333333333333335,
+            "physics_abstentions": 36,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "catalogue_correction_resolved"
+            ],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": 0.0
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__corrected_duplicate",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 72,
+        "rows_scored": 0,
+        "rows_abstained": 72,
+        "row_abstention_fraction": 1.0,
+        "physics_abstentions": 0,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": false,
+        "case_reasons": [],
+        "case_alerts": [
+          "catalogue_correction_resolved"
+        ],
+        "row_reason_counts": {
+          "out_of_distribution_object": 72
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.0,
+        "covered_verified_quiet_object_months": 0.0,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": null,
+        "empirical_q0_under_stress": null,
+        "recalibrated_wealth_threshold": null,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": -0.5138888888888888,
+        "q0_delta_vs_clean": null,
+        "false_event_rate_delta_vs_clean": null
+      }
+    },
+    "corrupted_history": {
+      "condition": "corrupted_history",
+      "attack_class": "storage-history-integrity",
+      "expected_response": "abstain",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 13,
+        "hard_case_abstention_fraction": 0.7222222222222222,
+        "cases_with_recoverable_alerts": 8,
+        "recoverable_alert_case_fraction": 0.4444444444444444,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "missing_or_corrupted_history": 13,
+          "poor_data_quality": 2,
+          "poor_propagation": 3
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 4,
+          "partial_record_corruption_rejected": 5
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": 0.856401384083045,
+        "pu_scorable_truth_intervals": 17,
+        "row_abstention_fraction": 0.7309236947791165,
+        "hard_case_abstention_fraction": 0.5,
+        "reason_counts": {
+          "conditional_distribution_unavailable": 4,
+          "irregular_or_gapped_sampling": 2,
+          "missing_or_corrupted_history": 66
+        },
+        "recoverable_alert_counts": {
+          "partial_record_corruption_rejected": 2
+        },
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__corrupted_history",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 39,
+            "rows_scored": 0,
+            "rows_abstained": 39,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "missing_or_corrupted_history"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "missing_or_corrupted_history": 39
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__corrupted_history",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 25,
+            "rows_scored": 0,
+            "rows_abstained": 25,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "missing_or_corrupted_history"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "missing_or_corrupted_history": 25
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__corrupted_history",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 100,
+            "rows_scored": 19,
+            "rows_abstained": 81,
+            "row_abstention_fraction": 0.81,
+            "physics_abstentions": 78,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "partial_record_corruption_rejected"
+            ],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__corrupted_history",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 85,
+            "rows_scored": 48,
+            "rows_abstained": 37,
+            "row_abstention_fraction": 0.43529411764705883,
+            "physics_abstentions": 34,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "partial_record_corruption_rejected"
+            ],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": -0.009611687812379865
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__corrupted_history",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 66,
+        "rows_scored": 34,
+        "rows_abstained": 32,
+        "row_abstention_fraction": 0.48484848484848486,
+        "physics_abstentions": 27,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": false,
+        "case_reasons": [],
+        "case_alerts": [
+          "partial_record_corruption_rejected"
+        ],
+        "row_reason_counts": {
+          "conditional_distribution_unavailable": 3,
+          "out_of_distribution_object": 2
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.5151515151515151,
+        "covered_verified_quiet_object_months": 0.25080031458403335,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": 0.0,
+        "empirical_q0_under_stress": 0.030555555555555558,
+        "recalibrated_wealth_threshold": 1.01,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": 0.0012626262626262985,
+        "q0_delta_vs_clean": 0.0023504273504273525,
+        "false_event_rate_delta_vs_clean": 0.0
+      }
+    },
+    "deletion": {
+      "condition": "deletion",
+      "attack_class": "availability-integrity",
+      "expected_response": "degrade-selectively",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 6,
+        "hard_case_abstention_fraction": 0.3333333333333333,
+        "cases_with_recoverable_alerts": 7,
+        "recoverable_alert_case_fraction": 0.3888888888888889,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "irregular_or_gapped_sampling": 2,
+          "poor_data_quality": 2,
+          "poor_propagation": 4
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5,
+          "record_count_changed_during_resolution": 2
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": 0.92234262125903,
+        "pu_scorable_truth_intervals": 19,
+        "row_abstention_fraction": 0.7178217821782178,
+        "hard_case_abstention_fraction": 0.0,
+        "reason_counts": {
+          "conditional_distribution_unavailable": 7,
+          "irregular_or_gapped_sampling": 4,
+          "out_of_distribution_object": 33
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__deletion",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 33,
+            "rows_scored": 0,
+            "rows_abstained": 33,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "out_of_distribution_object": 33
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__deletion",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 23,
+            "rows_scored": 1,
+            "rows_abstained": 22,
+            "row_abstention_fraction": 0.9565217391304348,
+            "physics_abstentions": 21,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__deletion",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 79,
+            "rows_scored": 20,
+            "rows_abstained": 59,
+            "row_abstention_fraction": 0.7468354430379747,
+            "physics_abstentions": 54,
+            "physically_feasible_rows": 2,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 3,
+              "irregular_or_gapped_sampling": 2
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__deletion",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 67,
+            "rows_scored": 36,
+            "rows_abstained": 31,
+            "row_abstention_fraction": 0.4626865671641791,
+            "physics_abstentions": 26,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 3,
+              "irregular_or_gapped_sampling": 2
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": 0.056329549363605125
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__deletion",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 54,
+        "rows_scored": 27,
+        "rows_abstained": 27,
+        "row_abstention_fraction": 0.5,
+        "physics_abstentions": 22,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": false,
+        "case_reasons": [],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "conditional_distribution_unavailable": 3,
+          "out_of_distribution_object": 2
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.5,
+        "covered_verified_quiet_object_months": 0.24342383474332646,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": 0.0,
+        "empirical_q0_under_stress": 0.03793103448275862,
+        "recalibrated_wealth_threshold": 1.01,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": -0.01388888888888884,
+        "q0_delta_vs_clean": 0.009725906277630415,
+        "false_event_rate_delta_vs_clean": 0.0
+      }
+    },
+    "insertion": {
+      "condition": "insertion",
+      "attack_class": "record-integrity",
+      "expected_response": "detect-or-abstain",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 6,
+        "hard_case_abstention_fraction": 0.3333333333333333,
+        "cases_with_recoverable_alerts": 5,
+        "recoverable_alert_case_fraction": 0.2777777777777778,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "irregular_or_gapped_sampling": 4,
+          "poor_propagation": 2
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": 0.8712702472293266,
+        "pu_scorable_truth_intervals": 23,
+        "row_abstention_fraction": 0.708029197080292,
+        "hard_case_abstention_fraction": 0.0,
+        "reason_counts": {
+          "conditional_distribution_unavailable": 5,
+          "irregular_or_gapped_sampling": 2,
+          "out_of_distribution_object": 45
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__insertion",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 45,
+            "rows_scored": 0,
+            "rows_abstained": 45,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "out_of_distribution_object": 45
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__insertion",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 32,
+            "rows_scored": 5,
+            "rows_abstained": 27,
+            "row_abstention_fraction": 0.84375,
+            "physics_abstentions": 26,
+            "physically_feasible_rows": 1,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__insertion",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 106,
+            "rows_scored": 23,
+            "rows_abstained": 83,
+            "row_abstention_fraction": 0.7830188679245284,
+            "physics_abstentions": 80,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__insertion",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 91,
+            "rows_scored": 52,
+            "rows_abstained": 39,
+            "row_abstention_fraction": 0.42857142857142855,
+            "physics_abstentions": 36,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": 0.005257175333901687
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__insertion",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 73,
+        "rows_scored": 38,
+        "rows_abstained": 35,
+        "row_abstention_fraction": 0.4794520547945205,
+        "physics_abstentions": 30,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": false,
+        "case_reasons": [],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "conditional_distribution_unavailable": 3,
+          "out_of_distribution_object": 2
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.5205479452054794,
+        "covered_verified_quiet_object_months": 0.25342755397935357,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": 0.0,
+        "empirical_q0_under_stress": 0.027500000000000004,
+        "recalibrated_wealth_threshold": 1.01,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": 0.006659056316590584,
+        "q0_delta_vs_clean": -0.0007051282051282019,
+        "false_event_rate_delta_vs_clean": 0.0
+      }
+    },
+    "irregular_sampling": {
+      "condition": "irregular_sampling",
+      "attack_class": "sampling-integrity",
+      "expected_response": "abstain-on-unsupported-segments",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 17,
+        "hard_case_abstention_fraction": 0.9444444444444444,
+        "cases_with_recoverable_alerts": 7,
+        "recoverable_alert_case_fraction": 0.3888888888888889,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "irregular_or_gapped_sampling": 13,
+          "poor_data_quality": 2,
+          "poor_propagation": 3
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5,
+          "record_count_changed_during_resolution": 2
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": null,
+        "pu_scorable_truth_intervals": 0,
+        "row_abstention_fraction": 1.0,
+        "hard_case_abstention_fraction": 1.0,
+        "reason_counts": {
+          "irregular_or_gapped_sampling": 220
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__irregular_sampling",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 35,
+            "rows_scored": 0,
+            "rows_abstained": 35,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "irregular_or_gapped_sampling"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "irregular_or_gapped_sampling": 35
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__irregular_sampling",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 25,
+            "rows_scored": 0,
+            "rows_abstained": 25,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "irregular_or_gapped_sampling"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "irregular_or_gapped_sampling": 25
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__irregular_sampling",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 84,
+            "rows_scored": 0,
+            "rows_abstained": 84,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "irregular_or_gapped_sampling"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "irregular_or_gapped_sampling": 84
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__irregular_sampling",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 72,
+            "rows_scored": 0,
+            "rows_abstained": 72,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "irregular_or_gapped_sampling"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "irregular_or_gapped_sampling": 72
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": null
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__irregular_sampling",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 58,
+        "rows_scored": 0,
+        "rows_abstained": 58,
+        "row_abstention_fraction": 1.0,
+        "physics_abstentions": 0,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": true,
+        "case_reasons": [
+          "irregular_or_gapped_sampling"
+        ],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "irregular_or_gapped_sampling": 58
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.0,
+        "covered_verified_quiet_object_months": 0.0,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": null,
+        "empirical_q0_under_stress": null,
+        "recalibrated_wealth_threshold": null,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": -0.5138888888888888,
+        "q0_delta_vs_clean": null,
+        "false_event_rate_delta_vs_clean": null
+      }
+    },
+    "replay": {
+      "condition": "replay",
+      "attack_class": "replay-integrity",
+      "expected_response": "recover-with-audit",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 4,
+        "hard_case_abstention_fraction": 0.2222222222222222,
+        "cases_with_recoverable_alerts": 18,
+        "recoverable_alert_case_fraction": 1.0,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "poor_propagation": 3
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5,
+          "replay_or_exact_duplicate_detected": 18
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": 0.8660130718954249,
+        "pu_scorable_truth_intervals": 21,
+        "row_abstention_fraction": 0.7222222222222222,
+        "hard_case_abstention_fraction": 0.0,
+        "reason_counts": {
+          "conditional_distribution_unavailable": 5,
+          "irregular_or_gapped_sampling": 2,
+          "out_of_distribution_object": 44
+        },
+        "recoverable_alert_counts": {
+          "replay_or_exact_duplicate_detected": 4
+        },
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__replay",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 44,
+            "rows_scored": 0,
+            "rows_abstained": 44,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "replay_or_exact_duplicate_detected"
+            ],
+            "row_reason_counts": {
+              "out_of_distribution_object": 44
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__replay",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 31,
+            "rows_scored": 3,
+            "rows_abstained": 28,
+            "row_abstention_fraction": 0.9032258064516129,
+            "physics_abstentions": 27,
+            "physically_feasible_rows": 1,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "replay_or_exact_duplicate_detected"
+            ],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__replay",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 105,
+            "rows_scored": 21,
+            "rows_abstained": 84,
+            "row_abstention_fraction": 0.8,
+            "physics_abstentions": 81,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "replay_or_exact_duplicate_detected"
+            ],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__replay",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 90,
+            "rows_scored": 51,
+            "rows_abstained": 39,
+            "row_abstention_fraction": 0.43333333333333335,
+            "physics_abstentions": 36,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [
+              "replay_or_exact_duplicate_detected"
+            ],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": 0.0
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__replay",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 72,
+        "rows_scored": 37,
+        "rows_abstained": 35,
+        "row_abstention_fraction": 0.4861111111111111,
+        "physics_abstentions": 30,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": false,
+        "case_reasons": [],
+        "case_alerts": [
+          "replay_or_exact_duplicate_detected"
+        ],
+        "row_reason_counts": {
+          "conditional_distribution_unavailable": 3,
+          "out_of_distribution_object": 2
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.5138888888888888,
+        "covered_verified_quiet_object_months": 0.2501856079306411,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": 0.0,
+        "empirical_q0_under_stress": 0.028205128205128206,
+        "recalibrated_wealth_threshold": 1.01,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": 0.0,
+        "q0_delta_vs_clean": 0.0,
+        "false_event_rate_delta_vs_clean": 0.0
+      }
+    },
+    "timestamp_displacement": {
+      "condition": "timestamp_displacement",
+      "attack_class": "timing-integrity",
+      "expected_response": "abstain-or-contain",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 6,
+        "hard_case_abstention_fraction": 0.3333333333333333,
+        "cases_with_recoverable_alerts": 5,
+        "recoverable_alert_case_fraction": 0.2777777777777778,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "irregular_or_gapped_sampling": 2,
+          "poor_propagation": 3
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": 0.8649918300653595,
+        "pu_scorable_truth_intervals": 24,
+        "row_abstention_fraction": 0.7074074074074074,
+        "hard_case_abstention_fraction": 0.0,
+        "reason_counts": {
+          "conditional_distribution_unavailable": 5,
+          "irregular_or_gapped_sampling": 2,
+          "out_of_distribution_object": 44
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__timestamp_displacement",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 44,
+            "rows_scored": 0,
+            "rows_abstained": 44,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "out_of_distribution_object": 44
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__timestamp_displacement",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 31,
+            "rows_scored": 5,
+            "rows_abstained": 26,
+            "row_abstention_fraction": 0.8387096774193549,
+            "physics_abstentions": 25,
+            "physically_feasible_rows": 1,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__timestamp_displacement",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 105,
+            "rows_scored": 23,
+            "rows_abstained": 82,
+            "row_abstention_fraction": 0.780952380952381,
+            "physics_abstentions": 79,
+            "physically_feasible_rows": 1,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__timestamp_displacement",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 90,
+            "rows_scored": 51,
+            "rows_abstained": 39,
+            "row_abstention_fraction": 0.43333333333333335,
+            "physics_abstentions": 36,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": false,
+            "case_reasons": [],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "conditional_distribution_unavailable": 2,
+              "irregular_or_gapped_sampling": 1
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": -0.0010212418300653558
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__timestamp_displacement",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 72,
+        "rows_scored": 37,
+        "rows_abstained": 35,
+        "row_abstention_fraction": 0.4861111111111111,
+        "physics_abstentions": 30,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": false,
+        "case_reasons": [],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "conditional_distribution_unavailable": 3,
+          "out_of_distribution_object": 2
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.5138888888888888,
+        "covered_verified_quiet_object_months": 0.2501856079306411,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": 0.0,
+        "empirical_q0_under_stress": 0.028205128205128206,
+        "recalibrated_wealth_threshold": 1.01,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": 0.0,
+        "q0_delta_vs_clean": 0.0,
+        "false_event_rate_delta_vs_clean": 0.0
+      }
+    },
+    "truncated_history": {
+      "condition": "truncated_history",
+      "attack_class": "availability-integrity",
+      "expected_response": "abstain",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 18,
+        "hard_case_abstention_fraction": 1.0,
+        "cases_with_recoverable_alerts": 3,
+        "recoverable_alert_case_fraction": 0.16666666666666666,
+        "reason_counts": {
+          "insufficient_history": 18,
+          "irregular_or_gapped_sampling": 2,
+          "poor_propagation": 5
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 3
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": null,
+        "pu_scorable_truth_intervals": 0,
+        "row_abstention_fraction": 1.0,
+        "hard_case_abstention_fraction": 1.0,
+        "reason_counts": {
+          "insufficient_history": 36
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__truncated_history",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 8,
+            "rows_scored": 0,
+            "rows_abstained": 8,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "insufficient_history"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "insufficient_history": 8
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__truncated_history",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 8,
+            "rows_scored": 0,
+            "rows_abstained": 8,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "insufficient_history"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "insufficient_history": 8
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__truncated_history",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 8,
+            "rows_scored": 0,
+            "rows_abstained": 8,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "insufficient_history"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "insufficient_history": 8
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__truncated_history",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 8,
+            "rows_scored": 0,
+            "rows_abstained": 8,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "insufficient_history"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "insufficient_history": 8
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": null
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__truncated_history",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 8,
+        "rows_scored": 0,
+        "rows_abstained": 8,
+        "row_abstention_fraction": 1.0,
+        "physics_abstentions": 0,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": true,
+        "case_reasons": [
+          "insufficient_history"
+        ],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "insufficient_history": 8
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.0,
+        "covered_verified_quiet_object_months": 0.0,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": null,
+        "empirical_q0_under_stress": null,
+        "recalibrated_wealth_threshold": null,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": -0.5138888888888888,
+        "q0_delta_vs_clean": null,
+        "false_event_rate_delta_vs_clean": null
+      }
+    },
+    "unresolved_duplicate": {
+      "condition": "unresolved_duplicate",
+      "attack_class": "catalogue-integrity",
+      "expected_response": "abstain",
+      "structural_integrity": {
+        "case_count": 18,
+        "hard_case_abstentions": 18,
+        "hard_case_abstention_fraction": 1.0,
+        "cases_with_recoverable_alerts": 5,
+        "recoverable_alert_case_fraction": 0.2777777777777778,
+        "reason_counts": {
+          "insufficient_history": 4,
+          "irregular_or_gapped_sampling": 1,
+          "poor_propagation": 3,
+          "unresolved_catalogue_revision": 18
+        },
+        "recoverable_alert_counts": {
+          "catalogue_correction_resolved": 5
+        }
+      },
+      "development_detection": {
+        "scope": "LEO development event-evidence cases at the Physics evaluation development diagnostic support/calibration point",
+        "case_count": 4,
+        "truth_intervals": 36,
+        "tp": 0,
+        "fn": 36,
+        "recall": 0.0,
+        "predicted_events": 0,
+        "pu_sequential_wealth_mean_percentile": null,
+        "pu_scorable_truth_intervals": 0,
+        "row_abstention_fraction": 1.0,
+        "hard_case_abstention_fraction": 1.0,
+        "reason_counts": {
+          "unresolved_catalogue_revision": 274
+        },
+        "recoverable_alert_counts": {},
+        "per_case": [
+          {
+            "case_id": "doris-ids-envisat-27386-2004-01-19__stress__unresolved_duplicate",
+            "base_case_id": "doris-ids-envisat-27386-2004-01-19",
+            "truth_intervals": 4,
+            "tp": 0,
+            "fn": 4,
+            "rows_input": 44,
+            "rows_scored": 0,
+            "rows_abstained": 44,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "unresolved_catalogue_revision"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "unresolved_catalogue_revision": 44
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-jason-1-26997-2011-09-26__stress__unresolved_duplicate",
+            "base_case_id": "doris-ids-jason-1-26997-2011-09-26",
+            "truth_intervals": 15,
+            "tp": 0,
+            "fn": 15,
+            "rows_input": 31,
+            "rows_scored": 0,
+            "rows_abstained": 31,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "unresolved_catalogue_revision"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "unresolved_catalogue_revision": 31
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-2-20436-2009-07-14__stress__unresolved_duplicate",
+            "base_case_id": "doris-ids-spot-2-20436-2009-07-14",
+            "truth_intervals": 10,
+            "tp": 0,
+            "fn": 10,
+            "rows_input": 105,
+            "rows_scored": 0,
+            "rows_abstained": 105,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "unresolved_catalogue_revision"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "unresolved_catalogue_revision": 105
+            },
+            "predicted_events": 0
+          },
+          {
+            "case_id": "doris-ids-spot-5-27421-2015-11-29__stress__unresolved_duplicate",
+            "base_case_id": "doris-ids-spot-5-27421-2015-11-29",
+            "truth_intervals": 7,
+            "tp": 0,
+            "fn": 7,
+            "rows_input": 90,
+            "rows_scored": 0,
+            "rows_abstained": 90,
+            "row_abstention_fraction": 1.0,
+            "physics_abstentions": 0,
+            "physically_feasible_rows": 0,
+            "hard_case_abstention": true,
+            "case_reasons": [
+              "unresolved_catalogue_revision"
+            ],
+            "case_alerts": [],
+            "row_reason_counts": {
+              "unresolved_catalogue_revision": 90
+            },
+            "predicted_events": 0
+          }
+        ],
+        "pu_delta_vs_clean": null
+      },
+      "final_calibration": {
+        "scope": "held-out LEO calibration verified-quiet Aqua case at the frozen Physics evaluation final support point",
+        "case_id": "aqua-free-drift-2024-02__stress__unresolved_duplicate",
+        "base_case_id": "aqua-free-drift-2024-02",
+        "rows_input": 72,
+        "rows_scored": 0,
+        "rows_abstained": 72,
+        "row_abstention_fraction": 1.0,
+        "physics_abstentions": 0,
+        "physically_feasible_rows": 0,
+        "hard_case_abstention": true,
+        "case_reasons": [
+          "unresolved_catalogue_revision"
+        ],
+        "case_alerts": [],
+        "row_reason_counts": {
+          "unresolved_catalogue_revision": 72
+        },
+        "predicted_events": 0,
+        "coverage_fraction": 0.0,
+        "covered_verified_quiet_object_months": 0.0,
+        "frozen_false_events": 0,
+        "frozen_false_events_per_object_month": null,
+        "empirical_q0_under_stress": null,
+        "recalibrated_wealth_threshold": null,
+        "risk_budget_exceeded": false,
+        "coverage_delta_vs_clean": -0.5138888888888888,
+        "q0_delta_vs_clean": null,
+        "false_event_rate_delta_vs_clean": null
+      }
+    }
+  },
+  "security_gate_failures": [],
+  "observed_vulnerabilities": [
+    "legitimate corrected catalogue records reduce held-out support coverage; coverage 0.513889 -> 0.000000",
+    "adversarial maneuver suppression measurably degrades development event ranking; PU delta -0.016748"
+  ],
+  "security_findings": [
+    "legitimate corrected catalogue records reduce held-out support coverage; coverage 0.513889 -> 0.000000",
+    "adversarial maneuver suppression measurably degrades development event ranking; PU delta -0.016748"
+  ],
+  "claim_boundary": "development/calibration deterministic integrity stress only; no confirmatory access, formal adversarial-robustness claim, or operational cyber-security guarantee"
+}

@@ -1,0 +1,110 @@
+name: Verify confirmatory record
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify-confirmatory-freeze:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: Confirmatory evaluation syntax and authorization regressions
+        run: |
+          python3 -m py_compile \
+            research/confirmatory_v1/run_confirmatory.py \
+            tools/finalize_confirmatory.py \
+            tools/confirmatory_post_result_audit.py \
+            tests/confirmatory_v1_preflight_test.py \
+            tests/confirmatory_v1_freeze_test.py \
+            tests/integration_disposition_test.py
+          node --check tools/export_confirmatory_features.js
+          PYTHONPATH=. python3 tests/confirmatory_v1_preflight_test.py
+
+      - name: Publication edition and confirmatory result freeze
+        run: |
+          python3 tests/publication_edition_test.py
+          python3 tests/confirmatory_v1_freeze_test.py
+          (cd benchmark-results && sha256sum -c confirmatory-v1-final.json.sha256)
+          python3 -m json.tool benchmark-results/confirmatory-v1-final.json >/dev/null
+          python3 -m json.tool research/confirmatory_v1/RUN-LOCK-v1.0.json >/dev/null
+          python3 -m json.tool research/confirmatory_v1/DATA-PROVENANCE-v1.0.json >/dev/null
+          python3 -m json.tool research/confirmatory_v1/AUDIT-VERIFICATION-v1.0.json >/dev/null
+
+      - name: Verify the negative integration decision
+        run: python3 tests/integration_disposition_test.py
+
+      - name: Install independent SGP4 validator
+        run: python3 -m pip install --disable-pip-version-check --no-cache-dir sgp4==2.27
+
+      - name: Verify maintained browser source contracts
+        run: |
+          python3 tools/update_browser_assets.py --check
+          node tests/browser_module_equivalence_test.js
+          node tests/browser_module_loader_test.js
+
+      - name: Verify maintained catalogue identifiers
+        run: node tests/catalogue_identifier_test.js
+
+      - name: Verify maintained TLE precision and replay
+        run: |
+          node --check tests/tle_precision_roundtrip_test.js
+          node tests/tle_precision_roundtrip_test.js
+          python3 tests/tle_precision_reference_check.py
+
+      - name: Verify maintained materialiser admission and selection
+        run: python3 tests/materializer_validation_test.py
+
+      - name: Maximum-cardinality event matching regressions
+        run: |
+          python3 tests/event_matching_test.py
+          node tests/event_matching_version_test.js
+
+      - name: Benchmark truth timestamp regressions
+        run: python3 tests/benchmark_timestamp_test.py
+
+      - name: Verify historical evaluator isolation and maintained versioning
+        run: |
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 -B -S tests/historical_evaluator_test.py
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 -B -S tests/evaluation_version_test.py
+          PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 -B -S tests/elapsed_evaluation_version_test.py
+
+      - name: Independently audit stored results
+        run: PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=. python3 tools/confirmatory_post_result_audit.py
+
+      - name: Permanent run-lock and audit assertions
+        run: |
+          grep -q '"one_shot_completed": true' research/confirmatory_v1/RUN-LOCK-v1.0.json
+          grep -q '"rerun_forbidden": true' research/confirmatory_v1/RUN-LOCK-v1.0.json
+          grep -q '"gate_passed": false' research/confirmatory_v1/RUN-LOCK-v1.0.json
+          grep -q 'Confirmatory evaluation scientific gate: FAIL' review/CONFIRMATORY-AUDIT.md
+          grep -q 'One-shot procedural qualification' review/CONFIRMATORY-AUDIT.md
+          grep -q 'Complete event-level metrics' research/confirmatory_v1/RESULTS-v1.0.md
+          grep -q 'Execution integrity note' research/confirmatory_v1/RESULTS-v1.0.md
+          grep -q 'NO INTEGRATION' research/confirmatory_v1/INTEGRATION-DISPOSITION.md
+
+      - name: Confirm one-shot execution surface is removed
+        run: |
+          test ! -e .github/workflows/confirmatory-confirmatory-once.yml
+          test ! -e .github/workflows/confirmatory-confirmatory-recovery.yml
+          test ! -e .github/workflows/confirmatory-confirmatory-recovery-v2.yml
+          test ! -e .github/workflows/confirmatory-authorized-loader-fix.yml
+          test ! -e .github/workflows/confirmatory-loader-fix-run.yml
+          test ! -e .github/workflows/confirmatory-post-audit-run.yml
+          test ! -e .github/workflows/confirmatory-post-audit-run-v2.yml
+          test ! -e .github/workflows/integration-negative-disposition.yml
+          test ! -e .github/workflows/final-repo-audit-fixes.yml
+          test ! -e .github/workflows/final-readme-status.yml
+          test ! -e tools/confirmatory_fix_authorized_loader.py

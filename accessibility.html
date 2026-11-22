@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SatSift Accessibility Statement | Satellite Screening</title>
+<meta name="description" content="SatSift accessibility features, keyboard support, internal WCAG review status and known limitations for orbital screening.">
+<meta name="robots" content="index, follow"><link rel="canonical" href="https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/accessibility">
+<style>
+    :root { --ink:#0f172a; --muted:#4b5563; --soft:#f8fafc; --line:#e5e7eb; --blue:#1d4ed8; --green:#166534; --amber:#92400e; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:24px auto; max-width:1120px; padding:0 16px; color:var(--ink); background:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; font-size:15px; line-height:1.55; }
+    h1 { margin:0 0 10px; font-size:clamp(30px,4vw,44px); line-height:1.08; letter-spacing:-.03em; }
+    h2 { margin:0 0 10px; font-size:22px; } h3 { margin:0 0 7px; font-size:16px; }
+    p { margin:0 0 14px; } a { color:var(--blue); text-decoration:none; } a:hover { text-decoration:underline; }
+    .hero,.card { border:1px solid var(--line); border-radius:16px; background:#fff; padding:22px; }
+    .hero { background:radial-gradient(circle at 100% 0%,rgba(37,99,235,.08),transparent 32%),linear-gradient(180deg,#fff,#f8fafc); }
+    .hero p { max-width:850px; color:var(--muted); font-size:16px; }
+    .nav { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    .button { display:inline-block; border:1px solid #cbd5e1; border-radius:9px; padding:8px 12px; color:var(--ink); background:#fff; font-weight:650; }
+    .stack { display:grid; gap:16px; margin-top:16px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .notice { border-left:4px solid #64748b; padding:10px 12px; background:#f8fafc; color:var(--muted); }
+    .ok { border-color:#bbf7d0; background:#ecfdf3; color:#166534; }
+    .warn { border-color:#fed7aa; background:#fffbeb; color:#92400e; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th,td { padding:8px 7px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    th { background:#f8fafc; color:#475569; }
+    .table-wrap { overflow-x:auto; }
+    code { background:#f8fafc; border:1px solid #e2e8f0; border-radius:5px; padding:1px 5px; }
+    .small { font-size:13px; color:var(--muted); }
+    .footer { margin-top:18px; padding-top:14px; border-top:1px solid var(--line); color:#6b7280; font-size:13px; }
+    :focus-visible { outline:3px solid rgba(29,78,216,.3); outline-offset:2px; }
+    @media(max-width:760px){ .grid{grid-template-columns:1fr;} body{margin:14px auto;} }
+    @media(prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;} }
+</style></head><body>
+<header class="hero"><h1>SatSift accessibility statement</h1><p>The workbench is designed for keyboard operation, readable responsive layouts and non-visual access to core analysis data. This statement documents the internal review completed for Workbench 3.4.</p>
+<nav class="nav" aria-label="Related pages"><a class="button" href="/satellite-maneuver-detector">Open workbench</a><a class="button" href="/satellite-maneuver-detector/docs">Documentation</a><a class="button" href="/satellite-maneuver-detector/benchmark">Benchmark status</a></nav></header>
+<main class="stack">
+<section class="card ok"><h2>Implemented accessibility features</h2><ul><li>Keyboard-operable native controls and visible focus indicators.</li><li>Skip link to the main analysis result.</li><li>Programmatic labels, headings, landmarks and live status announcements.</li><li>Tabular alternative for chart data and textual summaries for candidate events.</li><li>Responsive layouts without intentional horizontal page scrolling.</li><li>Reduced-motion handling for users who request it.</li><li>3D orbit context is supplemental; no decision depends on the graphic alone.</li></ul></section>
+<section class="card"><h2>Internal review status</h2><p>An automated semantic and responsive smoke test and a manual code review were completed against a WCAG 2.2 AA-oriented checklist. The package contains the test matrix and results.</p><p class="notice">This is an internal engineering review. It is not a formal Section 508 certification, third-party Accessibility Conformance Report or completed VPAT.</p></section>
+<section class="card"><h2>Known limitations</h2><ul><li>Interactive Plotly graphics may require additional screen-reader testing across specific browser and assistive-technology combinations.</li><li>The date-picker experience varies by browser and operating system.</li><li>Colour contrast and zoom were checked programmatically and manually for the supplied interface, but formal procurement review may require an external assessor.</li><li>Downloaded PNG charts are images; the JSON, CSV and chart-data table provide the machine-readable alternatives.</li></ul></section>
+<section class="card"><h2>Reporting a problem</h2><p>Report the affected page, browser, assistive technology and the action you were trying to complete through the contact route on <a href="https://www.sylvesterkaczmarek.com/">Sylvester Kaczmarek's website</a>.</p></section>
+</main><footer class="footer">SatSift · Internal WCAG 2.2 AA-oriented review · August 2026</footer></body></html>

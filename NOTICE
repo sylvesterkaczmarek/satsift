@@ -1,0 +1,13 @@
+SatSift
+Copyright 2026 Sylvester Kaczmarek
+
+SatSift's original source code and documentation are licensed under the
+Apache License, Version 2.0. See LICENSE for the licence text.
+
+Third-party software retains its own copyright and licence conditions.
+See THIRD-PARTY-NOTICES.md and licenses/.
+
+External orbital data, source publications, authored labels and benchmark
+evidence have separate attribution and redistribution terms described in
+benchmark/DATA-NOTICE.md and benchmark/SOURCE-LEDGER-v1.0.md.
+The Apache licence does not replace those terms.

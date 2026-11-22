@@ -1,0 +1,26 @@
+{
+  "schema": "smd-event-benchmark-v1",
+  "name": "Replace with the benchmark name",
+  "matching_tolerance_hours": 24,
+  "notes": "Every case must declare label_status. Use event-evidence when positive events are documented but the surrounding interval is not proven quiet; confirmed-quiet only for independently verified negative coverage; fully-labelled only when both positive and negative coverage are authoritative; unknown for unverified periods.",
+  "cases": [
+    {
+      "case_id": "replace-with-unique-case-id",
+      "object_id": "25544",
+      "description": "Replace with the object and observation-window description.",
+      "orbit_profile": "LEO",
+      "label_status": "event-evidence",
+      "label_confidence": "high",
+      "source": "Public URL, DOI, mission report, operator notice, or other ground-truth citation.",
+      "records": [],
+      "truth_events": [
+        {
+          "start": "2026-01-01T00:00:00Z",
+          "end": "2026-01-01T23:59:59Z",
+          "label": "Documented maneuver",
+          "source": "Specific source for this event, or omit to use the case source."
+        }
+      ]
+    }
+  ]
+}

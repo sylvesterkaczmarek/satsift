@@ -1,0 +1,8 @@
+<?php
+declare(strict_types=1);
+
+return [
+    'identity' => 'YOUR_SPACE_TRACK_EMAIL',
+    'password' => 'YOUR_SPACE_TRACK_PASSWORD',
+    'cache_dir' => __DIR__ . '/.satellite-maneuver-cache',
+];

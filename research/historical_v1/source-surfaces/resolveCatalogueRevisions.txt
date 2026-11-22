@@ -1,0 +1,47 @@
+  function resolveCatalogueRevisions(inputRecords) {
+    const records = inputRecords.slice().sort(compareRecordEpochs);
+    const retained = [];
+    const supersededRecords = [];
+    let exactDuplicateCount = 0;
+    let conflictingDuplicateCount = 0;
+    let unresolvedNearSimultaneousCount = 0;
+    let replacementCount = 0;
+
+    records.forEach(record => {
+      if (!retained.length) { retained.push(record); return; }
+      const previous = retained[retained.length - 1];
+      const deltaUs = recordEpochUs(record) - recordEpochUs(previous);
+      const exactEpoch = deltaUs === 0;
+      const nearOmmPair = deltaUs >= 0 && deltaUs <= CATALOGUE_REVISION_TOLERANCE_US && previous.sourceFormat === 'OMM JSON' && record.sourceFormat === 'OMM JSON';
+      if (!exactEpoch && !nearOmmPair) { retained.push(record); return; }
+
+      const conflict = recordsConflict(previous, record);
+      const preference = catalogueMetadataPreference(previous, record);
+      if (!conflict && exactEpoch) {
+        exactDuplicateCount++;
+        if (preference > 0) retained[retained.length - 1] = record;
+        return;
+      }
+      if (!conflict && !exactEpoch) {
+        if (preference === 0) { retained.push(record); return; }
+        const winner = preference > 0 ? record : previous;
+        const loser = preference > 0 ? previous : record;
+        supersededRecords.push(catalogueRevisionAudit(loser, winner, 'near-simultaneous duplicate catalogue solution'));
+        if (preference > 0) retained[retained.length - 1] = record;
+        return;
+      }
+      if (preference === 0) {
+        if (exactEpoch) conflictingDuplicateCount++;
+        else unresolvedNearSimultaneousCount++;
+        retained.push(record);
+        return;
+      }
+      const winner = preference > 0 ? record : previous;
+      const loser = preference > 0 ? previous : record;
+      supersededRecords.push(catalogueRevisionAudit(loser, winner, 'deterministic catalogue supersession'));
+      replacementCount++;
+      if (preference > 0) retained[retained.length - 1] = record;
+    });
+
+    return { records: retained, exactDuplicateCount, conflictingDuplicateCount, unresolvedNearSimultaneousCount, supersededRecords, replacementCount };
+  }

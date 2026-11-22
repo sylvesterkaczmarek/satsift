@@ -1,0 +1,208 @@
+{
+  "schema": "smd-public-evidence-manifest-v0.2",
+  "name": "Public-evidence satellite maneuver benchmark",
+  "version": "0.2",
+  "matching_tolerance_hours": 24,
+  "data_attribution": "Basic SSA orbital data from Space-Track.org, operated by U.S. Space Command. Public maneuver evidence is cited per case.",
+  "qualification": "Event labels are interval-censored public operator evidence. Verified-quiet controls require an authoritative statement that the spacecraft could not or would not execute commanded orbital maneuvers during the selected interval. Unknown windows are excluded from false-positive denominators.",
+  "split_policy": "All windows for a NORAD object belong to exactly one satellite-level split. The primary test split contains objects never used for calibration.",
+  "cases": [
+    {
+      "case_id": "sentinel1a-collision-avoidance-2014-04-05",
+      "object_id": "39634",
+      "object_name": "SENTINEL-1A",
+      "orbit_profile": "LEO",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2014-04-02",
+      "end_date": "2014-04-10",
+      "description": "Sentinel-1A collision-avoidance maneuver during LEOP. ESA reports a 39-second maneuver executed at 05:14 UTC on 5 April 2014.",
+      "source": "https://blogs.esa.int/eolaunches/2014/04/09/a-night-shift-like-never-before/",
+      "truth_events": [
+        {
+          "start": "2014-04-05T05:14:00Z",
+          "end": "2014-04-05T05:14:39Z",
+          "label": "Sentinel-1A collision avoidance maneuver",
+          "source": "https://blogs.esa.int/eolaunches/2014/04/09/a-night-shift-like-never-before/"
+        }
+      ]
+    },
+    {
+      "case_id": "acrimsat-uncontrolled-2014-04",
+      "object_id": "26033",
+      "object_name": "ACRIMSAT",
+      "orbit_profile": "LEO",
+      "split": "test",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2014-04-01",
+      "end_date": "2014-04-10",
+      "description": "Negative control. NASA reports ACRIMSAT went silent in December 2013; ESA reports it had run out of fuel and could no longer be maneuvered by April 2014.",
+      "source": "https://science.nasa.gov/mission/acrimsat/",
+      "corroborating_source": "https://blogs.esa.int/eolaunches/2014/04/09/a-night-shift-like-never-before/",
+      "truth_events": []
+    },
+    {
+      "case_id": "iss-dragon-reboost-2024-11-08",
+      "object_id": "25544",
+      "object_name": "INTERNATIONAL SPACE STATION",
+      "orbit_profile": "LEO",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2024-11-01",
+      "end_date": "2024-11-15",
+      "description": "NASA and SpaceX Dragon reboost demonstration.",
+      "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/",
+      "truth_events": [
+        {
+          "start": "2024-11-08T17:50:00Z",
+          "end": "2024-11-08T18:02:30Z",
+          "label": "Dragon reboost demonstration",
+          "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/"
+        }
+      ]
+    },
+    {
+      "case_id": "iss-progress-reboost-2023-07-27",
+      "object_id": "25544",
+      "object_name": "INTERNATIONAL SPACE STATION",
+      "orbit_profile": "LEO",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "start_date": "2023-07-20",
+      "end_date": "2023-08-03",
+      "description": "ISS reboost using Progress 83P thrusters. NASA gives the date and duration but not a precise UTC start time.",
+      "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/",
+      "truth_events": [
+        {
+          "start": "2023-07-27T00:00:00Z",
+          "end": "2023-07-27T23:59:59Z",
+          "label": "Progress 83P ISS reboost",
+          "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/"
+        }
+      ]
+    },
+    {
+      "case_id": "himawari9-stationkeeping-2024-07",
+      "object_id": "41836",
+      "object_name": "HIMAWARI-9",
+      "orbit_profile": "GEO",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2024-06-27",
+      "end_date": "2024-07-08",
+      "description": "Published Himawari-9 east-west station-keeping schedule.",
+      "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html",
+      "truth_events": [
+        {
+          "start": "2024-07-04T22:15:00Z",
+          "end": "2024-07-04T22:50:00Z",
+          "label": "East-west station keeping",
+          "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html"
+        }
+      ]
+    },
+    {
+      "case_id": "meteosat7-passivated-2017-05",
+      "object_id": "24932",
+      "object_name": "METEOSAT-7",
+      "orbit_profile": "GEO",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2017-05-01",
+      "end_date": "2017-05-15",
+      "description": "Negative control after Meteosat-7 disposal. EUMETSAT reports the fuel tank was empty and instruments switched off after the final graveyard-orbit burns.",
+      "source": "https://www.eumetsat.int/features/life-and-times-meteosat-7",
+      "truth_events": []
+    },
+    {
+      "case_id": "galileo5-recovery-2014-11",
+      "object_id": "40128",
+      "object_name": "GALILEO 5",
+      "orbit_profile": "MEO",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "start_date": "2014-11-10",
+      "end_date": "2014-12-03",
+      "description": "ESA reports 11 recovery maneuvers over 17 days; individual burn times are not public in the cited source.",
+      "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals",
+      "truth_events": [
+        {
+          "start": "2014-11-12T00:00:00Z",
+          "end": "2014-11-29T23:59:59Z",
+          "label": "Galileo 5 recovery maneuver campaign",
+          "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals"
+        }
+      ]
+    },
+    {
+      "case_id": "giovea-switched-off-2022-01",
+      "object_id": "28922",
+      "object_name": "GIOVE-A",
+      "orbit_profile": "MEO",
+      "split": "test",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2022-01-01",
+      "end_date": "2022-01-15",
+      "description": "Negative control after GIOVE-A decommissioning. ESA reports the onboard computer and transmitter were switched off and the attitude/orbit-control system put in standby.",
+      "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_prototype_GIOVE-A_switched_off_after_16_years_in_orbit",
+      "truth_events": []
+    },
+    {
+      "case_id": "integral-disposal-burn-2015-01",
+      "object_id": "27540",
+      "object_name": "INTEGRAL",
+      "orbit_profile": "HEO",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2015-01-05",
+      "end_date": "2015-01-20",
+      "description": "First INTEGRAL disposal-orbit burn, reported by ESA as occurring on 12-13 January 2015.",
+      "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future",
+      "truth_events": [
+        {
+          "start": "2015-01-12T00:00:00Z",
+          "end": "2015-01-13T23:59:59Z",
+          "label": "INTEGRAL first disposal-orbit burn",
+          "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future"
+        }
+      ]
+    },
+    {
+      "case_id": "cluster2-post-disposal-2024-02",
+      "object_id": "26411",
+      "object_name": "CLUSTER II SALSA",
+      "orbit_profile": "HEO",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "medium-public-evidence",
+      "start_date": "2024-02-01",
+      "end_date": "2024-02-15",
+      "description": "Negative control after the January 2024 disposal maneuver sequence. ESA states the January maneuvers set the trajectory so the orbit would evolve to the targeted September reentry.",
+      "source": "https://www.esa.int/Enabling_Support/Operations/Salsa_s_last_dance_targets_reentry_over_South_Pacific",
+      "truth_events": []
+    },
+    {
+      "case_id": "iss-provisional-quiet-2024-10",
+      "object_id": "25544",
+      "object_name": "INTERNATIONAL SPACE STATION",
+      "orbit_profile": "LEO",
+      "split": "calibration",
+      "label_status": "unknown",
+      "label_confidence": "provisional-control",
+      "start_date": "2024-10-01",
+      "end_date": "2024-10-15",
+      "description": "Unlabelled control retained for robustness analysis only. It is excluded from false-positive denominators.",
+      "source": "Public-evidence review required before any negative label is assigned.",
+      "truth_events": []
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "smd-publication-edition-v1",
+  "date": "2026-11-22",
+  "source_commit": "715e2e60390eb2bc8df36f6fb8d136f20805d2e1",
+  "scope": "Editorial terminology, metadata keys and dependent artifact hash references only. No experiment was rerun. Predictions, numerical values, case ordering, gate criteria and the failed gate are unchanged.",
+  "verification": "Each reissued JSON file was checked against the source tree using an exact transformation allowlist. Original hashes identify the earlier bytes; publication hashes identify this edition.",
+  "artifacts": [
+    {
+      "path": "benchmark-results/physics-v1-development.json",
+      "original_sha256": "276ed8fa51579936134cbfde1d3f012c85899dc0d34644adec376e26d6f883e4",
+      "publication_sha256": "b4422b7a2c01a2940513bc6fcef25963e454732792bac6cb17e2183bfd44898e"
+    },
+    {
+      "path": "benchmark-results/integrity-v1-stress.json",
+      "original_sha256": "ebc38c0fd77e03dad76c36b3db7ed6fb5b38e7cad52c41e78aba532e50d2a288",
+      "publication_sha256": "fa76061583d2b48b34f44f2167b8f2b702ceadd1553dcef73a2499092c00f73b"
+    },
+    {
+      "path": "benchmark-results/comparison-v1-development-calibration.json",
+      "original_sha256": "c0b3e28879aecfd9bbeaa8c5f030b87cbd87eb77544ffe762c13a80f5cde4d45",
+      "publication_sha256": "092df5a126d85fb7b58e5a0f682acdee1da39860359be943f102f26a986ddb43"
+    },
+    {
+      "path": "research/confirmatory_v1/DATA-PROVENANCE-v1.0.json",
+      "original_sha256": "21948fea6d71a14bb959d684d56c9816f35cb252fe19b0143218f180398c68ef",
+      "publication_sha256": "79a703fc51c9eab4af1f65a730c2a685d5dd3bd4a6325927eeaeac9494853466"
+    },
+    {
+      "path": "research/confirmatory_v1/PRECONFIRMATORY-FREEZE.json",
+      "original_sha256": "411617d5a4e60be2a8165d48f26f427c891faffdf9092617382156803fac9e46",
+      "publication_sha256": "58895167fdb53d08005572c294340a0665a9473fe088599f03be482bc1d431ea"
+    },
+    {
+      "path": "benchmark-results/confirmatory-v1-final.json",
+      "original_sha256": "16cdc46a57bb980cfa7e6ce067055934e9ff6a63db90bbf8776ebb0ecaf628d9",
+      "publication_sha256": "f9857bd8f9ae2525b1827ce4fdfd108f7c5468c67142226922542d24b88c923c"
+    },
+    {
+      "path": "research/confirmatory_v1/RUN-LOCK-v1.0.json",
+      "original_sha256": "9120266c8025a61cbda31c8992d0159c3a3d5e5029d554614ee6782ba8d86939",
+      "publication_sha256": "510b6942f033ff1172e2c90ab7721bc139008fbbd3f005bdcc95c80226b595ed"
+    },
+    {
+      "path": "research/confirmatory_v1/AUDIT-VERIFICATION-v1.0.json",
+      "original_sha256": "d32f5384d46b4b3bd598dddab2125c622da0e24d95247e9aeb92587fea39a85c",
+      "publication_sha256": "dcb0550eb1df899f2793dd7a2f03c4cd79f152c611b1ae256dd1a39a519843da"
+    }
+  ]
+}

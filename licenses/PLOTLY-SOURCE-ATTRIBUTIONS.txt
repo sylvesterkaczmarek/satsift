@@ -1,0 +1,745 @@
+Plotly 3.3.1 source attributions
+
+These comments are retained from the pinned upstream source files used by
+the distribution. Full licence terms are identified in PLOTLY-COMPONENTS.json.
+
+@plotly/d3-sankey@0.7.2
+package/build/d3-sankey.js
+
+ https://github.com/d3/d3-sankey Version 0.7.2. Copyright 2019 Mike Bostock.
+
+@plotly/mapbox-gl@1.13.4
+package/dist/mapbox-gl-unminified.js
+
+ Mapbox GL JS is licensed under the 3-Clause BSD License. Full text of license: https://github.com/mapbox/mapbox-gl-js/blob/v1.13.1/LICENSE.txt 
+
+@plotly/regl@2.1.2
+package/dist/regl.unchecked.js
+
+
+ * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
+ * in FIPS 180-2
+ * Version 2.2 Copyright Angel Marin, Paul Johnston 2000 - 2009.
+ * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
+ * Distributed under the BSD License
+ * See http://pajhome.org.uk/crypt/md5 for details.
+ * Also http://anmar.eu.org/projects/jssha2/
+ 
+
+assert@2.1.0
+package/build/assert.js
+
+ Copyright (c) 2009 Thomas Robinson <280north.com>
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+
+ rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+
+ The above copyright notice and this permission notice shall be included in
+
+assert@2.1.0
+package/build/internal/util/comparisons.js
+
+!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ 
+
+base64-arraybuffer@1.0.2
+package/dist/base64-arraybuffer.umd.js
+
+
+ * base64-arraybuffer 1.0.2 <https://github.com/niklasvh/base64-arraybuffer>
+ * Copyright (c) 2022 Niklas von Hertzen <https://hertzen.com>
+ * Released under MIT License
+ 
+
+buffer@6.0.3
+package/index.js
+
+!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ 
+
+d3-array@1.2.4
+package/dist/d3-array.js
+
+ https://d3js.org/d3-array/ v1.2.4 Copyright 2018 Mike Bostock
+
+d3-collection@1.0.7
+package/dist/d3-collection.js
+
+ https://d3js.org/d3-collection/ v1.0.7 Copyright 2018 Mike Bostock
+
+d3-dispatch@1.0.6
+package/dist/d3-dispatch.js
+
+ https://d3js.org/d3-dispatch/ v1.0.6 Copyright 2019 Mike Bostock
+
+d3-force@1.2.1
+package/dist/d3-force.js
+
+ https://d3js.org/d3-force/ v1.2.1 Copyright 2019 Mike Bostock
+
+d3-format@1.4.5
+package/dist/d3-format.js
+
+ https://d3js.org/d3-format/ v1.4.5 Copyright 2020 Mike Bostock
+
+d3-geo@1.12.1
+package/dist/d3-geo.js
+
+ https://d3js.org/d3-geo/ v1.12.1 Copyright 2020 Mike Bostock
+
+d3-geo-projection@2.9.0
+package/dist/d3-geo-projection.js
+
+ https://d3js.org/d3-geo-projection/ v2.9.0 Copyright 2020 Mike Bostock
+
+d3-hierarchy@1.1.9
+package/dist/d3-hierarchy.js
+
+ https://d3js.org/d3-hierarchy/ v1.1.9 Copyright 2019 Mike Bostock
+
+d3-path@1.0.9
+package/dist/d3-path.js
+
+ https://d3js.org/d3-path/ v1.0.9 Copyright 2019 Mike Bostock
+
+d3-quadtree@1.0.7
+package/dist/d3-quadtree.js
+
+ https://d3js.org/d3-quadtree/ v1.0.7 Copyright 2019 Mike Bostock
+
+d3-shape@1.3.7
+package/dist/d3-shape.js
+
+ https://d3js.org/d3-shape/ v1.3.7 Copyright 2019 Mike Bostock
+
+d3-time@1.1.0
+package/dist/d3-time.js
+
+ https://d3js.org/d3-time/ v1.1.0 Copyright 2019 Mike Bostock
+
+d3-time-format@2.2.3
+package/dist/d3-time-format.js
+
+ https://d3js.org/d3-time-format/ v2.2.3 Copyright 2019 Mike Bostock
+
+d3-timer@1.0.10
+package/dist/d3-timer.js
+
+ https://d3js.org/d3-timer/ v1.0.10 Copyright 2019 Mike Bostock
+
+events@3.3.0
+package/events.js
+
+ Copyright Joyent, Inc. and other Node contributors.
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+
+ distribute, sublicense, and/or sell copies of the Software, and to permit
+
+ The above copyright notice and this permission notice shall be included
+
+ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+ieee754@1.2.1
+package/index.js
+
+! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> 
+
+maplibre-gl@4.7.1
+package/dist/maplibre-gl.js
+
+*
+ * MapLibre GL JS
+ * @license 3-Clause BSD. Full text of license: https://github.com/maplibre/maplibre-gl-js/blob/v4.7.1/LICENSE.txt
+ 
+
+native-promise-only@0.8.1
+package/lib/npo.src.js
+
+! Native Promise Only
+    v0.8.1 (c) Kyle Simpson
+    MIT License: http://getify.mit-license.org
+
+
+object-assign@4.1.1
+package/index.js
+
+
+object-assign
+(c) Sindre Sorhus
+@license MIT
+
+
+polybooljs@1.2.2
+package/index.js
+
+
+ * @copyright 2016 Sean Connelly (@voidqk), http://syntheti.cc
+ * @license MIT
+ * @preserve Project Home: https://github.com/voidqk/polybooljs
+ 
+
+polybooljs@1.2.2
+package/lib/build-log.js
+
+ (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+
+ MIT License
+
+polybooljs@1.2.2
+package/lib/epsilon.js
+
+ (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+
+ MIT License
+
+polybooljs@1.2.2
+package/lib/geojson.js
+
+ (c) Copyright 2017, Sean Connelly (@voidqk), http://syntheti.cc
+
+ MIT License
+
+polybooljs@1.2.2
+package/lib/intersecter.js
+
+ (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+
+ MIT License
+
+polybooljs@1.2.2
+package/lib/linked-list.js
+
+ (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+
+ MIT License
+
+polybooljs@1.2.2
+package/lib/segment-chainer.js
+
+ (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+
+ MIT License
+
+polybooljs@1.2.2
+package/lib/segment-selector.js
+
+ (c) Copyright 2016, Sean Connelly (@voidqk), http://syntheti.cc
+
+ MIT License
+
+readable-stream@3.6.0
+package/lib/_stream_duplex.js
+
+ Copyright Joyent, Inc. and other Node contributors.
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+
+ distribute, sublicense, and/or sell copies of the Software, and to permit
+
+ The above copyright notice and this permission notice shall be included
+
+ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+readable-stream@3.6.0
+package/lib/_stream_passthrough.js
+
+ Copyright Joyent, Inc. and other Node contributors.
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+
+ distribute, sublicense, and/or sell copies of the Software, and to permit
+
+ The above copyright notice and this permission notice shall be included
+
+ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+readable-stream@3.6.0
+package/lib/_stream_readable.js
+
+ Copyright Joyent, Inc. and other Node contributors.
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+
+ distribute, sublicense, and/or sell copies of the Software, and to permit
+
+ The above copyright notice and this permission notice shall be included
+
+ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+readable-stream@3.6.0
+package/lib/_stream_transform.js
+
+ Copyright Joyent, Inc. and other Node contributors.
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+
+ distribute, sublicense, and/or sell copies of the Software, and to permit
+
+ The above copyright notice and this permission notice shall be included
+
+ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+readable-stream@3.6.0
+package/lib/_stream_writable.js
+
+ Copyright Joyent, Inc. and other Node contributors.
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+
+ distribute, sublicense, and/or sell copies of the Software, and to permit
+
+ The above copyright notice and this permission notice shall be included
+
+ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+regl@2.1.2
+package/dist/regl.unchecked.js
+
+
+ * A JavaScript implementation of the Secure Hash Algorithm, SHA-256, as defined
+ * in FIPS 180-2
+ * Version 2.2 Copyright Angel Marin, Paul Johnston 2000 - 2009.
+ * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
+ * Distributed under the BSD License
+ * See http://pajhome.org.uk/crypt/md5 for details.
+ * Also http://anmar.eu.org/projects/jssha2/
+ 
+
+safe-buffer@5.2.1
+package/index.js
+
+! safe-buffer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> 
+
+stream-browserify@3.0.0
+package/index.js
+
+ Copyright Joyent, Inc. and other Node contributors.
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+
+ distribute, sublicense, and/or sell copies of the Software, and to permit
+
+ The above copyright notice and this permission notice shall be included
+
+ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+string_decoder@1.3.0
+package/lib/string_decoder.js
+
+ Copyright Joyent, Inc. and other Node contributors.
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+
+ distribute, sublicense, and/or sell copies of the Software, and to permit
+
+ The above copyright notice and this permission notice shall be included
+
+ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+tinycolor2@1.4.2
+package/tinycolor.js
+
+ Brian Grinstead, MIT License
+
+topojson-client@3.1.0
+package/dist/topojson-client.js
+
+ https://github.com/topojson/topojson-client v3.1.0 Copyright 2019 Mike Bostock
+
+util@0.12.5
+package/util.js
+
+ Copyright Joyent, Inc. and other Node contributors.
+
+ Permission is hereby granted, free of charge, to any person obtaining a
+
+ distribute, sublicense, and/or sell copies of the Software, and to permit
+
+ The above copyright notice and this permission notice shall be included
+
+ NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+
+world-calendars@1.0.4
+package/dist/calendars/chinese.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Traditional Chinese calendar for jQuery v2.0.2.
+   Written by Nicolas Riesco (enquiries@nicolasriesco.net) December 2016.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/coptic.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Coptic calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) February 2010.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/discworld.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Discworld calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) January 2016.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/ethiopian.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Ethiopian calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) February 2010.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/hebrew.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Hebrew calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) August 2009.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/islamic.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Islamic calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) August 2009.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/julian.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Julian calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) August 2009.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/mayan.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Mayan calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) August 2009.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/nanakshahi.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Nanakshahi calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) January 2016.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/nepali.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Nepali calendar for jQuery v2.0.2.
+   Written by Artur Neumann (ict.projects{at}nepal.inf.org) April 2013.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/persian.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Persian calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) August 2009.
+   Available under the MIT (http://keith-wood.name/licence.html) license.
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/taiwan.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Taiwanese (Minguo) calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) February 2010.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/thai.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Thai calendar for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) February 2010.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/calendars/ummalqura.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   UmmAlQura calendar for jQuery v2.0.2.
+   Written by Amro Osama March 2013.
+   Modified by Binnooh.com & www.elm.sa - 2014 - Added dates back to 1276 Hijri year.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/main.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Calendars for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) August 2009.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+world-calendars@1.0.4
+package/dist/plus.js
+
+
+ * World Calendars
+ * https://github.com/alexcjohnson/world-calendars
+ *
+ * Batch-converted from kbwood/calendars
+ * Many thanks to Keith Wood and all of the contributors to the original project!
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ 
+
+ http://keith-wood.name/calendars.html
+   Calendars extras for jQuery v2.0.2.
+   Written by Keith Wood (wood.keith{at}optusnet.com.au) August 2009.
+   Available under the MIT (http://keith-wood.name/licence.html) license. 
+   Please attribute the author if you use it. 
+
+StackGL preserved source attributions
+
+!
+ * pad-left <https://github.com/jonschlinkert/pad-left>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT license.
+ 
+
+ Copyright (C) 2011 Google Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+
+ you may not use this file except in compliance with the License.
+
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ distributed under the License is distributed on an "AS IS" BASIS,
+
+ See the License for the specific language governing permissions and
+
+ limitations under the License.
+
+!
+ * repeat-string <https://github.com/jonschlinkert/repeat-string>
+ *
+ * Copyright (c) 2014-2015, Jon Schlinkert.
+ * Licensed under the MIT License.
+ 
+
+! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> 
+
+!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ 
+
+
+ * Ben Postlethwaite
+ * January 2013
+ * License MIT
+ 
+
+!
+ * Determine if an object is a Buffer
+ *
+ * @author   Feross Aboukhadijeh <https://feross.org>
+ * @license  MIT
+ 

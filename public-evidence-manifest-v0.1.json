@@ -1,0 +1,161 @@
+{
+  "schema": "smd-public-evidence-manifest-v0.1",
+  "name": "Public-evidence maneuver benchmark seed",
+  "version": "0.1",
+  "matching_tolerance_hours": 24,
+  "qualification": "This manifest uses public agency/operator notices as positive event evidence, not onboard telemetry or definitive burn truth. The provisional quiet-control windows are explicitly unknown and must not be scored as true negatives until independently verified.",
+  "cases": [
+    {
+      "case_id": "iss-dragon-reboost-2024-11-08",
+      "object_id": "25544",
+      "object_name": "INTERNATIONAL SPACE STATION",
+      "orbit_profile": "LEO",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2024-11-01",
+      "end_date": "2024-11-15",
+      "description": "NASA and SpaceX Dragon reboost demonstration.",
+      "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/",
+      "truth_events": [
+        {
+          "start": "2024-11-08T17:50:00Z",
+          "end": "2024-11-08T18:02:30Z",
+          "label": "Dragon reboost demonstration",
+          "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/"
+        }
+      ]
+    },
+    {
+      "case_id": "iss-progress-reboost-2023-07-27",
+      "object_id": "25544",
+      "object_name": "INTERNATIONAL SPACE STATION",
+      "orbit_profile": "LEO",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "start_date": "2023-07-20",
+      "end_date": "2023-08-03",
+      "description": "ISS reboost using Progress 83P thrusters. NASA gives the date and duration but not a precise UTC start time.",
+      "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/",
+      "truth_events": [
+        {
+          "start": "2023-07-27T00:00:00Z",
+          "end": "2023-07-27T23:59:59Z",
+          "label": "Progress 83P ISS reboost",
+          "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/"
+        }
+      ]
+    },
+    {
+      "case_id": "himawari9-stationkeeping-2024-07",
+      "object_id": "41836",
+      "object_name": "HIMAWARI-9",
+      "orbit_profile": "GEO",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2024-06-27",
+      "end_date": "2024-07-08",
+      "description": "Published Himawari-9 station-keeping schedule.",
+      "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html",
+      "truth_events": [
+        {
+          "start": "2024-07-04T22:15:00Z",
+          "end": "2024-07-04T22:50:00Z",
+          "label": "East-west station keeping",
+          "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html"
+        }
+      ]
+    },
+    {
+      "case_id": "galileo5-recovery-2014-11",
+      "object_id": "40128",
+      "object_name": "GALILEO 5",
+      "orbit_profile": "MEO",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "start_date": "2014-11-10",
+      "end_date": "2014-12-03",
+      "description": "ESA reports 11 recovery manoeuvres over 17 days; the public source does not give each burn time.",
+      "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals",
+      "truth_events": [
+        {
+          "start": "2014-11-12T00:00:00Z",
+          "end": "2014-11-29T23:59:59Z",
+          "label": "Galileo 5 recovery manoeuvre campaign",
+          "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals"
+        }
+      ]
+    },
+    {
+      "case_id": "integral-disposal-burn-2015-01",
+      "object_id": "27540",
+      "object_name": "INTEGRAL",
+      "orbit_profile": "HEO",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "start_date": "2015-01-05",
+      "end_date": "2015-01-20",
+      "description": "First INTEGRAL disposal-orbit burn, reported by ESA as occurring on 12-13 January 2015.",
+      "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future",
+      "truth_events": [
+        {
+          "start": "2015-01-12T00:00:00Z",
+          "end": "2015-01-13T23:59:59Z",
+          "label": "INTEGRAL first disposal-orbit burn",
+          "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future"
+        }
+      ]
+    },
+    {
+      "case_id": "iss-provisional-quiet-2024-10",
+      "object_id": "25544",
+      "object_name": "INTERNATIONAL SPACE STATION",
+      "orbit_profile": "LEO",
+      "label_status": "unknown",
+      "label_confidence": "provisional-quiet-control",
+      "start_date": "2024-10-01",
+      "end_date": "2024-10-15",
+      "description": "Unverified control window. Absence of a listed truth event is not evidence that no maneuver occurred.",
+      "source": "Public-evidence review required before publication of performance claims.",
+      "truth_events": []
+    },
+    {
+      "case_id": "himawari9-provisional-quiet-2024-07",
+      "object_id": "41836",
+      "object_name": "HIMAWARI-9",
+      "orbit_profile": "GEO",
+      "label_status": "unknown",
+      "label_confidence": "provisional-quiet-control",
+      "start_date": "2024-07-08",
+      "end_date": "2024-07-14",
+      "description": "Unverified control window after the published station-keeping window.",
+      "source": "Public-evidence review required before publication of performance claims.",
+      "truth_events": []
+    },
+    {
+      "case_id": "galileo5-provisional-quiet-2015-06",
+      "object_id": "40128",
+      "object_name": "GALILEO 5",
+      "orbit_profile": "MEO",
+      "label_status": "unknown",
+      "label_confidence": "provisional-quiet-control",
+      "start_date": "2015-06-01",
+      "end_date": "2015-06-15",
+      "description": "Unverified control window following recovery operations.",
+      "source": "Public-evidence review required before publication of performance claims.",
+      "truth_events": []
+    },
+    {
+      "case_id": "integral-provisional-quiet-2015-03",
+      "object_id": "27540",
+      "object_name": "INTEGRAL",
+      "orbit_profile": "HEO",
+      "label_status": "unknown",
+      "label_confidence": "provisional-quiet-control",
+      "start_date": "2015-03-01",
+      "end_date": "2015-03-15",
+      "description": "Unverified control window after the January-February disposal-burn campaign.",
+      "source": "Public-evidence review required before publication of performance claims.",
+      "truth_events": []
+    }
+  ]
+}

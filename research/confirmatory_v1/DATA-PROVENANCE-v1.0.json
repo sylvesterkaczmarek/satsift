@@ -1,0 +1,106 @@
+{
+  "schema": "smd-confirmatory-data-provenance-v1",
+  "history_source": "Space-Track GP_History via persistent same-site cache",
+  "materialized_test_set_sha256": "93877ae81f6481c1fe2be29983f9d35f92210b42e2ed41fa36fb23c9a2c632c9",
+  "cases": [
+    {
+      "case_id": "noaa-goes-goes-18-51850-2026-03-08",
+      "object_id": "51850",
+      "start": "2026-03-08",
+      "end": "2026-04-05",
+      "record_count": 101,
+      "records_sha256": "cd8b6a794c3182b338f2b79cfa5bfd2cc1003d562140fa693006b45174539111"
+    },
+    {
+      "case_id": "qzss-ohi-qzss-qzs-6-62876-2025-07-31",
+      "object_id": "62876",
+      "start": "2025-07-31",
+      "end": "2025-08-28",
+      "record_count": 51,
+      "records_sha256": "20cf3658c332e5cd34608e52d19784cbfe539403e87367b1f32ba6eda5104ba4"
+    },
+    {
+      "case_id": "cluster-samba-reentry-adjustment-2026-01",
+      "object_id": "26410",
+      "start": "2026-01-12",
+      "end": "2026-01-27",
+      "record_count": 7,
+      "records_sha256": "99df50fe87c803873f26e491eb8d19f601975cfc223b5a1bdc6d327211ebbad5"
+    },
+    {
+      "case_id": "cluster-rumba-post-final-adjustment-2024-09",
+      "object_id": "26463",
+      "start": "2024-09-10",
+      "end": "2024-09-24",
+      "record_count": 21,
+      "records_sha256": "af3191cb301491c9adeb8b7c5542a6b2eb04e4d9c4dcffe249f9d78a9dbcf71d"
+    },
+    {
+      "case_id": "cluster-tango-reentry-adjustment-2026-01",
+      "object_id": "26464",
+      "start": "2026-01-12",
+      "end": "2026-01-27",
+      "record_count": 6,
+      "records_sha256": "374cbccc4152aecf04949d194c5b3dce7d2c1ef32823cbc6cc1719086812969d"
+    },
+    {
+      "case_id": "calipso-passivated-2024-01",
+      "object_id": "29108",
+      "start": "2024-01-01",
+      "end": "2024-01-15",
+      "record_count": 38,
+      "records_sha256": "c56e83279ba167b241a15dcf354e4bc3914f43c2f5f757f219ea24e9f60ae963"
+    },
+    {
+      "case_id": "doris-ids-hy-2a-37781-2019-01-28",
+      "object_id": "37781",
+      "start": "2019-01-28",
+      "end": "2019-02-25",
+      "record_count": 79,
+      "records_sha256": "d964efaed57976f3c1d172008b0406dc5e9512bf2a36c2163b31862aa5540051"
+    },
+    {
+      "case_id": "doris-ids-jason-3-41240-2016-01-17",
+      "object_id": "41240",
+      "start": "2016-01-17",
+      "end": "2016-02-14",
+      "record_count": 37,
+      "records_sha256": "c7c3aded29cd89c87b260f43f63f75b1ba0b32ad860a2fad44bd4514eee1a026"
+    },
+    {
+      "case_id": "doris-ids-sentinel-3b-43437-2018-04-28",
+      "object_id": "43437",
+      "start": "2018-04-28",
+      "end": "2018-05-26",
+      "record_count": 48,
+      "records_sha256": "5392f41fe9cbfaf7cab0c7198ad570d2ea583296112c3804ea330ac2d3ed01c0"
+    },
+    {
+      "case_id": "doris-ids-sentinel-6a-46984-2020-11-21",
+      "object_id": "46984",
+      "start": "2020-11-21",
+      "end": "2020-12-19",
+      "record_count": 37,
+      "records_sha256": "5099d39b527aae2daea9f70162153611371b3df6b753ed92d776f982b2f71238"
+    },
+    {
+      "case_id": "gps-nanu-gps-svn57-prn29-iir-m-32384-2017-10-10",
+      "object_id": "32384",
+      "start": "2017-10-10",
+      "end": "2017-11-07",
+      "record_count": 52,
+      "records_sha256": "9c0aab25ae94c527446dc10be0d3ae3e149076b46a537c019b53c00ab6190774"
+    },
+    {
+      "case_id": "gps-nanu-gps-svn80-prn1-iii-62339-2025-08-25",
+      "object_id": "62339",
+      "start": "2025-08-25",
+      "end": "2025-09-22",
+      "record_count": 12,
+      "records_sha256": "2246572990443690e1e45b2b095e5629968d80b9e258b9b40604be346d70d3e3"
+    }
+  ],
+  "feature_artifact_sha256": "10f37c1464bb3c7c3070cc2f3dda57d21c8519598c3a3c767d8170058ee0ebb4",
+  "evaluation_output_sha256_before_provenance": "3d8e7293413dbd77fe32a72444d16276e2a28e9e5a1e28e78ebc6abea2d15768",
+  "frozen_code_commit": "2c394d4d9362c65560a2a08827b4e1a96f23ed87"
+}

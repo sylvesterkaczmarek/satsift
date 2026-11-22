@@ -1,0 +1,608 @@
+'use strict';
+
+// SGP4 propagation and detector 0.4, with an injected options reader.
+globalThis.SMDModules = globalThis.SMDModules || Object.create(null);
+if (Object.prototype.hasOwnProperty.call(globalThis.SMDModules, "detection")) {
+  throw new Error('Workbench module already registered: detection');
+}
+globalThis.SMDModules["detection"] = function createDetection(common, orbitalInput, packages, getAnalysisOptions) {
+  const {
+    METHOD_VERSION, WORKBENCH_VERSION, RUN_IDENTITY_VERSION, PROPAGATION_CONTRACT,
+    SATELLITE_JS_VERSION, MIN_EVALUATED_POINTS, DAY_MS, FEATURE_LABELS, PROFILE_LIBRARY, fmtNum,
+    median, empiricalQuantile, stableStringify, fnv1a64, vectorSubtract, vectorDot, vectorCross,
+    vectorNorm, vectorUnit, radians
+  } = common;
+  const {
+    recordEpochUs, compareRecordEpochs, parseInput, recordToOmm, resolveCatalogueRevisions
+  } = orbitalInput;
+  const {
+    buildEvidenceNote, buildCsv
+  } = packages;
+
+  function inferOrbitProfile(records) {
+    const periods = records.map(record => 1440 / record.meanMotion).filter(Number.isFinite);
+    const eccentricities = records.map(record => record.elements.ecc).filter(Number.isFinite);
+    const period = median(periods);
+    const eccentricity = median(eccentricities);
+    if (Number.isFinite(eccentricity) && eccentricity >= 0.25) return 'HEO';
+    if (Number.isFinite(period) && period >= 1200 && period <= 1600) return 'GEO';
+    if (Number.isFinite(period) && period >= 225) return 'MEO';
+    return 'LEO';
+  }
+
+  function eccentricityVector(elements) {
+    const longitude = radians((elements.raanDeg || 0) + (elements.argPerDeg || 0));
+    return { x: elements.ecc * Math.cos(longitude), y: elements.ecc * Math.sin(longitude) };
+  }
+
+  function inclinationVector(elements) {
+    const halfInclination = radians(elements.incDeg || 0) / 2;
+    const raan = radians(elements.raanDeg || 0);
+    const magnitude = Math.sin(halfInclination);
+    return { x: magnitude * Math.cos(raan), y: magnitude * Math.sin(raan) };
+  }
+
+  function planarDistance(first, second) {
+    return Math.hypot(first.x - second.x, first.y - second.y);
+  }
+
+  function classifySeverity(score) {
+    if (!Number.isFinite(score)) return 'n/a';
+    if (score >= 3) return 'Strong';
+    if (score >= 2) return 'Moderate';
+    return 'Weak';
+  }
+
+  function hasSgp4Support() {
+    return Boolean(window.satellite && ['sgp4', 'twoline2satrec', 'json2satrec']
+      .every(method => typeof window.satellite[method] === 'function'));
+  }
+
+  function satrecForRecord(record) {
+    if (!window.satellite || !record) return null;
+    if (record._satrec) return record._satrec;
+    try {
+      if (record.line1 && record.line2) {
+        // satellite.js does not interpret the documented all-blank TLE exponent
+        // fields as zero. Normalise only its input, retaining the source record.
+        let line1 = record.line1;
+        for (const start of [44, 53]) {
+          if (line1.slice(start, start + 8).trim() === '') {
+            line1 = line1.slice(0, start) + ' 00000-0' + line1.slice(start + 8);
+          }
+        }
+        record._satrec = window.satellite.twoline2satrec(line1, record.line2);
+      } else {
+        // satellite.js 6.0.2 initialises OMM models through Date milliseconds.
+        // Supply UTC here; propagateRecordAtEpoch uses this actual model epoch
+        // while retaining epochUs for the precise comparison instant.
+        const omm = recordToOmm(record);
+        omm.EPOCH = record.t.toISOString();
+        record._satrec = window.satellite.json2satrec(omm);
+      }
+      return record._satrec;
+    } catch (error) {
+      record._satrecError = error && error.message ? error.message : String(error);
+      return null;
+    }
+  }
+
+  function propagateRecordAtEpoch(record, targetUs) {
+    if (!Number.isSafeInteger(targetUs)) return null;
+    const satrec = satrecForRecord(record);
+    if (!satrec || !window.satellite || typeof window.satellite.sgp4 !== 'function') return null;
+    const modelEpochUs = record.line1 && record.line2 ? recordEpochUs(record) : record.t.getTime() * 1000;
+    const elapsedUs = targetUs - modelEpochUs;
+    if (!Number.isSafeInteger(elapsedUs)) return null;
+    return window.satellite.sgp4(satrec, elapsedUs / 60000000);
+  }
+
+  function computeSgp4Residual(before, after) {
+    if (!hasSgp4Support()) return null;
+    try {
+      const targetUs = recordEpochUs(after);
+      const reference = propagateRecordAtEpoch(before, targetUs);
+      const observation = propagateRecordAtEpoch(after, targetUs);
+      if (!reference || !observation || !reference.position || !reference.velocity || !observation.position || !observation.velocity) return null;
+
+      const radialUnit = vectorUnit(reference.position);
+      const crossUnit = vectorUnit(vectorCross(reference.position, reference.velocity));
+      if (!radialUnit || !crossUnit) return null;
+      const alongUnit = vectorUnit(vectorCross(crossUnit, radialUnit));
+      if (!alongUnit) return null;
+
+      const positionDifference = vectorSubtract(observation.position, reference.position);
+      const velocityDifference = vectorSubtract(observation.velocity, reference.velocity);
+      return {
+        radialKm: vectorDot(positionDifference, radialUnit),
+        alongKm: vectorDot(positionDifference, alongUnit),
+        crossKm: vectorDot(positionDifference, crossUnit),
+        positionKm: vectorNorm(positionDifference),
+        velocityMps: vectorNorm(velocityDifference) * 1000
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function featureFloor(feature, profileName, options, medianGap) {
+    const profile = PROFILE_LIBRARY[profileName];
+    let floor = profile.floors[feature] || 1e-9;
+    if (feature === 'aRate') {
+      floor = Math.max(floor, options.minAbsDeltaA / Math.max(medianGap, 0.25) * 0.02);
+    }
+    return floor;
+  }
+
+  function groupFlagsIntoEvents(flags, records, medianGap, profileName) {
+    if (!flags.length) return [];
+    const profile = PROFILE_LIBRARY[profileName];
+    const maximumSeparationDays = Math.max(1, medianGap * profile.eventGapFactor);
+    const chronological = flags.slice().sort((first, second) => first.idx - second.idx);
+    const groups = [];
+
+    chronological.forEach(flag => {
+      const current = groups[groups.length - 1];
+      if (!current) {
+        groups.push([flag]);
+        return;
+      }
+      const previous = current[current.length - 1];
+      const separation = (flag.t - previous.t) / DAY_MS;
+      if (flag.idx - previous.idx <= 2 && separation <= maximumSeparationDays) current.push(flag);
+      else groups.push([flag]);
+    });
+
+    return groups.map((group, index) => {
+      const strongest = group.reduce((best, flag) => flag.severityScore > best.severityScore ? flag : best, group[0]);
+      const beforeIndex = Math.max(0, group[0].idx - 1);
+      const afterIndex = group[group.length - 1].idx;
+      const netDeltaA = records[afterIndex].a - records[beforeIndex].a;
+      const featureSet = new Set();
+      group.forEach(flag => flag.breachedFeatures.forEach(feature => featureSet.add(feature)));
+      return {
+        id: 'EVT-' + String(index + 1).padStart(3, '0'),
+        start: group[0].t,
+        end: group[group.length - 1].t,
+        contextBeforeIndex: beforeIndex,
+        contextAfterIndex: afterIndex,
+        pointCount: group.length,
+        strongest,
+        score: strongest.severityScore,
+        tier: classifySeverity(strongest.severityScore),
+        netDeltaA,
+        direction: netDeltaA > 0.001 ? 'Orbit raise' : netDeltaA < -0.001 ? 'Orbit lower' : 'Primarily plane or fit change',
+        features: Array.from(featureSet),
+        flags: group
+      };
+    });
+  }
+
+  function canonicalRecord(record) {
+    return {
+      epochUs: recordEpochUs(record),
+      satId: /^\d+$/.test(record.satId) ? String(Number(record.satId)) : record.satId,
+      meanMotion: record.meanMotion,
+      eccentricity: record.elements.ecc,
+      inclination: record.elements.incDeg,
+      raan: record.elements.raanDeg,
+      argumentOfPerigee: record.elements.argPerDeg,
+      meanAnomaly: record.elements.meanAnomDeg,
+      bstar: record.bstar || 0,
+      meanMotionDot: record.meanMotionDot || 0,
+      meanMotionDdot: record.meanMotionDdot || 0,
+      ephemerisType: record.ephemerisType || 0,
+      propagation: record.line1 && record.line2
+        ? { kind: 'tle', line1: record.line1, line2: record.line2 }
+        : { kind: 'omm-date-ms', modelEpochUs: record.t.getTime() * 1000 }
+    };
+  }
+
+  function makeRunId(records, options, profileName, detectorModeUsed) {
+    const canonical = {
+      identityVersion: RUN_IDENTITY_VERSION,
+      method: METHOD_VERSION,
+      workbench: WORKBENCH_VERSION,
+      propagation: {
+        contract: PROPAGATION_CONTRACT,
+        satelliteJsVersion: SATELLITE_JS_VERSION,
+        available: hasSgp4Support()
+      },
+      records: records.map(canonicalRecord),
+      settings: {
+        window: options.requestedWindow,
+        alpha: options.alpha,
+        minAbsDeltaA: options.minAbsDeltaA,
+        maximumStaleDays: options.maximumStaleDays,
+        maximumGapFactor: options.maximumGapFactor,
+        requestedProfile: options.orbitProfile,
+        requestedMode: options.detectorMode,
+        profileName,
+        detectorModeUsed
+      }
+    };
+    return 'smd-v' + RUN_IDENTITY_VERSION + '-' + fnv1a64(stableStringify(canonical));
+  }
+
+  function analysisError(parsed, kind, message, qualityItems) {
+    return {
+      error: true,
+      errorKind: kind,
+      parsed,
+      inputFormat: parsed.format || 'unknown',
+      n: parsed.records ? parsed.records.length : 0,
+      rejectedCount: parsed.rejectedCount || 0,
+      message,
+      qualityItems: qualityItems || []
+    };
+  }
+
+  function analyzeRaw(raw, sourceLabel, overrideOptions) {
+    const options = getAnalysisOptions(overrideOptions);
+    const parsed = parseInput(raw);
+
+    if (parsed.fatalMessage) {
+      return analysisError(parsed, 'invalid-input', parsed.fatalMessage, [
+        { kind: 'err', label: 'Input parsing', value: 'failed' }
+      ]);
+    }
+
+    if (!parsed.records.length) {
+      return analysisError(parsed, 'missing-records', 'No valid TLE pairs or OMM JSON records were found. Check the input format and validation details.', [
+        { kind: 'err', label: 'Valid snapshots', value: '0' },
+        { kind: parsed.rejectedCount ? 'err' : 'neutral', label: 'Rejected records or pairs', value: String(parsed.rejectedCount || 0) }
+      ]);
+    }
+
+    const hardQualityErrors = [];
+    const qualityWarnings = [];
+
+    if (parsed.rejectedCount > 0) {
+      const sampleReason = parsed.rejectionReasons[0] ? ': ' + parsed.rejectionReasons[0] : '';
+      qualityWarnings.push(parsed.rejectedCount + ' malformed record(s) or pair(s) rejected' + sampleReason);
+    }
+
+    const records = parsed.records.slice().sort(compareRecordEpochs);
+    const satelliteIds = new Set(records.map(record => record.satId).filter(Boolean));
+    const objectNames = new Set(records.map(record => record.name).filter(Boolean));
+    if (satelliteIds.size > 1) hardQualityErrors.push('multiple catalog identifiers detected');
+
+    const revisionResolution = resolveCatalogueRevisions(records);
+    const uniqueRecords = revisionResolution.records;
+    const exactDuplicateCount = revisionResolution.exactDuplicateCount;
+    const conflictingDuplicateCount = revisionResolution.conflictingDuplicateCount;
+    const unresolvedNearSimultaneousCount = revisionResolution.unresolvedNearSimultaneousCount;
+    const supersededRecords = revisionResolution.supersededRecords;
+
+    if (exactDuplicateCount > 0) qualityWarnings.push(exactDuplicateCount + ' exact duplicate epoch(s) removed');
+    if (supersededRecords.length > 0) qualityWarnings.push(supersededRecords.length + ' near-simultaneous catalogue revision(s) resolved deterministically');
+    if (conflictingDuplicateCount > 0) hardQualityErrors.push(conflictingDuplicateCount + ' conflicting duplicate epoch(s) detected without sufficient supersession metadata');
+    if (unresolvedNearSimultaneousCount > 0) hardQualityErrors.push(unresolvedNearSimultaneousCount + ' near-simultaneous catalogue solution(s) could not be resolved safely');
+
+    const n = uniqueRecords.length;
+    if (n < 3) {
+      return analysisError(parsed, 'too-few', 'At least three unique valid snapshots are required to calculate epoch-to-epoch changes.', [
+        { kind: 'err', label: 'Unique valid snapshots', value: String(n) },
+        { kind: satelliteIds.size <= 1 ? 'ok' : 'err', label: 'Catalog ID consistency', value: satelliteIds.size <= 1 ? 'passed' : Array.from(satelliteIds).join(', ') }
+      ]);
+    }
+
+    const profileName = options.orbitProfile === 'auto' ? inferOrbitProfile(uniqueRecords) : options.orbitProfile;
+    const profile = PROFILE_LIBRARY[profileName] || PROFILE_LIBRARY.LEO;
+    const requestedMultivariate = options.detectorMode === 'multivariate';
+    const sgp4Available = hasSgp4Support();
+    let detectorModeUsed = requestedMultivariate && sgp4Available ? 'SGP4 multivariate' : 'Elements only';
+    if (requestedMultivariate && !sgp4Available) qualityWarnings.push('satellite.js did not load; elements-only fallback used');
+
+    const times = uniqueRecords.map(record => record.t);
+    const semiMajorAxes = uniqueRecords.map(record => record.a);
+    const spanDays = (recordEpochUs(uniqueRecords[n - 1]) - recordEpochUs(uniqueRecords[0])) / (DAY_MS * 1000);
+    const deltaA = new Array(n).fill(NaN);
+    const gaps = new Array(n).fill(NaN);
+    const deltaARate = new Array(n).fill(NaN);
+
+    for (let index = 1; index < n; index++) {
+      const gap = (recordEpochUs(uniqueRecords[index]) - recordEpochUs(uniqueRecords[index - 1])) / (DAY_MS * 1000);
+      const change = semiMajorAxes[index] - semiMajorAxes[index - 1];
+      gaps[index] = gap > 0 ? gap : NaN;
+      deltaA[index] = Number.isFinite(change) ? change : NaN;
+      deltaARate[index] = Number.isFinite(change) && Number.isFinite(gaps[index]) ? change / gaps[index] : NaN;
+    }
+
+    const validGaps = gaps.filter(Number.isFinite);
+    const medianDt = validGaps.length ? median(validGaps) : NaN;
+    const maximumDt = validGaps.length ? Math.max(...validGaps) : NaN;
+    const maximumUsableGap = Number.isFinite(medianDt) ? medianDt * options.maximumGapFactor : NaN;
+    const pairEligible = gaps.map((gap, index) => index > 0 && Number.isFinite(gap) && Number.isFinite(maximumUsableGap) && gap <= maximumUsableGap);
+    const excludedGapCount = pairEligible.reduce((count, eligible, index) => count + (index > 0 && !eligible && Number.isFinite(gaps[index]) ? 1 : 0), 0);
+    if (excludedGapCount > 0) qualityWarnings.push(excludedGapCount + ' oversized epoch gap(s) excluded from calibration and screening');
+
+    const now = new Date();
+    const latestEpoch = times[n - 1];
+    const ageDays = (now - latestEpoch) / DAY_MS;
+    if (ageDays > options.maximumStaleDays) qualityWarnings.push('latest element set is older than the selected stale-age limit');
+    if (ageDays < -7) hardQualityErrors.push('latest epoch is more than seven days in the future');
+    else if (ageDays < 0) qualityWarnings.push('latest epoch is in the future; some valid GP element sets use future epochs');
+
+    const featureValues = {};
+    Object.keys(FEATURE_LABELS).forEach(key => { featureValues[key] = new Array(n).fill(NaN); });
+    const sgp4Residuals = new Array(n).fill(null);
+    let sgp4PairCount = 0;
+    let sgp4FailureCount = 0;
+
+    for (let index = 1; index < n; index++) {
+      if (!Number.isFinite(gaps[index])) continue;
+      const before = uniqueRecords[index - 1];
+      const after = uniqueRecords[index];
+      const gap = gaps[index];
+      featureValues.aRate[index] = deltaARate[index];
+      featureValues.meanMotionRate[index] = (after.meanMotion - before.meanMotion) / gap;
+      featureValues.eccentricityVectorRate[index] = planarDistance(eccentricityVector(after.elements), eccentricityVector(before.elements)) / gap;
+      featureValues.inclinationVectorRate[index] = planarDistance(inclinationVector(after.elements), inclinationVector(before.elements)) / gap;
+      featureValues.bstarRate[index] = (Number(after.bstar || 0) - Number(before.bstar || 0)) / gap;
+
+      if (requestedMultivariate && sgp4Available) {
+        const residual = computeSgp4Residual(before, after);
+        if (residual) {
+          sgp4Residuals[index] = residual;
+          sgp4PairCount++;
+          featureValues.radialRate[index] = residual.radialKm / gap;
+          featureValues.alongRate[index] = residual.alongKm / gap;
+          featureValues.crossRate[index] = residual.crossKm / gap;
+        } else {
+          sgp4FailureCount++;
+        }
+      }
+    }
+
+    if (requestedMultivariate && sgp4Available && sgp4PairCount === 0) {
+      detectorModeUsed = 'Elements only';
+      qualityWarnings.push('SGP4 comparison failed for all pairs; elements-only fallback used');
+    } else if (requestedMultivariate && sgp4Available && sgp4FailureCount > 0) {
+      qualityWarnings.push(sgp4FailureCount + ' pair(s) could not be compared with SGP4');
+    }
+
+    const windowSize = options.requestedWindow;
+    const histories = {};
+    const baselines = {};
+    const halfWidths = {};
+    Object.keys(FEATURE_LABELS).forEach(key => {
+      histories[key] = [];
+      baselines[key] = new Array(n).fill(NaN);
+      halfWidths[key] = new Array(n).fill(NaN);
+    });
+
+    const evaluated = new Array(n).fill(false);
+    const multivariateScore = new Array(n).fill(NaN);
+    const breachedFeaturesByIndex = new Array(n).fill(null).map(() => []);
+    const diagnosticFlags = [];
+    let covered = 0;
+    let totalEvaluated = 0;
+
+    for (let index = 1; index < n; index++) {
+      if (!pairEligible[index] || !Number.isFinite(featureValues.aRate[index])) continue;
+
+      const ratios = {};
+      const availableForEvaluation = [];
+      Object.keys(FEATURE_LABELS).forEach(feature => {
+        const value = featureValues[feature][index];
+        const history = histories[feature];
+        if (!Number.isFinite(value) || history.length < windowSize) return;
+        const calibration = history.slice(-windowSize);
+        const centre = median(calibration);
+        const residuals = calibration.map(item => Math.abs(item - centre));
+        const rawHalfWidth = empiricalQuantile(residuals, 1 - options.alpha);
+        const bandHalfWidth = Math.max(rawHalfWidth, featureFloor(feature, profileName, options, medianDt));
+        baselines[feature][index] = centre;
+        halfWidths[feature][index] = bandHalfWidth;
+        ratios[feature] = Math.abs(value - centre) / bandHalfWidth;
+        availableForEvaluation.push(feature);
+      });
+
+      if (Number.isFinite(ratios.aRate)) {
+        evaluated[index] = true;
+        totalEvaluated++;
+        if (ratios.aRate <= 1) covered++;
+        const ratiosArray = Object.values(ratios).filter(Number.isFinite);
+        const score = ratiosArray.length ? Math.max(...ratiosArray) : NaN;
+        multivariateScore[index] = score;
+        const breached = Object.keys(ratios).filter(feature => ratios[feature] > 1);
+        breachedFeaturesByIndex[index] = breached;
+        const supportCount = breached.length;
+        const primaryBreach = ratios.aRate > 1;
+        const stateResidualKm = sgp4Residuals[index] ? sgp4Residuals[index].positionKm : NaN;
+        const deltaAGate = Math.abs(deltaA[index]) >= options.minAbsDeltaA;
+        const stateGate = Number.isFinite(stateResidualKm) && stateResidualKm >= profile.stateGateKm;
+        const spatialFeatures = ['radialRate', 'alongRate', 'crossRate'];
+        const spatialSupportCount = breached.filter(feature => spatialFeatures.includes(feature)).length;
+        const vectorSupport = breached.includes('eccentricityVectorRate') || breached.includes('inclinationVectorRate');
+        const smallElementGate = Math.abs(deltaA[index]) >= options.minAbsDeltaA * 0.10;
+        const corroboratedStateBreach = detectorModeUsed === 'SGP4 multivariate' &&
+          stateGate &&
+          supportCount >= profile.supportRequired &&
+          (smallElementGate || spatialSupportCount >= 2 || vectorSupport);
+        const candidate = Number.isFinite(score) &&
+          score >= profile.scoreThreshold &&
+          ((primaryBreach && deltaAGate) || corroboratedStateBreach);
+
+        if (candidate) {
+          diagnosticFlags.push({
+            idx: index,
+            t: times[index],
+            dA: deltaA[index],
+            dARate: deltaARate[index],
+            dt: gaps[index],
+            baseline: baselines.aRate[index],
+            halfWidth: halfWidths.aRate[index],
+            severityScore: score,
+            severityLabel: classifySeverity(score),
+            breachedFeatures: breached,
+            featureScores: ratios,
+            sgp4Residual: sgp4Residuals[index]
+          });
+        }
+      }
+
+      Object.keys(FEATURE_LABELS).forEach(feature => {
+        const value = featureValues[feature][index];
+        if (Number.isFinite(value)) histories[feature].push(value);
+      });
+    }
+
+    const observedCoverage = totalEvaluated > 0 ? covered / totalEvaluated : NaN;
+    const interpretable = hardQualityErrors.length === 0 && totalEvaluated >= MIN_EVALUATED_POINTS;
+    const flags = interpretable ? diagnosticFlags.slice().sort((first, second) => first.idx - second.idx) : [];
+    const events = interpretable ? groupFlagsIntoEvents(flags, uniqueRecords, medianDt, profileName) : [];
+    const strongestEvent = events.length ? events.reduce((best, event) => event.score > best.score ? event : best, events[0]) : null;
+    const strongestFlag = strongestEvent ? strongestEvent.strongest : null;
+
+    const bandLower = featureValues.aRate.map((value, index) => Number.isFinite(baselines.aRate[index]) && Number.isFinite(halfWidths.aRate[index]) ? baselines.aRate[index] - halfWidths.aRate[index] : null);
+    const bandUpper = featureValues.aRate.map((value, index) => Number.isFinite(baselines.aRate[index]) && Number.isFinite(halfWidths.aRate[index]) ? baselines.aRate[index] + halfWidths.aRate[index] : null);
+
+    let classification = 'No clear candidate event';
+    let resultKind = 'ok';
+    let resultTitle = 'No clear candidate event';
+    let resultBody = 'No eligible observation produced a corroborated multivariate breach under the current settings.';
+
+    if (hardQualityErrors.length) {
+      classification = 'Abstain due to poor data quality';
+      resultKind = 'err';
+      resultTitle = 'Abstain due to poor data quality';
+      resultBody = 'The input failed one or more hard quality checks. Candidate events and ranking scores are suppressed for this run.';
+    } else if (totalEvaluated < MIN_EVALUATED_POINTS) {
+      classification = 'Abstain due to insufficient evaluated history';
+      resultKind = 'err';
+      resultTitle = 'Abstain due to insufficient evaluated history';
+      resultBody = `Only ${totalEvaluated} sequential point(s) could be evaluated. At least ${MIN_EVALUATED_POINTS} are required before candidate events are reported.`;
+    } else if (events.length > 0) {
+      classification = strongestEvent.tier + ' candidate event';
+      resultKind = 'warn';
+      resultTitle = strongestEvent.tier + ' candidate maneuver event';
+      resultBody = 'One or more adjacent anomalous observations were grouped into candidate events. Review the supporting signals and data quality before follow-up.';
+    } else if (qualityWarnings.length) {
+      classification = 'No clear candidate event, with data warnings';
+      resultKind = 'warn';
+      resultTitle = 'No clear candidate event, with data warnings';
+      resultBody = 'No event passed the current criteria, but the listed data-quality warnings affect interpretation.';
+    }
+
+    const qualityMessages = hardQualityErrors.concat(qualityWarnings);
+    const qualityStatus = hardQualityErrors.length ? 'poor data quality' : qualityWarnings.length ? 'usable with warnings' : 'usable';
+
+    const rows = uniqueRecords.map((record, index) => {
+      const flag = flags.find(candidate => candidate.idx === index);
+      const residual = sgp4Residuals[index];
+      return {
+        index,
+        t: record.t,
+        a: record.a,
+        dA: deltaA[index],
+        dt: gaps[index],
+        dARate: deltaARate[index],
+        radialKm: residual ? residual.radialKm : NaN,
+        alongKm: residual ? residual.alongKm : NaN,
+        crossKm: residual ? residual.crossKm : NaN,
+        stateResidualKm: residual ? residual.positionKm : NaN,
+        pairEligible: pairEligible[index],
+        evaluated: evaluated[index],
+        bandLower: bandLower[index],
+        bandUpper: bandUpper[index],
+        multivariateScore: multivariateScore[index],
+        breachedFeatures: breachedFeaturesByIndex[index],
+        flagged: Boolean(flag),
+        severityScore: flag ? flag.severityScore : NaN,
+        featureValues: Object.fromEntries(Object.keys(FEATURE_LABELS).map(feature => [feature, featureValues[feature][index]])),
+        record
+      };
+    });
+
+    const qualityItems = [
+      { kind: n >= windowSize + MIN_EVALUATED_POINTS + 1 ? 'ok' : totalEvaluated >= MIN_EVALUATED_POINTS ? 'warn' : 'err', label: 'Unique valid snapshots', value: String(n) },
+      { kind: satelliteIds.size <= 1 ? 'ok' : 'err', label: 'Catalog ID consistency', value: satelliteIds.size <= 1 ? 'passed' : Array.from(satelliteIds).join(', ') },
+      { kind: parsed.rejectedCount === 0 ? 'ok' : 'warn', label: 'Rejected records or pairs', value: String(parsed.rejectedCount || 0) },
+      { kind: conflictingDuplicateCount === 0 ? exactDuplicateCount === 0 ? 'ok' : 'warn' : 'err', label: 'Duplicate epochs', value: conflictingDuplicateCount ? conflictingDuplicateCount + ' unresolved' : exactDuplicateCount ? exactDuplicateCount + ' removed' : 'none' },
+      { kind: unresolvedNearSimultaneousCount > 0 ? 'err' : supersededRecords.length > 0 ? 'warn' : 'ok', label: 'Catalogue revisions', value: unresolvedNearSimultaneousCount ? unresolvedNearSimultaneousCount + ' unresolved' : supersededRecords.length ? supersededRecords.length + ' superseded' : 'none' },
+      { kind: excludedGapCount === 0 ? 'ok' : 'warn', label: 'Oversized pair gaps', value: excludedGapCount === 0 ? 'none' : excludedGapCount + ' excluded' },
+      { kind: Number.isFinite(ageDays) && ageDays >= -7 && ageDays <= options.maximumStaleDays ? 'ok' : ageDays < -7 ? 'err' : 'warn', label: 'Latest element age', value: Number.isFinite(ageDays) ? fmtNum(ageDays, 2) + ' days' : 'n/a' },
+      { kind: detectorModeUsed === 'SGP4 multivariate' ? 'ok' : requestedMultivariate ? 'warn' : 'neutral', label: 'Detector mode used', value: detectorModeUsed },
+      { kind: !requestedMultivariate || sgp4PairCount > 0 ? 'ok' : 'warn', label: 'SGP4 pair comparisons', value: String(sgp4PairCount) },
+      { kind: totalEvaluated >= MIN_EVALUATED_POINTS ? 'ok' : 'err', label: 'Sequential evaluation points', value: totalEvaluated + ' of ' + MIN_EVALUATED_POINTS + ' required' }
+    ];
+
+    const generatedAt = new Date().toISOString();
+    const runId = makeRunId(uniqueRecords, options, profileName, detectorModeUsed);
+    const analysis = {
+      error: false,
+      sourceLabel,
+      inputFormat: parsed.format,
+      parsed,
+      rejectedCount: parsed.rejectedCount || 0,
+      objectId: satelliteIds.size === 1 ? Array.from(satelliteIds)[0] : '',
+      objectName: objectNames.size === 1 ? Array.from(objectNames)[0] : '',
+      records: uniqueRecords,
+      n,
+      spanDays,
+      medianDt,
+      maximumDt,
+      maximumUsableGap,
+      ageDays,
+      window: windowSize,
+      alpha: options.alpha,
+      minAbsDeltaA: options.minAbsDeltaA,
+      maximumGapFactor: options.maximumGapFactor,
+      profileName,
+      detectorModeRequested: options.detectorMode,
+      detectorModeUsed,
+      sgp4Available,
+      sgp4PairCount,
+      sgp4FailureCount,
+      excludedGapCount,
+      totalEvaluated,
+      observedCoverage,
+      interpretable,
+      qualityStatus,
+      qualityWarnings,
+      hardQualityErrors,
+      qualityMessages,
+      exactDuplicateCount,
+      conflictingDuplicateCount,
+      unresolvedNearSimultaneousCount,
+      supersededRecords,
+      classification,
+      resultKind,
+      resultTitle,
+      resultBody,
+      diagnosticFlagCount: diagnosticFlags.length,
+      flags,
+      events,
+      strongestFlag,
+      strongestEvent,
+      rows,
+      qualityItems,
+      bandLower,
+      bandUpper,
+      deltaA,
+      deltaARate,
+      multivariateScore,
+      featureValues,
+      baselines,
+      halfWidths,
+      pairEligible,
+      evaluated,
+      times,
+      semiMajorAxes,
+      generatedAt,
+      runId
+    };
+
+    analysis.evidenceText = buildEvidenceNote(analysis);
+    analysis.csv = buildCsv(analysis);
+    return analysis;
+  }
+
+  return Object.freeze({
+    inferOrbitProfile, eccentricityVector, inclinationVector, planarDistance, classifySeverity,
+    hasSgp4Support, satrecForRecord, propagateRecordAtEpoch, computeSgp4Residual, featureFloor,
+    groupFlagsIntoEvents, canonicalRecord, makeRunId, analysisError, analyzeRaw
+  });
+};

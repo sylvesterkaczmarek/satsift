@@ -1,0 +1,120 @@
+{
+  "schema": "smd-historical-evaluator-manifest-v1",
+  "evaluator_version": "confirmatory-v1-historical",
+  "source_snapshot_commit": "a810250f1153c6ce43372e56d13b80e4fc589a3e",
+  "scope": "Recompute the stored confirmatory-v1 case-level summaries, bootstrap intervals, orbit-regime blocks, ranking and gate with the historical formulas.",
+  "limitations": [
+    "This archive does not rerun data collection, feature extraction, model training or original inference.",
+    "Predictions, truth intervals, coverage fractions and case spans are inputs from the frozen result artefact.",
+    "Source surfaces preserve verification pins from the publication snapshot, including its two approved browser input-maintenance repairs; they are not complete executable copies from the original preconfirmatory commit.",
+    "Historical matching, exposure and uncertainty semantics remain unchanged. Future corrections require a separate maintained evaluator version and separate results."
+  ],
+  "stdlib_dependencies": [
+    "datetime",
+    "math",
+    "random",
+    "statistics"
+  ],
+  "files": [
+    {
+      "path": "evaluator.py",
+      "sha256": "c097e394fdd90c4b43d538b634e58f15c32654b12aef061cea976efcfde53d2d",
+      "role": "historical-statistical-evaluator",
+      "origins": [
+        {
+          "path": "research/selective_v1/core.py",
+          "definitions": [
+            "parse_time"
+          ]
+        },
+        {
+          "path": "research/comparison_v1/run_comparison.py",
+          "definitions": [
+            "SEED",
+            "MATCH_TOLERANCE_HOURS",
+            "BOOTSTRAP_ITERATIONS",
+            "METHOD_ORDER",
+            "ORBIT_REGIMES",
+            "finite",
+            "match_event_dicts",
+            "summarize_results",
+            "_percentile",
+            "bootstrap",
+            "evaluation_block",
+            "by_regime"
+          ]
+        },
+        {
+          "path": "research/confirmatory_v1/run_confirmatory.py",
+          "definitions": [
+            "MIN_RECALL_EXCLUSIVE",
+            "MAX_FALSE_RATE",
+            "MAX_MEDIAN_ABS_DELAY_HOURS",
+            "MIN_TRUE_POSITIVES",
+            "metric",
+            "ranking",
+            "evaluate_gate"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "source-surfaces/detector-scientific.txt",
+      "sha256": "971f7008aa9054df9899fb3dbd3cbf8710f78f7072644387d36982f2c9b372db",
+      "role": "inert-scientific-verification-surface",
+      "origins": [
+        {
+          "path": "app-3.4.js",
+          "extractor": "tests/integration_disposition_test.py::scientific_surface",
+          "omitted_functions": [
+            "resolveCatalogueRevisions",
+            "satrecForRecord"
+          ],
+          "qualification": "The two approved maintenance functions are pinned separately."
+        }
+      ]
+    },
+    {
+      "path": "source-surfaces/resolveCatalogueRevisions.txt",
+      "sha256": "845ffa8d3ce6b050f31e96e6875348c1768ecd52fed7c4dc7e2541ecac4b64a0",
+      "role": "inert-scientific-verification-surface",
+      "origins": [
+        {
+          "path": "app-3.4.js",
+          "definitions": [
+            "resolveCatalogueRevisions"
+          ],
+          "extractor": "tests/integration_disposition_test.py::js_function",
+          "qualification": "Approved input maintenance present in the publication snapshot."
+        }
+      ]
+    },
+    {
+      "path": "source-surfaces/satrecForRecord.txt",
+      "sha256": "821d24aff24e469940a28f17e8d3e7891de28dc37b791d36b651eccfb187e380",
+      "role": "inert-scientific-verification-surface",
+      "origins": [
+        {
+          "path": "app-3.4.js",
+          "definitions": [
+            "satrecForRecord"
+          ],
+          "extractor": "tests/integration_disposition_test.py::js_function",
+          "qualification": "Approved input maintenance present in the publication snapshot."
+        }
+      ]
+    },
+    {
+      "path": "source-surfaces/confirmatory-runner-scientific.txt",
+      "sha256": "80fe660398204142c1d5f9ee3ae8abd788851a688e3717d06de12c3555331780",
+      "role": "inert-scientific-verification-surface",
+      "origins": [
+        {
+          "path": "research/confirmatory_v1/run_confirmatory.py",
+          "extractor": "tools/confirmatory_post_result_audit.py::runner_scientific_surface",
+          "qualification": "The original extractor normalises descriptive settings_source string literals only."
+        }
+      ]
+    }
+  ]
+}

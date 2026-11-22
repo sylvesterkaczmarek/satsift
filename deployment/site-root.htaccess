@@ -1,0 +1,87 @@
+# BEGIN satellite-maneuver-detector immutable browser assets
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # RewriteRule sees decoded/normalised paths, while THE_REQUEST stays raw.
+  # Refuse aliases in either namespace unless the original path is a literal
+  # public route. Query values remain unrestricted. Keep this guard on rollback.
+  RewriteCond %{THE_REQUEST} !\s/+satellite-maneuver-detector(?:\.html|/+|/(?:docs|benchmark|accessibility)(?:\.html|/*)|/benchmark/(?:manifest|template)/*|/history/?|/(?:app-3\.4|plotly-3\.3\.1\.min|satellite-6\.0\.2\.min)\.js|/app/(?:common|orbital-input|benchmark|packages|detection|interface|bootstrap)-[0-9a-f]{12}\.js)?(?:\?[^\s]*)?\s
+  RewriteRule ^(?:tools/)?satellite-maneuver-detector(?:/|$|\.html$) - [F,L,NC]
+
+  # Content-addressed module assets. Canonical source names are never public.
+  # Reject symlinks before accepting a known asset name; missing files remain 404.
+  RewriteCond %{DOCUMENT_ROOT}/tools/satellite-maneuver-detector/app -l [OR]
+  RewriteCond %{DOCUMENT_ROOT}/tools/satellite-maneuver-detector/app/$1 -l
+  RewriteRule ^satellite-maneuver-detector/app/((?:common|orbital-input|benchmark|packages|detection|interface|bootstrap)-[0-9a-f]{12}\.js)$ - [F,L]
+  RewriteCond %{THE_REQUEST} \s/+satellite-maneuver-detector/app/(?:common|orbital-input|benchmark|packages|detection|interface|bootstrap)-[0-9a-f]{12}\.js(?:[?\s]|$)
+  RewriteCond %{DOCUMENT_ROOT}/tools/satellite-maneuver-detector/app/$1 -f
+  RewriteRule ^satellite-maneuver-detector/app/((?:common|orbital-input|benchmark|packages|detection|interface|bootstrap)-[0-9a-f]{12}\.js)$ tools/satellite-maneuver-detector/app/$1 [L]
+  RewriteRule ^satellite-maneuver-detector/app(?:/|$) - [R=404,L]
+</IfModule>
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector/app/(?:common|orbital-input|benchmark|packages|detection|interface|bootstrap)-[0-9a-f]{12}\.js(?:[?\s]|$)#"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://celestrak.org; font-src 'self' data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector/app/(?:common|orbital-input|benchmark|packages|detection|interface|bootstrap)-[0-9a-f]{12}\.js(?:[?\s]|$)#"
+  Header always set X-Robots-Tag "noindex, nofollow, nosnippet" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector/app/(?:common|orbital-input|benchmark|packages|detection|interface|bootstrap)-[0-9a-f]{12}\.js(?:[?\s]|$)#"
+</IfModule>
+# END satellite-maneuver-detector immutable browser assets
+
+# BEGIN satellite-maneuver-detector managed configuration
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Block private Space-Track files if they are ever placed under the web root.
+  RewriteRule (^|/)\.space-track-config\.php$ - [F,L,NC]
+  RewriteRule (^|/)\.satellite-maneuver-cache(?:/|$) - [F,L,NC]
+
+  # Canonicalize trailing slashes on the public detector routes.
+  RewriteRule ^satellite-maneuver-detector/benchmark/(manifest|template)/+$ https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/benchmark/$1 [R=301,L,NE]
+  RewriteRule ^satellite-maneuver-detector/(docs|benchmark|accessibility)/+$ https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/$1 [R=301,L,NE]
+  RewriteRule ^satellite-maneuver-detector/+$ https://www.sylvesterkaczmarek.com/satellite-maneuver-detector [R=301,L,NE]
+
+  # Explicit legacy detector redirects. These prevent obsolete .html URLs from
+  # remaining indexable even if broader site rewrite rules change later.
+  RewriteRule ^satellite-maneuver-detector\.html$ https://www.sylvesterkaczmarek.com/satellite-maneuver-detector [R=301,L,NE]
+  RewriteRule ^satellite-maneuver-detector/(docs|benchmark|accessibility)\.html$ https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/$1 [R=301,L,NE]
+
+  # Never expose the physical project namespace directly. Internal rewrites do
+  # not change THE_REQUEST, so clean public routes continue to work. Decode the
+  # request before checking it; the host may rewrite the per-directory path first.
+  RewriteCond expr "unescape(%{THE_REQUEST}) =~ m#^\S+\s/+tools/satellite-maneuver-detector(?:/|[?\s])#i"
+  RewriteRule ^ - [F,L]
+
+  # Public detector pages and API. These are deliberately allowlisted.
+  RewriteRule ^satellite-maneuver-detector/history/?$ tools/satellite-maneuver-detector/history.php [L]
+  RewriteRule ^satellite-maneuver-detector/docs/?$ tools/satellite-maneuver-detector/docs.html [L]
+  RewriteRule ^satellite-maneuver-detector/benchmark/manifest/?$ tools/satellite-maneuver-detector/public-evidence-manifest-v0.1.json [L]
+  RewriteRule ^satellite-maneuver-detector/benchmark/template/?$ tools/satellite-maneuver-detector/benchmark-template.json [L]
+  RewriteRule ^satellite-maneuver-detector/benchmark/?$ tools/satellite-maneuver-detector/benchmark.html [L]
+  RewriteRule ^satellite-maneuver-detector/accessibility/?$ tools/satellite-maneuver-detector/accessibility.html [L]
+
+  # Public detector static assets. No general catch-all is used.
+  RewriteRule ^satellite-maneuver-detector/app-3\.4\.js$ tools/satellite-maneuver-detector/app-3.4.js [L]
+  RewriteRule ^satellite-maneuver-detector/plotly-3\.3\.1\.min\.js$ tools/satellite-maneuver-detector/plotly-3.3.1.min.js [L]
+  RewriteRule ^satellite-maneuver-detector/satellite-6\.0\.2\.min\.js$ tools/satellite-maneuver-detector/satellite-6.0.2.min.js [L]
+
+  # Main workbench.
+  RewriteRule ^satellite-maneuver-detector/?$ tools/satellite-maneuver-detector/index.html [L]
+
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Security policy for the detector namespace only. Header expressions use the
+  # original HTTP request line so clean-route internal rewrites cannot erase scope.
+  Header always set X-Content-Type-Options "nosniff" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector(?:[/?\s]|$)#"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector(?:[/?\s]|$)#"
+  Header always set X-Frame-Options "DENY" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector(?:[/?\s]|$)#"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector(?:[/?\s]|$)#"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://celestrak.org; font-src 'self' data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector(?:[/?\s]|$)#"
+  # StackCP terminates TLS before Apache, so %{HTTPS} is not a reliable signal
+  # here. Browsers process HSTS only on secure transport; retain detector-only
+  # request scoping and do not trust a client-supplied forwarding header.
+  Header always set Strict-Transport-Security "max-age=31536000" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector(?:[/?\s]|$)#"
+
+  # Machine endpoints and browser assets are not standalone indexable pages.
+  # The public HTML workbench/docs/benchmark/accessibility routes intentionally
+  # do not receive this header and retain their index,follow meta directives.
+  Header always set X-Robots-Tag "noindex, nofollow, nosnippet" "expr=%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector/(?:history(?:[/?\s]|$)|benchmark/(?:manifest|template)(?:[/?\s]|$)|(?:app-3\.4|plotly-3\.3\.1\.min|satellite-6\.0\.2\.min)\.js(?:[?\s]|$))#"
+</IfModule>
+# END satellite-maneuver-detector managed configuration

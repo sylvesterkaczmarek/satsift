@@ -1,0 +1,351 @@
+name: Verify repository
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          package-manager-cache: false
+
+      - name: JavaScript syntax
+        run: |
+          node --check app-3.4.js
+          node --check app/common.js
+          node --check app/orbital-input.js
+          node --check app/benchmark.js
+          node --check app/packages.js
+          node --check app/detection.js
+          node --check app/interface.js
+          node --check tools/load_browser_app.js
+          node --check tests/browser_module_equivalence_test.js
+          node --check tests/browser_module_loader_test.js
+          node --check tests/catalogue_revision_test.js
+          node --check tests/catalogue_metadata_roundtrip_test.js
+          node --check tests/catalogue_identifier_test.js
+          node --check tests/tle_precision_roundtrip_test.js
+          node --check tests/history_provenance_test.js
+          node --check tests/timezone_epoch_test.js
+          node --check tests/benchmark_label_semantics_test.js
+          node --check tests/event_matching_bridge.js
+          node --check tests/benchmark_timestamp_bridge.js
+          node --check tests/event_matching_version_test.js
+          node --check tests/benchmark_import_contract_test.js
+          node --check tests/benchmark_tolerance_test.js
+          node --check tests/export_astrodynamics_fixtures.js
+          node --check tests/workbench_selftest_harness.js
+          node --check tests/release_quality_test.js
+          node --check tools/export_selective_v1_features.js
+          node --check tools/export_integrity_v1_features.js
+
+      - name: Browser module contracts and equivalence
+        run: |
+          python3 tools/update_browser_assets.py --check
+          node tests/browser_module_equivalence_test.js
+          node tests/browser_module_loader_test.js
+
+      - name: Input and async workflow regressions
+        run: |
+          node tests/input_validation_test.js
+          node tests/async_input_test.js
+          python3 tests/maneuver_research_regression_test.py
+          python3 tests/history_boundary_test.py
+          python3 tests/local_server_test.py
+
+      - name: Catalogue revision and metadata round-trip regressions
+        run: |
+          node tests/catalogue_revision_test.js
+          node tests/catalogue_metadata_roundtrip_test.js
+          node tests/catalogue_identifier_test.js
+
+      - name: TLE precision and reproducibility package regressions
+        run: node tests/tle_precision_roundtrip_test.js
+
+      - name: Cross-timezone OMM epoch tests
+        run: node tests/timezone_epoch_test.js
+
+      - name: Benchmark label semantics tests
+        run: |
+          node tests/benchmark_label_semantics_test.js
+          node tests/benchmark_tolerance_test.js
+          python3 tests/publication_benchmark_browser_contract_test.py
+
+      - name: Maximum-cardinality event matching regressions
+        run: |
+          python3 tests/event_matching_test.py
+          node tests/event_matching_version_test.js
+
+      - name: Benchmark truth timestamp regressions
+        run: python3 tests/benchmark_timestamp_test.py
+
+      - name: Publication benchmark v1 freeze regressions
+        run: python3 tests/benchmark_v1_manifest_test.py
+
+      - name: Materialiser response and record-selection regressions
+        run: python3 tests/materializer_validation_test.py
+
+      - name: Bounded neural runner regressions
+        run: python3 tests/neural_smoke_runner_test.py
+
+      - name: Selective ML v1 regressions
+        run: |
+          python3 -m research.selective_v1.test_selective_v1
+          python3 tests/selective_v1_freeze_test.py
+          grep -q 'CONFIRMATORY PARTITION IS SEALED' tools/export_selective_v1_features.js
+          grep -q 'confirmatory_partition_accessed' research/selective_v1/train_compare.py
+          grep -q 'no formal risk-control guarantee' research/selective_v1/detector.py
+
+      - name: Sequential evidence v1 regressions
+        run: |
+          python3 -m research.sequential_v1.test_sequential_v1
+          python3 tests/sequential_v1_freeze_test.py
+          grep -q 'Pr(X_t = 1 | F_{t-1}) <= q0' research/sequential_v1/METHOD-v1.0.md
+          grep -q 'empirically risk-calibrated sequential screening' research/sequential_v1/README.md
+          grep -q 'CONFIRMATORY PARTITION IS SEALED' research/sequential_v1/run_development.py
+
+      - name: Maneuver physics v1 regressions
+        run: |
+          python3 -m research.physics_v1.independent_check
+          python3 tests/physics_v1_freeze_test.py
+          grep -q 'equivalent RTN impulse' research/physics_v1/METHOD-v1.0.md
+          grep -q 'Physics evaluation integration gate failed' research/physics_v1/RESULTS-v1.0.md
+          grep -q 'CONFIRMATORY PARTITION IS SEALED' research/physics_v1/run_development.py
+
+      - name: Integrity and selective-abstention v1 regressions
+        run: |
+          python3 tests/integrity_v1_test.py
+          python3 tests/history_cache_integrity_test.py
+          python3 tests/integrity_v1_freeze_test.py
+          grep -q 'CONFIRMATORY PARTITION IS SEALED' research/integrity_v1/stressors.py
+          grep -q 'CONFIRMATORY PARTITION IS SEALED' research/integrity_v1/run_stress.py
+          grep -q 'CONFIRMATORY PARTITION IS SEALED' tools/export_integrity_v1_features.js
+          grep -q 'AI-security research track' research/integrity_v1/RESULTS-v1.0.md
+
+      - name: Comparison suite v1 regressions
+        run: |
+          PYTHONPATH=. python3 tests/comparison_v1_test.py
+          python3 tests/comparison_v1_freeze_test.py
+          grep -q 'CONFIRMATORY PARTITION IS SEALED' research/comparison_v1/run_comparison.py
+          grep -q 'Anti-cherry-picking rule' research/comparison_v1/METHOD-v1.0.md
+          grep -q 'Comparison evaluation is complete after post-run code and methodology audit' research/comparison_v1/RESULTS-v1.0.md
+          grep -q 'No candidate result caused a baseline to be removed' review/COMPARISON-AUDIT.md
+
+      - name: Workbench browser-style regression suite
+        run: node tests/workbench_selftest_harness.js
+
+      - name: Release-quality browser regressions
+        run: node tests/release_quality_test.js
+
+      - name: Security-header policy regressions
+        run: python3 tests/security_headers_test.py
+
+      - name: Install Apache routing validator
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends apache2-bin
+
+      - name: Apache route boundary integration
+        run: python3 tests/apache_route_boundary_test.py
+
+      - name: Source release packaging regressions
+        run: python3 tests/source_release_test.py
+
+      - name: Indexing and canonical URL regressions
+        run: python3 tests/indexing_config_test.py
+
+      - name: Deployment tooling regressions
+        run: |
+          python3 tests/deployment_tooling_test.py
+          python3 tests/production_verifier_test.py
+
+      - name: PHP syntax
+        run: |
+          php -l history.php
+          php -l config/.space-track-config.php.example
+
+      - name: History endpoint smoke tests
+        run: python3 tests/history_endpoint_smoke.py
+
+      - name: History concurrency guards
+        run: python3 tests/history_concurrency_guards.py
+
+      - name: History concurrency integration tests
+        run: python3 tests/history_concurrency_integration.py
+
+      - name: History request admission and resource limits
+        run: python3 tests/history_admission_test.py
+
+      - name: History acquisition provenance and correction regressions
+        run: |
+          python3 tests/history_provenance_test.py
+          node tests/history_provenance_test.js
+
+      - name: Elapsed exposure and uncertainty regressions
+        run: |
+          PYTHONPATH=. python3 tests/elapsed_exposure_test.py
+          PYTHONPATH=. python3 tests/elapsed_evaluation_test.py
+          PYTHONPATH=. python3 tests/elapsed_evaluation_version_test.py
+
+      - name: Physics-ML experimental tests
+        run: python3 research/physics_ml/test_detector.py
+
+      - name: Benchmark and research Python syntax
+        run: |
+          python3 -m py_compile \
+            tools/browser_assets.py \
+            tools/source_release.py \
+            tests/source_release_test.py \
+            tests/apache_route_boundary_test.py \
+            tools/update_browser_assets.py \
+            tools/browser_source.py \
+            tools/build_public_evidence_benchmark.py \
+            tools/compile_public_evidence_manifest_v1.py \
+            tools/build_benchmark_v1_recipe.py \
+            tools/materialize_benchmark_v1_spacetrack.py \
+            tools/deploy_production.py \
+            tools/verify_production.py \
+            tests/benchmark_v1_manifest_test.py \
+            tests/materializer_validation_test.py \
+            tests/event_matching_test.py \
+            tests/benchmark_timestamp_test.py \
+            research/event_matching.py \
+            research/neural_execution.py \
+            tools/run_neural_smoke.py \
+            tests/neural_execution_test.py \
+            tests/neural_smoke_runner_test.py \
+            research/elapsed_exposure.py \
+            research/elapsed_evaluator.py \
+            tools/evaluate_elapsed_benchmark.py \
+            tests/elapsed_exposure_test.py \
+            tests/elapsed_evaluation_test.py \
+            tests/elapsed_evaluation_version_test.py \
+            tests/publication_benchmark_browser_contract_test.py \
+            tests/selective_v1_freeze_test.py \
+            tests/sequential_v1_freeze_test.py \
+            tests/physics_v1_freeze_test.py \
+            tests/integrity_v1_test.py \
+            tests/integrity_v1_freeze_test.py \
+            tests/history_cache_integrity_test.py \
+            tests/history_admission_test.py \
+            tests/history_provenance_test.py \
+            tests/comparison_v1_test.py \
+            tests/comparison_v1_freeze_test.py \
+            tests/deployment_tooling_test.py \
+            tests/production_verifier_test.py \
+            tests/tle_precision_reference_check.py \
+            research/physics_ml/detector.py \
+            research/physics_ml/evaluate.py \
+            research/selective_v1/__init__.py \
+            research/selective_v1/core.py \
+            research/selective_v1/models.py \
+            research/selective_v1/detector.py \
+            research/selective_v1/train_compare.py \
+            research/selective_v1/test_selective_v1.py \
+            research/sequential_v1/__init__.py \
+            research/sequential_v1/formal.py \
+            research/sequential_v1/operational.py \
+            research/sequential_v1/run_development.py \
+            research/sequential_v1/simulate_null.py \
+            research/sequential_v1/test_sequential_v1.py \
+            research/physics_v1/__init__.py \
+            research/physics_v1/core.py \
+            research/physics_v1/inverter.py \
+            research/physics_v1/screen.py \
+            research/physics_v1/independent_check.py \
+            research/physics_v1/run_development.py \
+            research/integrity_v1/__init__.py \
+            research/integrity_v1/gate.py \
+            research/integrity_v1/stressors.py \
+            research/integrity_v1/run_stress.py \
+            research/comparison_v1/__init__.py \
+            research/comparison_v1/run_comparison.py
+
+      - name: Install independent SGP4 validator
+        run: python3 -m pip install --disable-pip-version-check --no-cache-dir sgp4==2.27
+
+      - name: Independent astrodynamics fixture validation
+        run: python3 tests/astrodynamics_fixture_check.py
+
+      - name: Independent precise TLE propagation validation
+        run: python3 tests/tle_precision_reference_check.py
+
+      - name: JSON validation
+        run: |
+          python3 -m json.tool benchmark-template.json >/dev/null
+          python3 -m json.tool public-evidence-manifest-v0.1.json >/dev/null
+          python3 -m json.tool public-evidence-manifest-v0.2.json >/dev/null
+          python3 -m json.tool public-evidence-manifest-v1.0.json >/dev/null
+          python3 -m json.tool benchmark/benchmark-v1-curation.json >/dev/null
+          python3 -m json.tool benchmark-data/public-evidence-benchmark-v1.0.recipe.json >/dev/null
+          python3 -m json.tool benchmark-results/selective-v1-model-selection.json >/dev/null
+          python3 -m json.tool benchmark-results/sequential-v1-development.json >/dev/null
+          python3 -m json.tool benchmark-results/sequential-v1-null-simulations.json >/dev/null
+          python3 -m json.tool benchmark-results/physics-v1-development.json >/dev/null
+          python3 -m json.tool benchmark-results/integrity-v1-stress.json >/dev/null
+          python3 -m json.tool benchmark-results/comparison-v1-development-calibration.json >/dev/null
+          python3 -m json.tool vendor-integrity.json >/dev/null
+          python3 -m json.tool licenses/THIRD-PARTY-SOURCES.json >/dev/null
+
+      - name: Repository integrity and security checks
+        run: python3 tests/repo_checks.py
+
+      - name: Vendor asset fingerprints
+        run: sha256sum plotly-3.3.1.min.js satellite-6.0.2.min.js
+
+  neural-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      OMP_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - name: Set up neural test interpreter
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12.11'
+
+      - name: Install pinned CPU dependencies
+        run: |
+          python3 -m pip install --disable-pip-version-check --no-cache-dir numpy==2.3.2
+          python3 -m pip install --disable-pip-version-check --no-cache-dir torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+          python3 -m pip check
+
+      - name: Execute bounded synthetic neural suite
+        run: python3 tools/run_neural_smoke.py > "$RUNNER_TEMP/neural-smoke.json"
+
+      - name: Retain successful execution provenance
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: neural-cpu-verification
+          path: ${{ runner.temp }}/neural-smoke.json
+          if-no-files-found: error
+          retention-days: 14
+
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser

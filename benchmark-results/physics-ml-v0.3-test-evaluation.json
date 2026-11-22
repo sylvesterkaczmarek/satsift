@@ -1,0 +1,55 @@
+{
+  "schema": "smd-event-evaluation-v1",
+  "split": "test",
+  "matching_tolerance_hours": 24.0,
+  "summary": {
+    "cases": 6,
+    "abstained_cases": 2,
+    "truth_events": 5,
+    "predicted_events": 6,
+    "true_positives": 1,
+    "false_positives_verified_quiet": 4,
+    "false_negatives": 4,
+    "unscored_predictions": 1,
+    "precision_scorable": 0.2,
+    "recall": 0.2,
+    "f1_scorable": 0.20000000000000004,
+    "verified_quiet_object_months": 0.6274619544973001,
+    "false_events_per_verified_quiet_object_month": 6.374888503327115,
+    "median_detection_delay_hours": 96.09516805556085,
+    "abstention_rate": 0.3333333333333333
+  },
+  "confidence_intervals_satellite_cluster_bootstrap": {
+    "precision_scorable": {
+      "low_95": 0.0,
+      "high_95": 1.0,
+      "valid_bootstrap_draws": 1972
+    },
+    "recall": {
+      "low_95": 0.0,
+      "high_95": 0.75,
+      "valid_bootstrap_draws": 1999
+    },
+    "f1_scorable": {
+      "low_95": 0.15384615384615383,
+      "high_95": 0.6666666666666665,
+      "valid_bootstrap_draws": 1312
+    },
+    "false_events_per_verified_quiet_object_month": {
+      "low_95": 5.7362109103445755,
+      "high_95": 6.620604222586199,
+      "valid_bootstrap_draws": 1827
+    },
+    "median_detection_delay_hours": {
+      "low_95": 96.09516805556083,
+      "high_95": 96.09516805556085,
+      "valid_bootstrap_draws": 1312
+    },
+    "abstention_rate": {
+      "low_95": 0.0,
+      "high_95": 0.6666666666666666,
+      "valid_bootstrap_draws": 2000
+    }
+  },
+  "qualification": "False positives are counted only in verified-quiet intervals. Predictions outside documented event intervals in event-evidence cases are unscored rather than assumed false."
+}

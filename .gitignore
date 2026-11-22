@@ -1,0 +1,27 @@
+.space-track-config.php
+.satellite-maneuver-cache/
+.env
+.env.*
+!.env.example
+*.cache
+*.log
+*.tmp
+*.bak
+*.swp
+__pycache__/
+*.py[cod]
+.DS_Store
+.satellite-vendor-install.lock
+satellite-*.min.js.sha256
+satellite-maneuver-public-evidence-benchmark.local.json
+node_modules/
+test-results/
+playwright-report/
+
+# Local environments and reconstructed source data
+.venv/
+.venvs/
+benchmark-data/public-evidence-benchmark-v1.0.json
+
+# Per-release provenance is distributed with the source archive.
+/SOURCE-RELEASE.json

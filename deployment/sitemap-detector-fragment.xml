@@ -1,0 +1,13 @@
+<!-- Merge these four <url> entries into the site-root sitemap.xml. -->
+<url>
+  <loc>https://www.sylvesterkaczmarek.com/satellite-maneuver-detector</loc>
+</url>
+<url>
+  <loc>https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/docs</loc>
+</url>
+<url>
+  <loc>https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/benchmark</loc>
+</url>
+<url>
+  <loc>https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/accessibility</loc>
+</url>

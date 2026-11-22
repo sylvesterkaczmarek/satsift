@@ -1,0 +1,36 @@
+{
+  "name": "satsift",
+  "version": "3.4.9",
+  "private": true,
+  "description": "SatSift screens satellite orbital-element histories for candidate maneuvers and anomalies using SGP4 evidence.",
+  "license": "Apache-2.0",
+  "author": "Sylvester Kaczmarek",
+  "homepage": "https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sylvesterkaczmarek/satsift.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sylvesterkaczmarek/satsift/issues"
+  },
+  "keywords": [
+    "satsift",
+    "satellite",
+    "satellite-maneuvers",
+    "orbital-mechanics",
+    "space-situational-awareness",
+    "sgp4",
+    "tle",
+    "anomaly-detection",
+    "reproducible-research"
+  ],
+  "scripts": {
+    "start": "python3 tools/serve_workbench.py",
+    "test:browser": "playwright test"
+  },
+  "engines": { "node": ">=22" },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.1"
+  }
+}

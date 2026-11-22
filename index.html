@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>SatSift | Satellite Maneuver Screening Workbench</title>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="SatSift screens satellite orbital-element histories for candidate maneuvers and anomalies with SGP4 evidence, data-quality checks and reproducible exports." name="description"/>
+<meta content="index, follow" name="robots"/>
+<link href="https://www.sylvesterkaczmarek.com/satellite-maneuver-detector" rel="canonical"/>
+<meta content="SatSift | Satellite Maneuver Screening Workbench" property="og:title"/>
+<meta content="Screen candidate satellite maneuvers and orbital anomalies with SatSift. Inspect SGP4 evidence, data quality and reproducible exports." property="og:description"/>
+<meta content="website" property="og:type"/>
+<meta content="https://www.sylvesterkaczmarek.com/satellite-maneuver-detector" property="og:url"/>
+<meta content="Sylvester Kaczmarek" property="og:site_name"/>
+<script defer src="/satellite-maneuver-detector/satellite-6.0.2.min.js?v=14488fc91092"></script>
+<style>
+    :root {
+      --gap: 16px;
+      --ink: #0f172a;
+      --muted: #4b5563;
+      --soft: #f8fafc;
+      --line: #e5e7eb;
+      --blue: #1d4ed8;
+      --green-bg: #ecfdf3;
+      --green-line: #bbf7d0;
+      --green-text: #166534;
+      --amber-bg: #fffbeb;
+      --amber-line: #fed7aa;
+      --amber-text: #92400e;
+      --red-bg: #fef2f2;
+      --red-line: #fecaca;
+      --red-text: #991b1b;
+      --slate-bg: #f1f5f9;
+      --slate-line: #cbd5e1;
+      --slate-text: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      margin: 24px auto;
+      max-width: 1320px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.5;
+      background: #ffffff;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    a {
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    textarea {
+      width: 100%;
+      height: 260px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 13px;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      resize: vertical;
+      background: #fff;
+    }
+
+    button,
+    select,
+    input[type="number"],
+    input[type="text"],
+    input[type="date"] {
+      font: inherit;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      cursor: pointer;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #f3f4f6;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+      background: #f8fafc;
+    }
+
+    button.primary {
+      background: #0f172a;
+      border-color: #0f172a;
+      color: #fff;
+    }
+
+    button.primary:hover {
+      background: #111827;
+    }
+
+    button.primary:disabled {
+      color: #475569;
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+
+    button.compact {
+      padding: 7px 10px;
+      font-size: 13px;
+    }
+
+    button.copy-btn {
+      padding: 5px 9px;
+      font-size: 12px;
+      border-radius: 999px;
+    }
+
+    select,
+    input[type="number"],
+    input[type="text"],
+    input[type="date"] {
+      width: 100%;
+      padding: 8px 9px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    label {
+      font-weight: 650;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    details {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #fff;
+      margin-top: 12px;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 650;
+    }
+
+    .hero {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 32%),
+        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      margin-bottom: var(--gap);
+    }
+
+    .hero-copy {
+      max-width: 900px;
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.85fr);
+      gap: var(--gap);
+      align-items: start;
+    }
+
+    .stack {
+      display: grid;
+      gap: var(--gap);
+      min-width: 0;
+    }
+
+    .row > *,
+    .card,
+    .workflow-intro > *,
+    .chart-heading > * {
+      min-width: 0;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    .soft-card {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .small {
+      font-size: 13px;
+    }
+
+    .tiny {
+      font-size: 12px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    .hr {
+      height: 1px;
+      background: var(--line);
+      margin: 12px 0;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+      gap: var(--gap);
+      margin-bottom: var(--gap);
+      align-items: start;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .badge-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 10px 0 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.2;
+    }
+
+    .ok {
+      background: var(--green-bg);
+      border-color: var(--green-line);
+      color: var(--green-text);
+    }
+
+    .warn {
+      background: var(--amber-bg);
+      border-color: var(--amber-line);
+      color: var(--amber-text);
+    }
+
+    .err {
+      background: var(--red-bg);
+      border-color: var(--red-line);
+      color: var(--red-text);
+    }
+
+    .neutral {
+      background: var(--slate-bg);
+      border-color: var(--slate-line);
+      color: var(--slate-text);
+    }
+
+    .metric-row {
+      font-size: 13px;
+      overflow-wrap: anywhere;
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
+    .metric-row span {
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .small-list {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+
+    .small-list li {
+      margin: 4px 0;
+    }
+
+    .quality-list {
+      display: grid;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .quality-item {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #eef2f7;
+      padding-bottom: 7px;
+    }
+
+    .quality-item:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .quality-left {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      margin-top: 6px;
+      flex: 0 0 auto;
+      background: #94a3b8;
+    }
+
+    .dot.ok-dot {
+      background: #16a34a;
+    }
+
+    .dot.warn-dot {
+      background: #f59e0b;
+    }
+
+    .dot.err-dot {
+      background: #dc2626;
+    }
+
+    .quality-value {
+      color: var(--muted);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .result-title {
+      font-size: 17px;
+      font-weight: 750;
+      margin-bottom: 4px;
+    }
+
+    .result-body {
+      color: var(--muted);
+      margin-bottom: 0;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .result-kv {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 9px;
+    }
+
+    .result-kv .k {
+      color: #64748b;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .result-kv .v {
+      font-weight: 650;
+      font-size: 13px;
+    }
+
+    #orbitViewer {
+      height: 380px;
+      min-height: 320px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #020617;
+    }
+
+
+    pre {
+      white-space: pre-wrap;
+      font-size: 13px;
+      margin: 8px 0 0;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px;
+      max-height: 280px;
+      overflow: auto;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      margin-top: 8px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 8px 6px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #475569;
+      font-weight: 700;
+      background: #f8fafc;
+    }
+
+    tr.clickable {
+      cursor: pointer;
+    }
+
+    tr.clickable:hover {
+      background: #f8fafc;
+    }
+
+    .rank-score {
+      font-weight: 750;
+    }
+
+    .footer {
+      font-size: 13px;
+      color: #6b7280;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    @media (max-width: 980px) {
+      body {
+        margin: 16px auto;
+        padding: 0 12px;
+      }
+
+      .row,
+      .grid2,
+      .grid3,
+      .service-grid,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+
+      #orbitViewer {
+        height: 320px;
+      }
+    }
+
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.52;
+      background: #f8fafc;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    summary:focus-visible,
+    [role="button"]:focus-visible {
+      outline: 3px solid rgba(29, 78, 216, 0.28);
+      outline-offset: 2px;
+    }
+
+    .workflow-intro {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .workflow-intro p {
+      max-width: 780px;
+      margin: 0;
+    }
+
+    .import-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(180px, 0.42fr);
+      gap: 10px;
+      align-items: stretch;
+      margin-bottom: 10px;
+    }
+
+    .drop-zone {
+      border: 1px dashed #94a3b8;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 12px;
+      min-height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: var(--muted);
+      cursor: pointer;
+      transition: border-color 120ms ease, background 120ms ease;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: var(--blue);
+      background: #eff6ff;
+    }
+
+    .import-controls {
+      display: grid;
+      gap: 8px;
+      align-content: start;
+    }
+
+    .source-loader {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .summary-card {
+      display: none;
+    }
+
+    .summary-card.visible {
+      display: block;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .summary-item {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 10px;
+      min-width: 0;
+    }
+
+    .summary-item .k {
+      color: #64748b;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+
+    .summary-item .v {
+      font-size: 14px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .summary-interpretation {
+      margin: 12px 0 0;
+      padding: 10px 12px;
+      border-left: 3px solid #64748b;
+      background: #f8fafc;
+      color: var(--muted);
+    }
+
+    .chart-card {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .chart-heading {
+      padding: 16px 16px 4px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .chart-heading p {
+      margin: 0;
+    }
+
+    .chart-panel {
+      min-height: 250px;
+      height: 280px;
+    }
+
+    .chart-card.expanded .chart-panel {
+      height: 430px;
+    }
+
+    .chart-panel + .chart-panel {
+      border-top: 1px solid var(--line);
+    }
+
+    .chart-fallback {
+      padding: 16px;
+    }
+
+    .table-action {
+      appearance: none;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: var(--blue);
+      cursor: pointer;
+      font: inherit;
+      padding: 2px 3px;
+      text-align: left;
+    }
+
+    .table-action:hover {
+      text-decoration: underline;
+      background: transparent;
+    }
+
+    details.orbit-panel {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    details.orbit-panel > summary {
+      padding: 15px 16px;
+      list-style-position: inside;
+    }
+
+    .orbit-content {
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .orbit-actions {
+      padding-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .visually-hidden {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    @media (max-width: 980px) {
+      .import-grid,
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .chart-panel {
+        height: 270px;
+      }
+
+      .chart-card.expanded .chart-panel {
+        height: 380px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .import-grid,
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: minmax(150px, 0.7fr) minmax(150px, 0.7fr) minmax(150px, 0.7fr);
+      gap: 10px;
+      align-items: end;
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .event-features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-width: 320px;
+    }
+
+    .feature-chip {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background: #eef2ff;
+      border: 1px solid #c7d2fe;
+      color: #3730a3;
+      font-size: 11px;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .test-pass {
+      color: var(--green-text);
+      font-weight: 700;
+    }
+
+    .test-fail {
+      color: var(--red-text);
+      font-weight: 700;
+    }
+
+    .dependency-note {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid var(--line);
+    }
+
+    .demo-panel {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f8fafc;
+    }
+
+    .demo-panel p {
+      margin: 2px 0 0;
+    }
+
+    .demo-notice {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      border: 1px solid var(--green-line);
+      border-radius: 10px;
+      background: var(--green-bg);
+      color: var(--green-text);
+    }
+
+    .demo-notice.visible {
+      display: flex;
+    }
+
+    .demo-notice p {
+      margin: 0;
+    }
+
+    .history-panel {
+      margin-top: 12px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .history-panel > summary {
+      padding: 12px;
+    }
+
+    .history-panel-body {
+      padding: 0 12px 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .history-error {
+      color: var(--red-text);
+    }
+
+    .history-error-actions {
+      margin-top: 8px;
+    }
+
+    @media (max-width: 760px) {
+      .history-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+  
+
+    [hidden] {
+      display: none !important;
+    }
+
+    .post-analysis {
+      margin-top: var(--gap);
+    }
+
+    .result-integrated {
+      margin-bottom: 12px;
+    }
+
+    .chart-controls {
+      justify-content: flex-end;
+    }
+
+    .technical-panel,
+    .developer-tools {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .technical-panel > summary,
+    .developer-tools > summary {
+      padding: 15px 16px;
+      list-style-position: inside;
+      font-size: 16px;
+    }
+
+    .technical-body,
+    .developer-tools-body {
+      padding: 0 16px 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .technical-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--gap);
+      padding-top: 14px;
+    }
+
+    .technical-section {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px;
+      background: #fff;
+      min-width: 0;
+    }
+
+    .run-details {
+      margin-top: 14px;
+      background: #f8fafc;
+    }
+
+    .run-details-body {
+      padding-top: 10px;
+    }
+
+    .run-details .metric-row {
+      overflow-wrap: anywhere;
+    }
+
+    .developer-tools-content {
+      padding-top: 14px;
+    }
+
+    .export-options {
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+    }
+
+    .export-options > summary {
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      font-weight: 500;
+    }
+
+    .sticky-result {
+      position: sticky;
+      top: 8px;
+      z-index: 30;
+      max-width: 1320px;
+      margin: 0 auto var(--gap);
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.10);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .sticky-result-copy {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .sticky-result-copy span,
+    .sticky-result-copy strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .demo-controls {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) auto;
+      gap: 8px;
+      align-items: end;
+      min-width: min(100%, 420px);
+    }
+
+    .demo-copy {
+      min-width: 220px;
+    }
+
+    @media (max-width: 760px) {
+      .technical-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .demo-panel,
+      .sticky-result {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .demo-controls {
+        grid-template-columns: 1fr;
+        min-width: 100%;
+      }
+
+      .sticky-result-copy {
+        white-space: normal;
+        flex-wrap: wrap;
+      }
+    }
+
+
+    .hero-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      background: #ffffff;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 650;
+      text-decoration: none;
+    }
+
+    .button-link:hover {
+      background: #f3f4f6;
+      text-decoration: none;
+    }
+
+    .button-link.primary-link {
+      border-color: #0f172a;
+      background: #0f172a;
+      color: #ffffff;
+    }
+
+    .button-link.primary-link:hover {
+      background: #111827;
+    }
+
+    .quick-start {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0 14px;
+    }
+
+    .quick-step {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr);
+      gap: 8px;
+      align-items: start;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--soft);
+    }
+
+    .quick-step-number {
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .quick-step > div strong,
+    .quick-step > div span {
+      display: block;
+    }
+
+    .quick-step > div span {
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .docs-inline {
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+
+    .skip-link {
+      position: fixed;
+      z-index: 2000;
+      top: 8px;
+      left: 8px;
+      padding: 9px 12px;
+      border: 2px solid var(--blue);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 700;
+      transform: translateY(-160%);
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    .chart-data-details {
+      margin: 0 16px 16px;
+    }
+
+    .chart-data-details .table-wrap {
+      max-height: 360px;
+      overflow: auto;
+    }
+
+    .chart-data-details table {
+      min-width: 940px;
+    }
+
+    .chart-data-details caption {
+      padding: 8px 0;
+      color: var(--muted);
+      text-align: left;
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      .quick-start {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions .button-link,
+      .hero-actions button {
+        width: 100%;
+      }
+    }
+
+
+
+    #orbitViewer[role="img"] {
+      outline: none;
+    }
+
+    #orbitViewer[role="img"]:focus-visible {
+      outline: 3px solid rgba(29, 78, 216, 0.28);
+      outline-offset: 2px;
+    }
+
+    .institution-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+
+    /* Workbench hierarchy: source, settings, then evidence. */
+    :root {
+      --ink: #172c3a;
+      --muted: #526575;
+      --soft: #f5f8fa;
+      --line: #dbe3e8;
+      --blue: #075e76;
+    }
+    html { scroll-padding-top: 88px; }
+    body { max-width: 1280px; margin: 28px auto; background: #f5f7f8; font-size: 15px; line-height: 1.55; }
+    h1 { max-width: 900px; font-size: clamp(30px, 4vw, 44px); line-height: 1.12; letter-spacing: -0.035em; }
+    h2 { font-size: 19px; line-height: 1.35; }
+    h3 { font-size: 16px; }
+    a { text-underline-offset: 3px; }
+    p a, .footer a, .docs-inline a { text-decoration: underline; }
+    a:focus-visible { outline: 3px solid #2183a0; outline-offset: 3px; }
+    button, .button-link, select, input[type="number"], input[type="text"], input[type="date"] { min-height: 44px; }
+    button, .button-link { font-weight: 650; border-color: #bccbd4; }
+    button.compact { min-height: 40px; padding: 8px 12px; }
+    button.primary, .button-link.primary-link { background: #075e76; border-color: #075e76; }
+    button.primary:hover, .button-link.primary-link:hover { background: #084b5d; border-color: #084b5d; }
+    button.primary:disabled { background: #eaf0f3; border-color: #d1dce3; color: #526575; }
+    button:disabled { opacity: 0.72; }
+    select, input[type="number"], input[type="text"], input[type="date"], textarea { border-color: #b9c8d2; }
+    label { font-size: 13px; font-weight: 650; }
+    details { border-radius: 9px; }
+    summary { min-height: 24px; }
+    .hero { padding: 28px 30px; border-top: 4px solid #075e76; border-radius: 14px; background: #fff; box-shadow: 0 3px 12px rgba(20, 43, 58, 0.035); }
+    .hero .badge-row { margin: 0 0 16px; }
+    .hero-copy { max-width: 760px; font-size: 17px; margin-top: 10px; }
+    .research-note { max-width: 850px; margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+    .research-note strong { color: var(--ink); }
+    .hero-actions { margin-top: 20px; gap: 10px; }
+    .hero-actions .button-link:last-child { border-color: transparent; background: transparent; color: var(--blue); }
+    .row { grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.85fr); gap: 20px; }
+    .card { padding: 22px; border-radius: 12px; box-shadow: 0 2px 8px rgba(20, 43, 58, 0.025); }
+    .step-number { display: inline-flex; width: 28px; height: 28px; justify-content: center; align-items: center; margin-right: 7px; border-radius: 8px; background: #e7f1f4; color: #075e76; font-size: 13px; vertical-align: 1px; }
+    .workflow-intro { margin-bottom: 18px; }
+    .workflow-intro > a { font-size: 13px; }
+    .demo-panel { display: block; padding: 18px; background: #f0f7f9; border-color: #c6dfe6; margin-bottom: 16px; }
+    .demo-copy { min-width: 0; }
+    .demo-copy p { max-width: 560px; }
+    .demo-controls { margin-top: 16px; grid-template-columns: minmax(0, 1fr) auto; min-width: 0; gap: 10px; }
+    .demo-controls label { margin-bottom: 5px; }
+    #manualInputDetails, #historyDetails { margin-top: 10px; padding: 0; }
+    #manualInputDetails > summary, #historyDetails > summary { padding: 13px 15px; }
+    #manualInputDetails > div { padding: 0 15px 15px; }
+    .summary-hint { display: block; padding-left: 18px; margin-top: 3px; color: var(--muted); font-size: 12px; font-weight: 400; }
+    .history-panel-body { padding: 0 15px 15px; }
+    .history-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .controls-card .grid2 { grid-template-columns: 1fr; gap: 14px; }
+    .controls-card > details { margin-top: 18px; background: #f8fafb; }
+    .controls-card > details .grid2 { grid-template-columns: 1fr 1fr; }
+    .controls-card .actions { margin-top: 18px !important; }
+    .controls-card #run { flex: 1 1 160px; }
+    .controls-card .badge-row { align-items: flex-start; }
+    #status { line-height: 1.5; }
+    .controls-card .small { font-size: 12px; }
+    .post-analysis { gap: 20px; margin-top: 20px; }
+    .empty-analysis { display: flex; gap: 16px; align-items: center; background: #edf2f5; border-style: dashed; box-shadow: none; }
+    .empty-analysis h2 { font-size: 17px; margin-bottom: 5px; }
+    .empty-analysis p { margin: 0; color: var(--muted); font-size: 13px; max-width: 760px; }
+    .empty-analysis-marker { flex: 0 0 40px; height: 40px; display: grid; place-items: center; border: 1px solid #bdcbd4; border-radius: 50%; font-size: 16px; color: #526575; }
+    .post-analysis:has(.summary-card.visible) .empty-analysis,
+    .post-analysis:not(:has(.summary-card.visible)) #chartCard,
+    .post-analysis:not(:has(.summary-card.visible)) #orbitDetails,
+    .post-analysis:not(:has(.summary-card.visible)) #exportCard,
+    .post-analysis:has(.analysis-error) #chartCard,
+    .post-analysis:has(.analysis-error) #orbitDetails,
+    .post-analysis:has(.analysis-error) #exportCard,
+    .analysis-error .summary-grid,
+    .analysis-error .summary-interpretation { display: none; }
+    #executiveSummary { border-top: 3px solid #075e76; }
+    #executiveSummary.analysis-error { border-top-color: #b42318; }
+    #resultBox { margin-top: 16px; margin-bottom: 12px; padding: 18px; }
+    .result-title { font-size: 21px; line-height: 1.3; }
+    .result-body { max-width: 850px; font-size: 14px; }
+    .result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 700px; }
+    .result-kv { background: rgba(255,255,255,.6); border-color: rgba(15,23,42,.1); }
+    .summary-grid { gap: 10px; }
+    .summary-item { padding: 13px; background: #fff; }
+    .summary-item .v { font-size: 14px; }
+    .summary-interpretation { padding: 13px 16px; border-radius: 0 8px 8px 0; font-size: 14px; }
+    .demo-notice { background: #edf5f9; border-color: #bfd6e2; color: #254f64; }
+    .chart-card { padding: 0; }
+    .chart-heading { padding: 20px 22px 4px; }
+    .chart-data-details { margin: 0 22px 20px; }
+    .chart-panel:not(.js-plotly-plot) { min-height: 0; height: auto; }
+    .table-wrap { max-width: 100%; }
+    #flagTableWrap table { min-width: 760px; }
+    #flagTableWrap td:nth-child(2) { min-width: 175px; }
+    .table-scroll-hint { display: none; }
+    .skip-link { opacity: 0; pointer-events: none; }
+    .skip-link:focus { opacity: 1; pointer-events: auto; }
+    .table-wrap:focus-visible { outline: 3px solid #2183a0; outline-offset: 3px; }
+    th { white-space: nowrap; }
+    td { overflow-wrap: anywhere; }
+    .quality-item { flex-wrap: wrap; gap: 5px 12px; }
+    .quality-value { white-space: normal; overflow-wrap: anywhere; }
+    .technical-panel, .developer-tools, details.orbit-panel { padding: 0; }
+    .technical-panel > summary, .developer-tools > summary, details.orbit-panel > summary { padding: 17px 22px; }
+    .sticky-result { border-color: #afc7d2; border-left: 4px solid #075e76; }
+    #analysisOutput:focus { outline: none; }
+    #analysisOutput:focus-visible { outline: 3px solid #2183a0; outline-offset: 3px; }
+    .footer { font-size: 12px; line-height: 1.7; margin-top: 22px; color: #526575; }
+    .no-script { margin-bottom: 18px; border-color: #c98433; background: #fff7e8; }
+    @media (max-width: 980px) {
+      .row { grid-template-columns: minmax(0, 1fr); }
+      .controls-card > .grid2 { grid-template-columns: 1fr 1fr; }
+      .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero { padding: 24px; }
+    }
+    @media (max-width: 620px) {
+      body { margin: 12px auto; padding: 0 12px; }
+      html { scroll-padding-top: 160px; }
+      .hero, .card { padding: 18px; }
+      .hero h1 { font-size: 32px; }
+      .hero-copy { font-size: 15px; }
+      .hero .badge-row { margin-bottom: 13px; gap: 6px; }
+      .hero-actions { gap: 7px; margin-top: 16px; }
+      .hero-actions .button-link, .hero-actions button { width: 100%; }
+      .research-note { font-size: 12px; }
+      .demo-panel { padding: 14px; }
+      .demo-controls, .history-grid, .import-grid { grid-template-columns: 1fr; }
+      .demo-controls button { width: 100%; }
+      .controls-card > details .grid2 { grid-template-columns: 1fr; }
+      .controls-card > .grid2 { gap: 10px; }
+      .controls-card #run { flex-basis: 140px; }
+      .empty-analysis { align-items: flex-start; gap: 12px; }
+      .empty-analysis-marker { flex-basis: 30px; height: 30px; font-size: 13px; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .table-scroll-hint { display: block; margin: 10px 0 0; }
+      .summary-item { padding: 10px 12px; }
+      .summary-item .k { margin-bottom: 3px; }
+      .result-title { font-size: 19px; }
+      .result-grid { grid-template-columns: 1fr; }
+      .chart-card, .technical-panel, .developer-tools, details.orbit-panel { padding: 0; }
+      .chart-heading { padding: 18px 18px 4px; }
+      .chart-heading .chart-controls { justify-content: flex-start; }
+      .chart-data-details { margin: 0 18px 18px; }
+      .technical-panel > summary, .developer-tools > summary, details.orbit-panel > summary { padding: 16px 18px; }
+      .sticky-result { gap: 6px; padding: 9px 11px; }
+      .sticky-result-copy { font-size: 12px; gap: 4px; }
+      .sticky-result button { align-self: flex-start; }
+    }
+
+</style>
+</head>
+<body>
+<a class="skip-link" href="#analysisOutput">Skip to analysis result</a>
+<header class="hero">
+<div aria-label="Tool status" class="badge-row">
+<span class="badge neutral">Research prototype</span>
+<span class="badge neutral">Browser-side analysis</span>
+
+</div>
+<h1>SatSift</h1>
+<p class="hero-copy">
+      Screen satellite orbital-element histories for candidate maneuvers. Inspect SGP4 evidence, understand the limits and export a reproducible analysis.
+    </p>
+<p class="research-note"><strong>For research and follow-up.</strong> A candidate is an unusual catalogue change, not a confirmed maneuver. This tool does not replace orbit determination or operational tracking.</p>
+<div class="hero-actions" aria-label="Primary actions">
+<button class="primary" id="heroDemoButton" type="button">Try a synthetic example</button>
+<button id="heroHistoryButton" type="button">Use real satellite data</button>
+<a class="button-link" href="/satellite-maneuver-detector/docs">How to use</a>
+</div>
+</header><noscript><div class="card no-script"><strong>JavaScript is needed to run this workbench.</strong> Enable JavaScript for browser-side analysis, or read the <a href="/satellite-maneuver-detector/docs">documentation</a> to understand the method and input format.</div></noscript><div aria-live="polite" class="sticky-result" hidden="" id="stickyResultBar" role="status">
+<div class="sticky-result-copy">
+<strong id="stickyObject">Object</strong>
+<span aria-hidden="true">·</span>
+<span id="stickyResult">Result</span>
+<span aria-hidden="true">·</span>
+<span id="stickyQuality">Data quality</span>
+</div>
+<button class="compact" id="stickyViewResult" type="button">View result</button>
+</div>
+<main class="row" aria-label="Screening setup">
+<section class="stack">
+<div class="card" id="analysisPaths">
+<div class="workflow-intro">
+<div>
+<h2><span class="step-number" aria-hidden="true">1</span> Choose your history</h2>
+<p class="small muted">Try an example first, or analyse dated TLE or OMM records for one satellite.</p>
+</div>
+<a href="/satellite-maneuver-detector/docs#quick-start">Full usage guide</a>
+</div>
+<div class="demo-panel">
+<div class="demo-copy">
+<h3 id="demoHeading">Start with a synthetic example</h3>
+<p class="small muted">See how a candidate, quiet history or insufficient data is reported. Runs locally with fictional orbital data.</p>
+</div>
+<div class="demo-controls">
+<div>
+<label for="demoSelect">Example scenario</label>
+<select id="demoSelect">
+<option value="leo">Low Earth orbit candidate</option>
+<option value="geo">Geostationary candidate</option>
+<option value="quiet">Quiet history</option>
+<option value="sparse">Insufficient history</option>
+</select>
+</div>
+<button class="compact primary" id="tryDemo" type="button">Run demonstration</button>
+</div>
+</div>
+<div aria-live="polite" class="demo-notice" id="demoNotice" role="status">
+<p><strong id="demoNoticeTitle">Demonstration analysed.</strong> <span id="demoNoticeSummary">The result is ready below.</span></p>
+<button class="compact" id="viewDemoResults" type="button">View result</button>
+</div>
+<details id="manualInputDetails">
+<summary><span>Import your own history</span><span class="summary-hint">TLE, OMM or a saved analysis package</span></summary>
+<div style="margin-top:10px;">
+<p class="small muted" id="inputRequirements">Use multiple dated snapshots from one satellite. A single current TLE is not enough: screening needs a calibration window followed by at least five eligible evaluation pairs.</p>
+<p class="small muted">To reopen a saved analysis package, choose its JSON file with <strong>Replace current input</strong> selected. Its saved detector settings will be restored.</p>
+<div class="import-grid">
+<div aria-controls="fileInput" class="drop-zone" id="dropZone" role="button" tabindex="0">
+            Drop a TLE, TXT, OMM JSON or saved analysis file here, or choose a file.
+          </div>
+<div class="import-controls">
+<div>
+<label for="importMode">File import action</label>
+<select id="importMode">
+<option selected="" value="replace">Replace current input</option>
+<option value="append">Append and merge</option>
+</select>
+</div>
+<button class="compact" id="chooseFile" type="button">Choose file</button>
+<input accept=".txt,.tle,.json,text/plain,application/json" aria-label="Import orbital-element file" class="visually-hidden" id="fileInput" type="file"/>
+</div>
+</div>
+<div aria-live="polite" class="small muted" id="fileImportHint"></div>
+<label for="tles" style="margin-top:12px;">TLE or OMM JSON history</label>
+<textarea aria-describedby="inputRequirements parseSummary" id="tles" placeholder="Paste consecutive TLE line pairs or an array of OMM JSON records here." spellcheck="false"></textarea>
+<div class="metric-row" id="parseSummary"></div>
+</div>
+</details>
+<details class="history-panel" id="historyDetails">
+<summary><span>Retrieve real satellite history</span><span class="summary-hint">NORAD number and a date range</span></summary>
+<div class="history-panel-body">
+<h3 style="margin-top:12px;">Load historical orbital data</h3>
+<p class="small muted">
+            Load up to 31 days of OMM history for one object. This requires a configured history service on the hosting server. Basic SSA data comes from <a href="https://www.space-track.org/" rel="noopener noreferrer" target="_blank">Space-Track.org</a>, operated by USSPACECOM. Credentials stay on the server; imported files work without this service.
+          </p>
+<p class="docs-inline"><a href="/satellite-maneuver-detector/docs#historical-data">Historical-data guide</a> · <a href="/satellite-maneuver-detector/docs#history-corrections">Catalogue corrections</a> · <a href="/satellite-maneuver-detector/docs#troubleshooting">Troubleshooting</a></p>
+<div class="history-grid">
+<div>
+<label for="publicNorad">NORAD catalog number</label>
+<input id="publicNorad" inputmode="numeric" placeholder="Example: 25544" type="text" value="25544"/>
+</div>
+<div>
+<label for="historyStart">Start date</label>
+<input id="historyStart" type="date"/>
+</div>
+<div>
+<label for="historyEnd">End date</label>
+<input id="historyEnd" type="date"/>
+</div>
+</div>
+<div class="history-actions">
+<button class="compact primary" id="loadHistory" type="button">Load real history and analyse</button>
+<button class="compact" id="copyDeepLink" type="button">Copy object link</button>
+</div>
+<div aria-live="polite" class="small muted" id="historyFetchHint" style="margin-top:8px;"></div>
+<details>
+<summary>Current CelesTrak snapshot</summary>
+<p class="small muted" style="margin-top:10px;">
+              CelesTrak provides the current GP record as OMM JSON. One snapshot cannot support screening, but it can replace the input or be appended safely to an existing history. Responses are cached locally for two hours.
+            </p>
+<div class="actions">
+<button class="compact" id="appendPublicOmm" type="button">Append current snapshot</button>
+<button class="compact" id="replacePublicOmm" type="button">Replace input with one snapshot</button>
+</div>
+<div aria-live="polite" class="small muted" id="publicFetchHint" style="margin-top:8px;"></div>
+</details>
+</div>
+</details>
+
+</div>
+
+
+
+
+</section>
+<aside class="stack">
+<div class="card controls-card">
+<h2><span class="step-number" aria-hidden="true">2</span> Set up screening</h2>
+<p class="small muted">Start with Balanced and Automatic. Change the advanced settings when you need to examine a specific assumption.</p>
+<div class="grid2">
+<div>
+<label for="sensitivity">Sensitivity preset</label>
+<select id="sensitivity">
+<option selected="" value="balanced">Balanced</option>
+<option value="sensitive">More sensitive</option>
+<option value="conservative">More conservative</option>
+<option value="custom">Custom</option>
+</select>
+</div>
+<div>
+<label for="orbitProfile">Orbit profile</label>
+<select id="orbitProfile">
+<option selected="" value="auto">Automatic</option>
+<option value="LEO">LEO</option>
+<option value="MEO">MEO</option>
+<option value="GEO">GEO</option>
+<option value="HEO">Highly elliptical</option>
+</select>
+</div>
+</div>
+<details>
+<summary>Advanced detector settings</summary>
+<div class="grid2" style="margin-top:10px;">
+<div>
+<label for="detectorMode">Detector mode</label>
+<select id="detectorMode">
+<option selected="" value="multivariate">SGP4 multivariate</option>
+<option value="elements">Elements only</option>
+</select>
+</div>
+<div>
+<label for="dath">Minimum |Δa|</label>
+<input id="dath" min="0.001" step="0.01" type="number" value="0.05"/>
+<div class="small muted">km; corroborated SGP4 or orbital-vector evidence can also satisfy the event gate</div>
+</div>
+
+<div>
+<label for="win">Calibration window</label>
+<input id="win" max="100" min="5" type="number" value="6"/>
+<div class="small muted">eligible pairs</div>
+</div>
+<div>
+<label for="alpha">Residual tail fraction α</label>
+<input id="alpha" max="0.5" min="0.01" step="0.01" type="number" value="0.10"/>
+<div class="small muted">Controls the empirical band; not a calibrated false-alarm probability</div>
+</div>
+<div>
+<label for="stale">Maximum element age</label>
+<input id="stale" min="1" step="1" type="number" value="30"/>
+<div class="small muted">days</div>
+</div>
+<div>
+<label for="gapWarn">Maximum usable pair gap</label>
+<input id="gapWarn" min="1.5" step="0.5" type="number" value="3"/>
+<div class="small muted">times median gap; larger pairs are excluded</div>
+</div>
+</div>
+</details>
+<div class="actions" style="margin-top:12px;">
+<button class="primary" id="run" type="button">Run analysis</button>
+<button id="reset" type="button">Reset output</button>
+</div>
+<div class="hr"></div>
+<div class="badge-row">
+<span aria-live="polite" class="badge neutral" id="status">Waiting for input</span>
+<span class="small muted" id="flagCount"></span>
+</div>
+<div class="metric-row" id="pairCount"></div>
+
+</div>
+
+
+
+
+
+</aside>
+</main><section class="post-analysis stack" id="analysisOutput" aria-label="Screening results" tabindex="-1"><div class="card empty-analysis" id="analysisEmptyState"><div class="empty-analysis-marker" aria-hidden="true">3</div><div><h2>Your evidence will appear here</h2><p>Run an example or load a history to see the result, data quality and orbital-change charts. You can then download the evidence for follow-up.</p></div></div><section aria-live="polite" class="card summary-card" id="executiveSummary">
+<h2><span class="step-number" aria-hidden="true">3</span> Analysis result</h2>
+<div class="soft-card result-integrated" id="resultBox">
+<div class="result-title">No analysis yet</div>
+<p class="result-body">Load an example, import a file or paste orbital-element history, then run the analysis.</p>
+</div><div class="summary-grid">
+<div class="summary-item" id="summaryObjectItem"><div class="k">Object</div><div class="v" id="summaryObject">n/a</div></div>
+<div class="summary-item" id="summaryPeriodItem"><div class="k">Period analysed</div><div class="v" id="summaryPeriod">n/a</div></div>
+<div class="summary-item" id="summarySnapshotsItem"><div class="k">Valid snapshots</div><div class="v" id="summarySnapshots">n/a</div></div>
+<div class="summary-item" id="summaryQualityItem"><div class="k">Data quality</div><div class="v" id="summaryQuality">n/a</div></div>
+<div class="summary-item" id="summaryResultItem"><div class="k">Result</div><div class="v" id="summaryResult">n/a</div></div>
+<div class="summary-item" id="summaryEpochItem"><div class="k">Strongest epoch</div><div class="v" id="summaryEpoch">n/a</div></div>
+<div class="summary-item" id="summaryDeltaAItem"><div class="k">Observed Δa</div><div class="v" id="summaryDeltaA">n/a</div></div>
+<div class="summary-item" id="summaryEventCountItem"><div class="k">Candidate events</div><div class="v" id="summaryEventCount">n/a</div></div>
+</div>
+<p class="summary-interpretation" id="summaryInterpretation"></p>
+</section><div class="card chart-card" id="chartCard">
+<div class="chart-heading">
+<div>
+<h2 style="margin-bottom:4px;">Orbital change evidence</h2>
+<p class="small muted">The two views share the same time range. Oversized sampling gaps are excluded from calibration and screening.</p>
+</div>
+<div class="chart-controls actions"><button class="compact" id="toggleChartSize" type="button">Expand charts</button><button class="compact" disabled="" id="resetChartZoom" type="button">Reset chart zoom</button></div>
+</div>
+<div aria-label="Interactive chart of semi-major axis over time" class="chart-panel" id="orbitChart" role="img"><div class="chart-fallback small muted">Run an analysis to display semi-major axis over time.</div></div>
+<div aria-label="Interactive chart of sampling-normalised orbital change and the empirical band" class="chart-panel" id="rateChart" role="img"><div class="chart-fallback small muted">Run an analysis to display sampling-normalised Δa and the rolling empirical band.</div></div>
+<details class="chart-data-details" id="chartDataDetails">
+<summary>Accessible chart data</summary>
+<p class="small muted">Tabular values underlying the two charts. Candidate observations are identified in the final column.</p>
+<div aria-label="Per-epoch orbital-change data" class="table-wrap" role="region" tabindex="0">
+<table>
+<caption>Per-epoch orbital-change evidence</caption>
+<thead><tr><th scope="col">Epoch UTC</th><th scope="col">Semi-major axis</th><th scope="col">Δa</th><th scope="col">Gap</th><th scope="col">Δa/Δt</th><th scope="col">Radial</th><th scope="col">Along-track</th><th scope="col">Cross-track</th><th scope="col">Status</th></tr></thead>
+<tbody id="chartDataBody"><tr><td colspan="9" class="muted">Run an analysis to populate the accessible chart data.</td></tr></tbody>
+</table>
+</div>
+</details>
+</div><div class="card" hidden="" id="candidateEventsCard">
+<h2>Candidate events</h2>
+<div class="actions" style="justify-content:space-between;">
+<p class="small muted" style="margin:0;">Adjacent anomalous observations are grouped into candidate events. They remain screening cues rather than confirmed maneuvers.</p>
+<button class="copy-btn" disabled="" id="copyFlags" type="button">Copy event list</button>
+</div>
+
+<div aria-live="polite" class="small muted" id="flagCopyHint" style="margin-top:8px;"></div>
+<p class="small muted table-scroll-hint">Scroll the table sideways to see every supporting signal.</p>
+<div aria-label="Candidate event details" class="table-wrap" id="flagTableWrap" role="region" style="display:none;" tabindex="0">
+<table>
+<thead>
+<tr><th>Event</th><th>Interval</th><th>Direction</th><th>Net Δa</th><th>Tier</th><th>Supporting signals</th></tr>
+</thead>
+<tbody id="flagTableBody"></tbody>
+</table>
+</div>
+<details id="epochDetails" style="display:none;">
+<summary>Supporting anomalous epochs</summary>
+<div class="table-wrap" id="epochTableWrap"></div>
+</details>
+<details class="event-text-details"><summary>Plain-text event list</summary><pre class="mono" id="flags">Run the analysis to populate the candidate-event list.</pre></details>
+</div><details class="card orbit-panel" id="orbitDetails">
+<summary>Orbit context, loaded on demand</summary>
+<div class="orbit-content">
+<div class="orbit-actions">
+<p class="small muted" style="margin:0; max-width:760px;">
+              Approximate three-dimensional comparison of element sets immediately before and after a selected candidate. This visual context is rendered locally with Plotly and is not operational orbit propagation.
+            </p>
+<button class="compact" disabled="" id="fitOrbit" type="button">Fit orbit view</button>
+</div>
+<div aria-label="Three-dimensional visual comparison of selected orbital element sets" id="orbitViewer" role="img" tabindex="0" style="margin-top:10px;"></div>
+<div aria-live="polite" class="small muted" id="orbitHint" style="margin-top:8px;">
+            Run an analysis, then open this section to load the 3D context.
+          </div>
+</div>
+</details><div class="card" id="exportCard">
+<h2>Keep the evidence</h2>
+<p class="small muted">Download the input history, settings and result together, so the analysis can be reviewed and reproduced.</p>
+<div class="actions"><button class="compact primary" disabled="" id="downloadBundle" type="button">Download analysis package</button><details class="export-options">
+<summary>Other exports</summary>
+<div class="actions export-secondary" style="margin-top:10px;"><button class="compact" disabled="" id="copyEvidence" type="button">Copy evidence note</button><button class="compact" disabled="" id="downloadCsv" type="button">Download CSV</button><button class="compact" disabled="" id="downloadJson" type="button">Download JSON</button><button class="compact" disabled="" id="saveChart" type="button">Save charts PNG</button></div>
+</details></div>
+<div aria-live="polite" class="small muted" id="exportHint" style="margin-top:8px;"></div>
+</div><details class="card technical-panel" id="technicalDetails">
+<summary>Technical details</summary>
+<div class="technical-body">
+<div class="technical-grid"><div class="technical-section">
+<h2>Data quality</h2>
+<p class="small muted">Results are interpreted only when the history is internally consistent and provides at least five sequential evaluation points.</p>
+<div class="quality-list" id="qualitySummary">
+<div class="quality-item"><div class="quality-left"><span class="dot"></span><div>Waiting for analysis</div></div><div class="quality-value">n/a</div></div>
+</div>
+</div><div class="technical-section">
+<h2>Method metadata</h2>
+<div class="quality-list">
+<div class="quality-item"><div class="quality-left"><span class="dot ok-dot"></span><div>Detector method</div></div><div class="quality-value">0.4</div></div>
+<div class="quality-item"><div class="quality-left"><span class="dot ok-dot"></span><div>State comparison</div></div><div class="quality-value">SGP4 at a common epoch</div></div>
+<div class="quality-item"><div class="quality-left"><span class="dot ok-dot"></span><div>Signals</div></div><div class="quality-value">RTN residuals and element changes</div></div>
+<div class="quality-item"><div class="quality-left"><span class="dot ok-dot"></span><div>Calibration</div></div><div class="quality-value">rolling robust multivariate baselines</div></div>
+<div class="quality-item"><div class="quality-left"><span class="dot ok-dot"></span><div>Output</div></div><div class="quality-value">event-level screening</div></div>
+<div class="quality-item"><div class="quality-left"><span class="dot warn-dot"></span><div>3D comparison</div></div><div class="quality-value">visual context only</div></div>
+</div>
+<div class="dependency-note small muted" id="dependencyStatus">Checking SGP4 dependency. Plotly charts and 3D context load on demand.</div>
+</div><div class="technical-section">
+<h2>Method in brief</h2>
+<ul class="small-list">
+<li>Accepts checksum-valid TLE pairs or validated OMM JSON records and can retrieve authenticated Space-Track GP history through a same-site server endpoint.</li>
+<li>Propagates consecutive element sets to the later epoch with SGP4 and computes radial, along-track and cross-track residuals.</li>
+<li>Combines state residuals with Δa/Δt, mean-motion, eccentricity-vector, inclination-vector and B* changes.</li>
+<li>Uses orbit-specific signal floors and rolling robust empirical baselines fitted only to preceding eligible pairs.</li>
+<li>Groups adjacent anomalous epochs into candidate events and abstains when identifiers, data quality, propagation or history are inadequate.</li>
+</ul>
+</div><div class="technical-section">
+<h2>Limits and follow-up</h2>
+<ul class="small-list">
+<li>A candidate event groups one or more eligible multivariate breaches that pass the configured element-change or corroborated state-residual gates.</li>
+<li>A flag does not confirm a burn, command, intent or operational purpose.</li>
+<li>Weak, Moderate and Strong are internal event-screening tiers, not calibrated probabilities.</li>
+<li>Oversized epoch gaps are excluded rather than compared directly with dense sampling intervals; SGP4 and element-space signals are calibrated only from preceding eligible pairs.</li>
+<li>False positives can still arise from catalog updates, drag effects, noisy element fitting or unmodelled operational context.</li>
+<li>Follow-up should include source review, orbit determination, additional catalog data and mission-context checks where available.</li>
+</ul>
+</div></div>
+<details class="run-details">
+<summary>Run and reproducibility details</summary>
+<div class="run-details-body"><p class="small muted">The run identifier, detector settings and audit record support reproducibility and troubleshooting.</p><div class="metric-row" id="audit"></div></div>
+</details>
+</div>
+</details><details class="card developer-tools" id="developerTools">
+<summary>Developer validation tools</summary>
+<div class="developer-tools-body"><div class="developer-tools-content">
+
+<p class="small muted">Run deterministic checks against synthetic candidate, quiet, sparse and malformed histories. These are software regression checks, not an operational performance benchmark.</p>
+<div class="institution-links small"><a href="/satellite-maneuver-detector/benchmark">Public-evidence benchmark status</a><a href="/satellite-maneuver-detector/accessibility">Accessibility statement</a></div>
+<div class="actions">
+<button class="compact" id="runSelfTests" type="button">Run regression checks</button>
+<button class="compact" id="rankExamples" type="button">Rank built-in examples</button>
+<button class="compact" disabled="" id="downloadRankJson" type="button">Download ranking JSON</button>
+</div>
+<div aria-live="polite" class="small muted" id="selfTestHint" style="margin-top:8px;"></div>
+<div class="table-wrap" id="selfTestWrap" style="display:none;"></div>
+<div aria-live="polite" class="small muted" id="rankHint" style="margin-top:8px;"></div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Rank</th><th>Object</th><th>Profile</th><th>Classification</th><th>Score</th><th>Quality</th></tr></thead>
+<tbody id="rankTableBody"><tr><td class="muted" colspan="6">Run ranked demo screening to populate this table.</td></tr></tbody>
+</table>
+</div>
+<details id="benchmarkDetails" style="margin-top:14px;">
+<summary>Run a labelled event benchmark</summary>
+<p class="small muted" style="margin-top:10px;">
+          Import a benchmark JSON file containing orbital histories, documented event intervals and source citations. The public manifest route is a small v0.1 runner-format seed, not the frozen publication benchmark v1.0. The workbench reports event-level precision, recall, F1, false events per object-month and first-alarm detection delay. No operational performance claim is made unless you supply a suitable ground-truth dataset.
+        </p>
+<p class="small muted">Truth timestamps must include <code>Z</code> or a numeric timezone offset, for example <code>2026-01-01T12:00:00.123456Z</code>. Use at most six fractional digits. Omit <code>end</code> for a point event.</p>
+<div class="actions">
+<button class="compact" id="chooseBenchmark" type="button">Choose benchmark JSON</button>
+<input accept=".json,application/json" aria-label="Import labelled benchmark JSON file" class="visually-hidden" id="benchmarkInput" type="file">
+<button class="compact" id="downloadBenchmarkTemplate" type="button">Download benchmark template</button>
+<button class="compact primary" disabled="" id="runBenchmark" type="button">Run benchmark</button>
+<button class="compact" disabled="" id="downloadBenchmarkReport" type="button">Download benchmark report</button>
+</div>
+<div aria-live="polite" class="small muted" id="benchmarkHint" style="margin-top:8px;"></div>
+<div class="summary-grid" id="benchmarkMetrics" style="display:none; margin-top:10px;">
+<div class="summary-item"><div class="k">Cases</div><div class="v" id="benchmarkCases">n/a</div></div>
+<div class="summary-item"><div class="k">True positives</div><div class="v" id="benchmarkTp">n/a</div></div>
+<div class="summary-item"><div class="k">False positives</div><div class="v" id="benchmarkFp">n/a</div></div>
+<div class="summary-item"><div class="k">False negatives</div><div class="v" id="benchmarkFn">n/a</div></div>
+<div class="summary-item"><div class="k">Precision</div><div class="v" id="benchmarkPrecision">n/a</div></div>
+<div class="summary-item"><div class="k">Recall</div><div class="v" id="benchmarkRecall">n/a</div></div>
+<div class="summary-item"><div class="k">F1</div><div class="v" id="benchmarkF1">n/a</div></div>
+<div class="summary-item"><div class="k">False events/object-month</div><div class="v" id="benchmarkFalseRate">n/a</div></div>
+<div class="summary-item"><div class="k">Median detection delay</div><div class="v" id="benchmarkDelay">n/a</div></div>
+<div class="summary-item"><div class="k">Abstained cases</div><div class="v" id="benchmarkAbstentions">n/a</div></div>
+<div class="summary-item"><div class="k">Orbit profiles</div><div class="v" id="benchmarkProfiles">n/a</div></div>
+<div class="summary-item"><div class="k">Recall after deterministic thinning</div><div class="v" id="benchmarkThinRecall">n/a</div></div>
+</div>
+<div class="table-wrap" id="benchmarkTableWrap" style="display:none;">
+<table>
+<thead><tr><th>Case</th><th>Object</th><th>Truth</th><th>Predicted</th><th>Matched</th><th>Result</th><th>Status</th></tr></thead>
+<tbody id="benchmarkTableBody"></tbody>
+</table>
+</div>
+<div class="table-wrap" id="benchmarkProfileWrap" style="display:none;">
+<table>
+<caption>Benchmark performance by orbit profile</caption>
+<thead><tr><th>Profile</th><th>Cases</th><th>TP</th><th>FP</th><th>FN</th><th>Precision</th><th>Recall</th><th>F1</th></tr></thead>
+<tbody id="benchmarkProfileBody"></tbody>
+</table>
+</div>
+</details>
+</div></div>
+</details></section>
+
+<footer class="footer">
+    Pasted and imported TLE or OMM data is processed in your browser. Public loading contacts CelesTrak only after you press a snapshot button. Historical Basic SSA data is attributed to Space-Track.org, operated by USSPACECOM.
+    Tool by <a href="https://sylvesterkaczmarek.com/" rel="noopener noreferrer" target="_blank">Sylvester Kaczmarek</a>. <a href="/satellite-maneuver-detector/docs">Documentation</a> · <a href="/satellite-maneuver-detector/benchmark">Benchmark status</a> · <a href="/satellite-maneuver-detector/accessibility">Accessibility</a>.
+    <br/>
+    Workbench 3.4.9 · Detector method 0.4 · Research screening of public orbital-element histories.
+  </footer>
+<!-- BEGIN BROWSER MODULE SCRIPTS -->
+<script defer src="/satellite-maneuver-detector/app/common-bc423f074a86.js" integrity="sha256-vEI/B0qG4V6Uu4TybLzdwSXKj8y1IqxGTkhxTDYn+5w=" crossorigin="anonymous"></script>
+<script defer src="/satellite-maneuver-detector/app/orbital-input-e1b787fca1e2.js" integrity="sha256-4beH/KHil20I0a8aBwkrIknvj1vn0wHMABUzvUpXfj0=" crossorigin="anonymous"></script>
+<script defer src="/satellite-maneuver-detector/app/benchmark-91d4848f8ca3.js" integrity="sha256-kdSEj4yjucZ20x1rnOklD6cGVP5mnpHe3U6jKN3WOhU=" crossorigin="anonymous"></script>
+<script defer src="/satellite-maneuver-detector/app/packages-1ca01aa7ed42.js" integrity="sha256-HKAap+1CX7Einb16WS6hjDq25oaM11FR5yAvrS+L0WU=" crossorigin="anonymous"></script>
+<script defer src="/satellite-maneuver-detector/app/detection-133da300883d.js" integrity="sha256-Ez2jAIg9dFkhj/iGC/CUokXNEdpX+j6k+cfPey5R+zg=" crossorigin="anonymous"></script>
+<script defer src="/satellite-maneuver-detector/app/interface-3a88f4921deb.js" integrity="sha256-Ooj0kh3rNIFAFoTTdRnW5mW+mq3aDHQxFUaio11Z/vQ=" crossorigin="anonymous"></script>
+<script defer src="/satellite-maneuver-detector/app/bootstrap-e1b9aa794488.js" integrity="sha256-4bmqeUSIHlXa0vd6Zc+iNrCtF2JgkVT3NXHW7feEM/c=" crossorigin="anonymous"></script>
+<!-- END BROWSER MODULE SCRIPTS -->
+</body>
+</html>

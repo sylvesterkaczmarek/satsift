@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SatSift Documentation | Satellite Maneuver Screening</title>
+  <meta name="description" content="SatSift documentation for satellite maneuver screening, TLE and OMM histories, SGP4 evidence, results, reproducible exports and scientific limitations." />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/docs" />
+  <meta property="og:title" content="SatSift Documentation | Satellite Maneuver Screening" />
+  <meta property="og:description" content="How to use SatSift for satellite orbital change screening and interpret candidate maneuvers and evidence limits." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/docs" />
+  <meta property="og:site_name" content="Sylvester Kaczmarek" />
+  <style>
+    :root {
+      --ink: #0f172a;
+      --muted: #4b5563;
+      --soft: #f8fafc;
+      --line: #e5e7eb;
+      --blue: #1d4ed8;
+      --green-bg: #ecfdf3;
+      --green-line: #bbf7d0;
+      --green-text: #166534;
+      --amber-bg: #fffbeb;
+      --amber-line: #fed7aa;
+      --amber-text: #92400e;
+      --slate-bg: #f1f5f9;
+      --slate-line: #cbd5e1;
+      --slate-text: #334155;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 24px auto;
+      max-width: 1180px;
+      padding: 0 16px;
+      color: var(--ink);
+      background: #fff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    h1, h2, h3 { color: var(--ink); }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+    }
+    h2 { margin: 0 0 10px; font-size: 22px; line-height: 1.25; }
+    h3 { margin: 0 0 7px; font-size: 16px; line-height: 1.3; }
+    p { margin: 0 0 14px; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      padding: 1px 5px;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      background: #f8fafc;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    section[id] { scroll-margin-top: 18px; }
+
+    .hero {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(37, 99, 235, 0.08), transparent 32%),
+        linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .hero-copy { max-width: 850px; color: var(--muted); font-size: 16px; }
+    .badge-row, .actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border: 1px solid var(--slate-line);
+      border-radius: 999px;
+      background: var(--slate-bg);
+      color: var(--slate-text);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .button-link {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      background: #fff;
+      color: var(--ink);
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .button-link:hover { background: #f3f4f6; text-decoration: none; }
+    .button-link.primary { border-color: #0f172a; background: #0f172a; color: #fff; }
+    .button-link.primary:hover { background: #111827; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 18px;
+      margin-top: 18px;
+      align-items: start;
+    }
+
+    .toc {
+      position: sticky;
+      top: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+    .toc strong { display: block; margin-bottom: 8px; }
+    .toc a {
+      display: block;
+      padding: 5px 7px;
+      border-radius: 6px;
+      color: #334155;
+      font-size: 13px;
+    }
+    .toc a:hover { background: var(--soft); color: var(--blue); text-decoration: none; }
+
+    .content { display: grid; gap: 14px; min-width: 0; }
+    .card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    }
+
+    .quick-grid, .path-grid, .result-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .quick-item, .path-item, .result-item {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--soft);
+    }
+    .step-number {
+      display: inline-flex;
+      width: 28px;
+      height: 28px;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 8px;
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .note, .warning, .success {
+      padding: 11px 13px;
+      border-radius: 10px;
+      margin: 12px 0;
+    }
+    .note { border: 1px solid var(--slate-line); background: var(--slate-bg); color: var(--slate-text); }
+    .warning { border: 1px solid var(--amber-line); background: var(--amber-bg); color: var(--amber-text); }
+    .success { border: 1px solid var(--green-line); background: var(--green-bg); color: var(--green-text); }
+
+    .small { font-size: 13px; }
+    .muted { color: var(--muted); }
+
+    ul, ol { margin: 8px 0 0; padding-left: 22px; }
+    li { margin: 5px 0; }
+
+    .table-wrap { overflow-x: auto; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 9px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: var(--soft); color: #475569; font-weight: 700; }
+
+    details {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    summary { cursor: pointer; font-weight: 700; }
+
+    .footer {
+      margin-top: 18px;
+      padding: 14px 0 4px;
+      border-top: 1px solid var(--line);
+      color: #6b7280;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .toc { position: static; }
+      .toc nav { columns: 2; }
+      .quick-grid, .path-grid, .result-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      body { margin: 12px auto; padding: 0 10px; }
+      .hero, .card { padding: 15px; }
+      .actions .button-link { width: 100%; }
+      .toc nav { columns: 1; }
+    }
+  
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="badge-row" aria-label="Documentation status">
+      <span class="badge">Workbench 3.4.9</span>
+      <span class="badge">Detector method 0.4</span>
+      <span class="badge">Research prototype</span>
+    </div>
+    <h1>SatSift documentation</h1>
+    <p class="hero-copy">How to use SatSift to screen satellite orbital histories, interpret candidate events, retrieve data and understand the scientific limits.</p>
+    <div class="actions">
+      <a class="button-link primary" href="/satellite-maneuver-detector">Open workbench</a>
+      <a class="button-link" href="/satellite-maneuver-detector?demo=leo">Run LEO demonstration</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="toc" aria-label="Documentation navigation">
+      <strong>Contents</strong>
+      <nav>
+        <a href="#quick-start">Quick start</a>
+        <a href="#analysis-paths">Analysis paths</a>
+        <a href="#historical-data">Historical data</a>
+        <a href="#input-formats">Input formats</a>
+        <a href="#results">Understanding results</a>
+        <a href="#data-quality">Data quality</a>
+        <a href="#method">Detector method</a>
+        <a href="#profiles">Orbit profiles</a>
+        <a href="#events">Candidate events</a>
+        <a href="#exports">Exports</a>
+        <a href="#validation">Validation tools</a>
+        <a href="#troubleshooting">Troubleshooting</a>
+        <a href="#accessibility">Accessibility</a>
+        <a href="#institutional-use">Institutional evaluation</a>
+        <a href="#limitations">Limitations</a>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <section class="card" id="quick-start">
+        <h2>Quick start</h2>
+        <div class="quick-grid">
+          <div class="quick-item"><span class="step-number">1</span><h3>Choose a path</h3><p class="small muted">Use a demonstration, retrieve real history, or import your own TLE or OMM records.</p></div>
+          <div class="quick-item"><span class="step-number">2</span><h3>Run the analysis</h3><p class="small muted">Demonstrations run immediately. Historical retrieval loads and analyses the selected interval.</p></div>
+          <div class="quick-item"><span class="step-number">3</span><h3>Read the result</h3><p class="small muted">Start with the summary, then review data quality, charts and any grouped candidate event.</p></div>
+        </div>
+        <div class="success"><strong>First visit</strong><br />Run the LEO candidate demonstration. It requires no account, file or external data request.</div>
+      </section>
+
+      <section class="card" id="analysis-paths">
+        <h2>Analysis paths</h2>
+        <div class="path-grid">
+          <div class="path-item"><h3>Built-in demonstration</h3><p class="small muted">Synthetic histories show a LEO candidate, GEO station-keeping candidate, quiet control and sparse-history abstention.</p></div>
+          <div class="path-item"><h3>Real historical data</h3><p class="small muted">Enter a NORAD catalog number and date range. The server retrieves authenticated Space-Track GP history and starts the analysis.</p></div>
+          <div class="path-item"><h3>Your own records</h3><p class="small muted">Paste or import checksum-valid TLE history or validated OMM JSON for one catalog object.</p></div>
+        </div>
+        <div class="note">Do not press the historical-data button while evaluating a built-in demonstration unless you intend to replace the demonstration with real satellite data.</div>
+      </section>
+
+      <section class="card" id="historical-data">
+        <h2>Historical data</h2>
+        <ol>
+          <li>Open <strong>Analyse a real satellite using historical data</strong>.</li>
+          <li>Enter a numeric NORAD catalog number.</li>
+          <li>Select the start and end dates. The current maximum is 31 calendar days, including both dates.</li>
+          <li>Press <strong>Load real history and analyse</strong>.</li>
+          <li>Wait for the result banner and screening summary.</li>
+        </ol>
+        <p class="small muted">The browser calls a same-site PHP endpoint. Space-Track credentials remain on the server and are not included in page source, browser storage or exported analysis files.</p>
+        <p class="small muted">Downloaded historical dates are retained. Loading a cached range preserves its acquisition time; the time a response is served does not indicate a new download. Older caches report unknown acquisition times. Analysis JSON and saved packages retain the available source evidence and local content identities.</p>
+        <div class="warning"><strong>Current snapshot</strong><br />The CelesTrak snapshot control returns one current OMM record. A single record cannot support maneuver screening. Append it to existing history; replacement is disabled while a multi-record history is loaded. Its two-hour local cache retains the original acquisition time.</div>
+        <h3 id="history-corrections">Applying a catalogue correction</h3>
+        <ol>
+          <li>Save the original reproducibility package and retain its source file privately.</li>
+          <li>Obtain an authorised correction file or use the current GP snapshot for a new observation. Do not repeatedly download retained history to check for changes.</li>
+          <li>Use <strong>Append and merge</strong> to apply catalogue revision selection. For a reviewed complete replacement history, use <strong>Replace current input</strong>. Inspect supersession and data-quality diagnostics.</li>
+          <li>Export the reviewed analysis as a separate package and retain the original. A local import time does not establish when the provider data was retrieved.</li>
+        </ol>
+        <p class="small muted">This changes the selected analysis. The persistent server cache and frozen research inputs keep their own records. Current snapshots cannot reconstruct every missing or retrospective correction. Local hashes identify content and do not authenticate a provider.</p>
+        <p class="small muted">Acquisition follows the <a href="https://www.space-track.org/documentation" target="_blank" rel="noopener noreferrer">Space-Track API guidelines</a> and <a href="https://celestrak.org/usage-policy.php" target="_blank" rel="noopener noreferrer">CelesTrak usage policy</a>. Historical coverage has no automatic expiry or force-refresh control.</p>
+      </section>
+
+      <section class="card" id="input-formats">
+        <h2>Input formats</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Format</th><th>Requirements</th><th>Typical use</th></tr></thead>
+            <tbody>
+              <tr><td>TLE</td><td>Valid line 1 and line 2 pairs with correct checksums, epochs and matching catalog identifiers.</td><td>Paste or import historical two-line element records.</td></tr>
+              <tr><td>OMM JSON</td><td>Records containing epoch, catalog identifier, mean motion, eccentricity, inclination, RAAN, argument of pericenter and mean anomaly.</td><td>Space-Track history, CelesTrak snapshots and reproducible imports.</td></tr>
+              <tr><td>Benchmark JSON</td><td>Cases containing orbital history, labelled event intervals and source citations.</td><td>Event-level validation metrics.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted">Append and merge rejects mixed catalog objects and conflicting records at the same epoch. Exact duplicates are removed.</p>
+      </section>
+
+      <section class="card" id="results">
+        <h2>Understanding results</h2>
+        <div class="result-grid">
+          <div class="result-item"><h3>No clear candidate event</h3><p class="small muted">No eligible observation passed the current multivariate screening gates. This does not prove that no maneuver occurred.</p></div>
+          <div class="result-item"><h3>Candidate event</h3><p class="small muted">One or more adjacent anomalous observations passed the configured element-change or corroborated state-residual gates.</p></div>
+          <div class="result-item"><h3>Abstain</h3><p class="small muted">The workbench suppresses candidate reporting because history, identifiers, propagation or data quality are inadequate.</p></div>
+        </div>
+        <p><strong>Weak, Moderate and Strong</strong> are internal screening tiers based on anomaly magnitude and corroborating signals. They are not maneuver probabilities.</p>
+        <p>The sticky result bar preserves the object, classification and data-quality status while you inspect charts and technical details.</p>
+      </section>
+
+      <section class="card" id="data-quality">
+        <h2>Data quality</h2>
+        <p>The workbench checks:</p>
+        <ul>
+          <li>Catalog identifier consistency</li>
+          <li>Malformed or rejected records</li>
+          <li>Exact and conflicting duplicate epochs</li>
+          <li>Future or stale element epochs</li>
+          <li>Oversized sampling gaps</li>
+          <li>Successful SGP4 pair comparisons</li>
+          <li>Enough sequential evaluation points after calibration</li>
+        </ul>
+        <div class="note">Oversized epoch gaps are excluded from calibration and screening instead of being treated as comparable with densely sampled intervals.</div>
+      </section>
+
+      <section class="card" id="method">
+        <h2>Detector method</h2>
+        <ol>
+          <li>Parse and validate TLE or OMM history for one object.</li>
+          <li>Infer or apply an orbit-specific detector profile.</li>
+          <li>Propagate consecutive element sets to the later epoch using SGP4.</li>
+          <li>Compute radial, along-track and cross-track state residuals.</li>
+          <li>Combine state residuals with semi-major-axis rate, mean-motion, eccentricity-vector, inclination-vector and B* changes.</li>
+          <li>Fit rolling robust baselines using only preceding eligible pairs.</li>
+          <li>Apply magnitude and corroboration gates.</li>
+          <li>Group adjacent anomalous epochs into candidate events.</li>
+        </ol>
+        <p class="small muted">If satellite.js is unavailable, the workbench can fall back to elements-only analysis. The detector mode used is displayed in the result and technical details.</p>
+      </section>
+
+      <section class="card" id="profiles">
+        <h2>Orbit profiles</h2>
+        <p>Automatic mode classifies the orbit from its element history and applies profile-specific signal floors and thresholds.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Profile</th><th>Why it differs</th></tr></thead>
+            <tbody>
+              <tr><td>LEO</td><td>Drag, frequent catalog updates and dense constellation maintenance can affect normal variation.</td></tr>
+              <tr><td>MEO</td><td>Longer periods and different navigation or transfer-orbit behaviour require different residual scales.</td></tr>
+              <tr><td>GEO</td><td>Station-keeping produces small, structured changes and long orbital periods.</td></tr>
+              <tr><td>HEO</td><td>High eccentricity creates strongly varying orbital speed and geometry.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="events">
+        <h2>Candidate events</h2>
+        <p>Adjacent anomalous observations are grouped into one event rather than reported as separate maneuvers. An event can include:</p>
+        <ul>
+          <li>Start and end epochs</li>
+          <li>Strongest observation</li>
+          <li>Supporting observation count</li>
+          <li>Net semi-major-axis change</li>
+          <li>Screening tier and anomaly score</li>
+          <li>Data-quality qualification</li>
+          <li>Before-and-after orbit context</li>
+        </ul>
+        <p class="small muted">The 3D orbit comparison is approximate visual context and is not operational orbit determination.</p>
+      </section>
+
+      <section class="card" id="exports">
+        <h2>Exports and reproducibility</h2>
+        <p><strong>Download analysis package</strong> is the recommended export. It contains normalised input records, detector settings, method and workbench versions, quality checks, event results and the deterministic run identifier.</p>
+        <p>Exports keep missing element-set identifiers absent and preserve supplied values, including <code>0</code> and <code>999</code>. Appending the same orbital solution with better catalogue metadata retains the new metadata.</p>
+        <p>Workbench 3.4.9 preserves full fractional-day epoch precision and the original validated pair from new TLE imports through normalisation, append operations and saved packages. Reopening a new package retains the same TLE propagation input and evaluates common-epoch residuals at precise elapsed times. Retained lines are checked against the normalised fields before import.</p>
+        <p>Choose <strong>Replace current input</strong> to reopen a package and restore its input and settings. Legacy packages remain importable and receive a recomputed current run identifier. The importer reports when original TLE precision cannot be recovered. Older exports may also contain an invented <code>999</code> or have lost their TLE origin; reimport the original source to recover missing information.</p>
+        <p>Native OMM timestamps retain microseconds for ordering and target-epoch comparisons. Satellite.js still initialises native OMM orbital models through millisecond-resolution JavaScript dates.</p>
+        <details>
+          <summary>Package format and run identity</summary>
+          <p>New packages declare <code>package_schema_version: 1</code> and <code>run_identity_version: 2</code>. The <code>normalized_input_omm</code> array is retained. Original TLE pairs use <code>SMD_TLE: {schema_version: 1, line1, line2}</code> with <code>SMD_SOURCE_FORMAT: "TLE"</code>. The original-pair field remains optional for legacy records that lack source lines; saving them again retains only their available normalised data. Inconsistent retained data and unsupported explicit package versions are rejected.</p>
+          <p>Per-epoch results in CSV and analysis JSON use six fractional second digits in UTC; normalised OMM input retains its source epoch spelling. Interface labels retain millisecond resolution.</p>
+          <p>Identifiers use <code>smd-v2-</code> followed by an FNV-1a 64-bit noncryptographic hash of canonical run inputs, settings and the propagation contract. Equivalent supported UTC timestamp spellings share an identity. Legacy identifiers are replaced when the analysis is recalculated. This identifies numerical input, configuration and propagation. Generated time, latest-element age and freshness warnings are recomputed when reopening and can change.</p>
+        </details>
+        <ul>
+          <li>Evidence note for reports and review discussions</li>
+          <li>CSV containing per-epoch signals and screening state</li>
+          <li>JSON containing machine-readable analysis results</li>
+          <li>Combined chart PNG</li>
+          <li>Reproducibility package containing the complete run context</li>
+        </ul>
+        <div class="note">The same validated input, settings and propagation contract produce the same run identifier. A changed input or setting invalidates the previous result and exports.</div>
+      </section>
+
+      <section class="card" id="validation">
+        <h2>Validation tools</h2>
+        <p>The collapsed <strong>Developer validation tools</strong> section provides:</p>
+        <ul>
+          <li>Eight deterministic regression checks for candidate, quiet, sparse, malformed, mixed-object and grouping behaviour</li>
+          <li>Ranking across the built-in examples</li>
+          <li>A labelled benchmark runner</li>
+        </ul>
+        <p>The benchmark runner reports event-level precision, recall, F1, false events per object-month, detection delay and abstentions when supplied with a suitable labelled dataset.</p>
+        <p>Workbench 3.4.9 matches the largest possible number of prediction and truth events, then minimises total distance from each prediction's strongest point to the matched truth interval midpoint. A prediction is eligible when its interval overlaps the truth interval expanded by the selected tolerance, including the boundaries. Detection delay is measured from truth onset to prediction onset; strongest-point delay is a separate diagnostic.</p>
+        <p>New benchmark reports identify these rules and strict truth timestamp admission as <code>event-matching-v3</code>. Previously recorded research results retain their original scoring. Truth boundaries must be complete strings such as <code>2026-01-02T03:04:05.123456Z</code> or the equivalent with a numeric offset. Use uppercase <code>T</code> and <code>Z</code>, no surrounding whitespace and at most six fractional digits. Invalid calendar dates, values without a timezone and non-string values are rejected.</p>
+        <p>Supply <code>matching_tolerance_hours</code> as a JSON number from 0 to 168, including either boundary. Omit the field to use 24 hours. Numeric strings, null, booleans, arrays, objects and non-finite values are rejected.</p>
+        <p>Omit <code>end</code> for a point event. A supplied empty or null end is invalid, and end must not precede start after conversion to UTC. Accepted truth boundaries retain microseconds and are reported in UTC, independently of the computer timezone.</p>
+        <div class="warning">Synthetic regression checks validate software behaviour. They do not establish operational maneuver-detection performance.</div>
+      </section>
+
+      <section class="card" id="troubleshooting">
+        <h2>Troubleshooting</h2>
+        <details open>
+          <summary>Historical data load failed with HTTP 503</summary>
+          <p class="small muted">The same-site history endpoint is temporarily unavailable or cannot authenticate with Space-Track. The existing demonstration or imported input is preserved. Try again later or use a local TLE or OMM history file.</p>
+        </details>
+        <details>
+          <summary>Run analysis appears to do nothing</summary>
+          <p class="small muted">When a result is current, the control is disabled and labelled as up to date. After changing input or settings, run the analysis and use the sticky result bar or View result button to reach the summary.</p>
+        </details>
+        <details>
+          <summary>The workbench abstained</summary>
+          <p class="small muted">Open Technical details and review data quality. Common causes are too little history, mixed catalog identifiers, conflicting duplicate epochs, oversized gaps or unsuccessful propagation.</p>
+        </details>
+        <details>
+          <summary>A file was rejected</summary>
+          <p class="small muted">Check TLE line length and checksum, or ensure OMM JSON contains the required fields. Confirm that all records belong to one catalog object.</p>
+        </details>
+        <details>
+          <summary>SGP4 is unavailable</summary>
+          <p class="small muted">A browser extension, network filter or unavailable local vendor asset may have blocked satellite.js. Reload the page, verify the same-site asset route, or use elements-only mode. The result states which detector mode was used.</p>
+        </details>
+        <details>
+          <summary>No candidate event was found</summary>
+          <p class="small muted">This means no eligible observation passed the selected gates. It does not establish that the object did not maneuver. Review the date range, data density, profile and operational context.</p>
+        </details>
+      </section>
+
+      <section class="card" id="accessibility">
+        <h2>Accessibility</h2>
+        <p>The workbench supports keyboard navigation, visible focus, responsive layouts, status announcements and a tabular alternative for the interactive charts.</p>
+        <ul>
+          <li>Use the skip link to move directly to the analysis result.</li>
+          <li>Open <strong>Accessible chart data</strong> below the charts for the underlying values.</li>
+          <li>All primary actions use native buttons, links, inputs and disclosure controls.</li>
+        </ul>
+        <p class="small muted">An internal WCAG 2.2 AA-oriented review and automated smoke test are included in Workbench 3.4. This is not a formal Section 508 certification or third-party Accessibility Conformance Report. See the <a href="/satellite-maneuver-detector/accessibility">accessibility statement</a>.</p>
+      </section>
+
+
+      <section class="card" id="benchmark-status">
+        <h2>Benchmark status</h2>
+        <p>The workbench includes a browser benchmark runner, a small public v0.1 seed manifest covering LEO, MEO, GEO and HEO examples, a same-site builder that retrieves OMM histories, reporting by orbit profile and a deterministic missing-data sensitivity check. The public manifest route serves that seed and runner format; it is not publication benchmark v1.0.</p>
+        <p>Frozen publication benchmark v1.0 contains 40 satellite-disjoint development, calibration and confirmatory cases, including 10 verified-quiet controls and 154 documented event intervals. Its one-shot confirmatory partition has already been consumed and is permanently closed to retuning as untouched evidence. Physics-ML v1.0 failed the predeclared gate and was not integrated; detector 0.4 remains the public scientific method. Review the <a href="/satellite-maneuver-detector/benchmark">benchmark status and evidence distinctions</a> before citing any result.</p>
+      </section>
+
+      <section class="card" id="dependencies">
+        <h2>Local dependencies and security</h2>
+        <p>Plotly is served from a versioned local file and loaded on demand after analysis, avoiding the large renderer on the initial page load. satellite.js is pinned to version 6.0.2 and remains available at startup for SGP4 screening. Cesium has been removed; the optional 3D orbit context is rendered locally with Plotly.</p>
+        <ul>
+          <li>No analysis library is loaded by the browser from a third-party CDN.</li>
+          <li>The page uses a restrictive Content Security Policy and blocks framing.</li>
+          <li>Space-Track credentials remain outside the public web root and are never sent to the browser.</li>
+        </ul>
+      </section>
+
+      <section class="card" id="institutional-use">
+        <h2>Institutional evaluation</h2>
+        <p>This release is suitable for technical evaluation and research screening. It is not an operational space-domain-awareness service and should not be used as the sole basis for maneuver confirmation or operational decisions.</p>
+        <ul>
+          <li>Use labelled, independently sourced maneuver and quiet-control cases to evaluate performance.</li>
+          <li>Retain the analysis package and deterministic run identifier for review.</li>
+          <li>Confirm candidate events using orbit determination, additional catalogs and mission context.</li>
+        </ul>
+      </section>
+
+      <section class="card" id="limitations">
+        <h2>Limitations</h2>
+        <ul>
+          <li>The workbench screens catalog-level orbital changes and does not confirm burns, commands, intent or operational purpose.</li>
+          <li>TLE and OMM records are fitted element products rather than direct maneuver measurements.</li>
+          <li>Catalog updates, drag, sparse sampling and noisy fitting can produce unusual changes.</li>
+          <li>Internal screening tiers are not calibrated probabilities.</li>
+          <li>Follow-up should include source review, orbit determination, additional catalogs and mission context where available.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">
+    Documentation for <a href="/satellite-maneuver-detector">SatSift</a> by <a href="https://sylvesterkaczmarek.com/">Sylvester Kaczmarek</a>.<br />
+    Workbench 3.4.9 · Detector method 0.4 · Last updated November 2026
+  </footer>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "schema": "smd-browser-assets-v1",
+  "module_sources": [
+    "app/common.js",
+    "app/orbital-input.js",
+    "app/benchmark.js",
+    "app/packages.js",
+    "app/detection.js",
+    "app/interface.js"
+  ],
+  "entry_source": "app-3.4.js"
+}

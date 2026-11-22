@@ -1,0 +1,311 @@
+{
+  "schema": "smd-physics-ml-benchmark-results-v1",
+  "detector_method": "physics-ml-v0.2",
+  "benchmark_version": "0.3",
+  "matching_tolerance_hours": 24,
+  "training": {
+    "split": "calibration",
+    "nominal_rows_by_profile": {
+      "GEO": 13,
+      "LEO": 62
+    },
+    "calibrated_profiles": [
+      "GEO",
+      "LEO"
+    ],
+    "alpha_event": 0.02,
+    "betting_epsilon": 0.5,
+    "physics_z_gate": 2.0,
+    "qualification": "Profile-specific nominal models are fitted only from verified-quiet calibration rows. Profiles without sufficient nominal calibration data abstain."
+  },
+  "cases": [
+    {
+      "case_id": "iss-dragon-reboost-2024-11-08",
+      "object_id": "25544",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/",
+      "span_days": 14.75468524,
+      "abstained": true,
+      "abstention_reason": null,
+      "truth_events": [
+        {
+          "start": "2024-11-08T17:50:00Z",
+          "end": "2024-11-08T18:02:30Z",
+          "label": "Dragon reboost demonstration",
+          "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/"
+        }
+      ],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 84
+      }
+    },
+    {
+      "case_id": "iss-progress-reboost-2023-07-27",
+      "object_id": "25544",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/",
+      "span_days": 14.95794291,
+      "abstained": true,
+      "abstention_reason": null,
+      "truth_events": [
+        {
+          "start": "2023-07-27T00:00:00Z",
+          "end": "2023-07-27T23:59:59Z",
+          "label": "Progress 83P ISS reboost",
+          "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/"
+        }
+      ],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 63
+      }
+    },
+    {
+      "case_id": "ers2-passivated-2011-09",
+      "object_id": "23560",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.esa.int/Enabling_Support/Operations/ERS_satellite_missions_complete_after_20_years",
+      "span_days": 13.733801960011574,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 61,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 1
+      }
+    },
+    {
+      "case_id": "giovea-switched-off-2021-12",
+      "object_id": "28922",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "MEO",
+      "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_prototype_GIOVE-A_switched_off_after_16_years_in_orbit",
+      "span_days": 0,
+      "abstained": true,
+      "abstention_reason": "no calibrated nominal model for MEO",
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "meteosat7-passivated-2017-05",
+      "object_id": "24932",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "GEO",
+      "source": "https://www.eumetsat.int/features/life-and-times-meteosat-7",
+      "span_days": 13.22287955,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 13,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "sentinel1a-collision-avoidance-2014-04-05",
+      "object_id": "39634",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://blogs.esa.int/eolaunches/2014/04/09/a-night-shift-like-never-before/",
+      "span_days": 6.90545813,
+      "abstained": true,
+      "abstention_reason": null,
+      "truth_events": [
+        {
+          "start": "2014-04-05T05:14:00Z",
+          "end": "2014-04-05T05:14:39Z",
+          "label": "Sentinel-1A collision avoidance maneuver",
+          "source": "https://blogs.esa.int/eolaunches/2014/04/09/a-night-shift-like-never-before/"
+        }
+      ],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 22
+      }
+    },
+    {
+      "case_id": "goce-propulsion-exhausted-2013-10",
+      "object_id": "34602",
+      "split": "test",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.esa.int/Applications/Observing_the_Earth/FutureEO/GOCE/GOCE_completes_its_mission",
+      "span_days": 13.792170160011574,
+      "abstained": true,
+      "abstention_reason": null,
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 52
+      }
+    },
+    {
+      "case_id": "galileo5-recovery-2014-11",
+      "object_id": "40128",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "orbit_profile": "MEO",
+      "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals",
+      "span_days": 8.04884833,
+      "abstained": true,
+      "abstention_reason": "no calibrated nominal model for MEO",
+      "truth_events": [
+        {
+          "start": "2014-11-12T00:00:00Z",
+          "end": "2014-11-29T23:59:59Z",
+          "label": "Galileo 5 recovery maneuver campaign",
+          "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals"
+        }
+      ],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 2
+      }
+    },
+    {
+      "case_id": "himawari9-stationkeeping-2024-07",
+      "object_id": "41836",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "GEO",
+      "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html",
+      "span_days": 11.4083305,
+      "abstained": true,
+      "abstention_reason": null,
+      "truth_events": [
+        {
+          "start": "2024-07-04T22:15:00Z",
+          "end": "2024-07-04T22:50:00Z",
+          "label": "East-west station keeping",
+          "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html"
+        }
+      ],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 30
+      }
+    },
+    {
+      "case_id": "meteosat8-passivated-2022-10",
+      "object_id": "27509",
+      "split": "test",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "GEO",
+      "source": "https://www.eumetsat.int/long-serving-european-weather-satellite-safely-moved-graveyard-orbit",
+      "span_days": 5.30620308,
+      "abstained": true,
+      "abstention_reason": null,
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 9
+      }
+    },
+    {
+      "case_id": "integral-disposal-campaign-2015-01",
+      "object_id": "27540",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "HEO",
+      "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future",
+      "span_days": 15.012297860011573,
+      "abstained": true,
+      "abstention_reason": "no calibrated nominal model for HEO",
+      "truth_events": [
+        {
+          "start": "2015-01-24T00:00:00Z",
+          "end": "2015-01-24T23:59:59Z",
+          "label": "INTEGRAL large disposal burn",
+          "source": "https://blogs.esa.int/rocketscience/2015/01/24/burn-complete-update-at-1815-cet/"
+        },
+        {
+          "start": "2015-02-04T00:00:00Z",
+          "end": "2015-02-04T23:59:59Z",
+          "label": "INTEGRAL disposal burn",
+          "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future"
+        }
+      ],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 4
+      }
+    },
+    {
+      "case_id": "cluster-salsa-post-targeting-2024-02",
+      "object_id": "26411",
+      "split": "calibration",
+      "label_status": "unknown",
+      "label_confidence": "robustness-only",
+      "orbit_profile": "HEO",
+      "source": "https://www.esa.int/Science_Exploration/Space_Science/Cluster/Frequently_asked_questions_Cluster_s_Salsa_reentry",
+      "span_days": 9.04033282,
+      "abstained": true,
+      "abstention_reason": "no calibrated nominal model for HEO",
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 2
+      }
+    }
+  ]
+}

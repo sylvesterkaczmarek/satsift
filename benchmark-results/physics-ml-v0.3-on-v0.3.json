@@ -1,0 +1,592 @@
+{
+  "schema": "smd-physics-ml-benchmark-results-v1",
+  "detector_method": "physics-ml-v0.3",
+  "benchmark_version": "0.3",
+  "matching_tolerance_hours": 24,
+  "training": {
+    "split": "calibration",
+    "nominal_rows_by_profile": {
+      "GEO": 13,
+      "LEO": 62
+    },
+    "calibrated_profiles": [
+      "GEO",
+      "LEO"
+    ],
+    "alpha_event": 0.02,
+    "betting_epsilon": 0.5,
+    "physics_z_gate": 2.0,
+    "context_scale_floors": {
+      "log_gap_days": 0.5,
+      "log_semi_major_axis_km": 0.1,
+      "eccentricity": 0.01,
+      "inclination_sin": 0.25,
+      "log_abs_bstar": 0.001
+    },
+    "qualification": "Profile-specific nominal models use verified-quiet calibration rows only. Fixed physical context-scale floors prevent a single quiet spacecraft from defining zero within-regime support width."
+  },
+  "cases": [
+    {
+      "case_id": "iss-dragon-reboost-2024-11-08",
+      "object_id": "25544",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/",
+      "span_days": 14.75468524,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [
+        {
+          "start": "2024-11-08T17:50:00Z",
+          "end": "2024-11-08T18:02:30Z",
+          "label": "Dragon reboost demonstration",
+          "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/"
+        }
+      ],
+      "predicted_events": [
+        {
+          "start_utc": "2024-11-01T14:40:37.683Z",
+          "end_utc": "2024-11-03T04:14:26.149Z",
+          "strongest_utc": "2024-11-03T04:14:26.149Z",
+          "max_wealth": 24605.872521841753,
+          "max_score": 16070881.112198418,
+          "physical_modes": [
+            "cross-track",
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2024-11-03T15:14:02.919Z",
+          "end_utc": "2024-11-06T00:10:55.389Z",
+          "strongest_utc": "2024-11-06T00:10:55.389Z",
+          "max_wealth": 24596460936.003628,
+          "max_score": 112982967.88866091,
+          "physical_modes": [
+            "along-track",
+            "cross-track",
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2024-11-06T21:28:06.807Z",
+          "end_utc": "2024-11-06T21:28:06.807Z",
+          "strongest_utc": "2024-11-06T21:28:06.807Z",
+          "max_wealth": 677939954547.7319,
+          "max_score": 337704.9426181947,
+          "physical_modes": [
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2024-11-09T08:37:13.206Z",
+          "end_utc": "2024-11-09T11:44:19.783Z",
+          "strongest_utc": "2024-11-09T11:44:19.783Z",
+          "max_wealth": 8.964897096062676e+17,
+          "max_score": 26839340.28671628,
+          "physical_modes": [
+            "along-track"
+          ]
+        },
+        {
+          "start_utc": "2024-11-10T10:55:16.519Z",
+          "end_utc": "2024-11-10T21:39:46.304Z",
+          "strongest_utc": "2024-11-10T21:39:46.304Z",
+          "max_wealth": 6.810555281794394e+20,
+          "max_score": 8264216.754477069,
+          "physical_modes": [
+            "along-track",
+            "cross-track",
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2024-11-11T19:13:55.901Z",
+          "end_utc": "2024-11-12T01:37:01.528Z",
+          "strongest_utc": "2024-11-12T01:37:01.528Z",
+          "max_wealth": 9.85508632260904e+22,
+          "max_score": 41046.86804315253,
+          "physical_modes": [
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2024-11-12T09:32:00.271Z",
+          "end_utc": "2024-11-12T18:11:14.000Z",
+          "strongest_utc": "2024-11-12T18:11:14.000Z",
+          "max_wealth": 2.7163081676691165e+24,
+          "max_score": 1450415.6211310886,
+          "physical_modes": [
+            "cross-track",
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2024-11-13T04:58:47.372Z",
+          "end_utc": "2024-11-13T04:58:47.372Z",
+          "strongest_utc": "2024-11-13T04:58:47.372Z",
+          "max_wealth": 3.2675180446572627e+25,
+          "max_score": 141038.85035618508,
+          "physical_modes": [
+            "cross-track"
+          ]
+        },
+        {
+          "start_utc": "2024-11-14T07:16:32.310Z",
+          "end_utc": "2024-11-15T10:03:51.002Z",
+          "strongest_utc": "2024-11-15T10:03:51.002Z",
+          "max_wealth": 3.909630970811357e+29,
+          "max_score": 372215215.5115093,
+          "physical_modes": [
+            "along-track",
+            "cross-track",
+            "mixed-physical-support"
+          ]
+        }
+      ],
+      "decision_counts": {
+        "nominal": 4,
+        "candidate": 34,
+        "statistical-alert": 44,
+        "abstain": 2
+      }
+    },
+    {
+      "case_id": "iss-progress-reboost-2023-07-27",
+      "object_id": "25544",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/",
+      "span_days": 14.95794291,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [
+        {
+          "start": "2023-07-27T00:00:00Z",
+          "end": "2023-07-27T23:59:59Z",
+          "label": "Progress 83P ISS reboost",
+          "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/"
+        }
+      ],
+      "predicted_events": [
+        {
+          "start_utc": "2023-07-21T16:25:37.184Z",
+          "end_utc": "2023-07-21T16:25:37.184Z",
+          "strongest_utc": "2023-07-21T16:25:37.184Z",
+          "max_wealth": 197.22826140469294,
+          "max_score": 10392.06872119163,
+          "physical_modes": [
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2023-07-24T13:44:24.000Z",
+          "end_utc": "2023-07-27T03:42:38.534Z",
+          "strongest_utc": "2023-07-27T03:42:38.534Z",
+          "max_wealth": 129691.5674951966,
+          "max_score": 419746.0442785254,
+          "physical_modes": [
+            "cross-track",
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2023-07-27T14:48:40.395Z",
+          "end_utc": "2023-07-27T21:04:56.223Z",
+          "strongest_utc": "2023-07-27T21:04:56.223Z",
+          "max_wealth": 3095713.7442231723,
+          "max_score": 1085825.4466323988,
+          "physical_modes": [
+            "along-track",
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2023-07-28T12:07:53.999Z",
+          "end_utc": "2023-07-28T12:07:53.999Z",
+          "strongest_utc": "2023-07-28T12:07:53.999Z",
+          "max_wealth": 548636034.3484132,
+          "max_score": 5739718.844619208,
+          "physical_modes": [
+            "along-track"
+          ]
+        },
+        {
+          "start_utc": "2023-07-28T21:52:45.225Z",
+          "end_utc": "2023-07-29T13:00:47.999Z",
+          "strongest_utc": "2023-07-29T13:00:47.999Z",
+          "max_wealth": 157533354961.67255,
+          "max_score": 18169076.795143437,
+          "physical_modes": [
+            "cross-track",
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2023-07-30T04:26:32.568Z",
+          "end_utc": "2023-07-30T04:26:32.568Z",
+          "strongest_utc": "2023-07-30T04:26:32.568Z",
+          "max_wealth": 4342013096130.3315,
+          "max_score": 246838.14866716502,
+          "physical_modes": [
+            "cross-track"
+          ]
+        },
+        {
+          "start_utc": "2023-07-30T20:25:07.785Z",
+          "end_utc": "2023-07-30T20:25:07.785Z",
+          "strongest_utc": "2023-07-30T20:25:07.785Z",
+          "max_wealth": 52231209663955.086,
+          "max_score": 65538.70108792544,
+          "physical_modes": [
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2023-07-31T21:05:59.964Z",
+          "end_utc": "2023-07-31T21:05:59.964Z",
+          "strongest_utc": "2023-07-31T21:05:59.964Z",
+          "max_wealth": 2473942526216361.0,
+          "max_score": 3675.770786344127,
+          "physical_modes": [
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2023-08-01T12:23:58.163Z",
+          "end_utc": "2023-08-02T02:04:31.401Z",
+          "strongest_utc": "2023-08-02T02:04:31.401Z",
+          "max_wealth": 3.1002602208567085e+17,
+          "max_score": 567987.6116784322,
+          "physical_modes": [
+            "cross-track",
+            "mixed-physical-support"
+          ]
+        },
+        {
+          "start_utc": "2023-08-03T06:32:29.290Z",
+          "end_utc": "2023-08-03T14:00:56.589Z",
+          "strongest_utc": "2023-08-03T14:00:56.589Z",
+          "max_wealth": 1.2365015496348724e+21,
+          "max_score": 6214977.913401311,
+          "physical_modes": [
+            "cross-track"
+          ]
+        }
+      ],
+      "decision_counts": {
+        "nominal": 5,
+        "candidate": 20,
+        "statistical-alert": 38,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "ers2-passivated-2011-09",
+      "object_id": "23560",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.esa.int/Enabling_Support/Operations/ERS_satellite_missions_complete_after_20_years",
+      "span_days": 13.733801960011574,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 62,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "giovea-switched-off-2021-12",
+      "object_id": "28922",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "MEO",
+      "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_prototype_GIOVE-A_switched_off_after_16_years_in_orbit",
+      "span_days": 0,
+      "abstained": true,
+      "abstention_reason": "no calibrated nominal model for MEO",
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "meteosat7-passivated-2017-05",
+      "object_id": "24932",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "GEO",
+      "source": "https://www.eumetsat.int/features/life-and-times-meteosat-7",
+      "span_days": 13.22287955,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 13,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "sentinel1a-collision-avoidance-2014-04-05",
+      "object_id": "39634",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://blogs.esa.int/eolaunches/2014/04/09/a-night-shift-like-never-before/",
+      "span_days": 6.90545813,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [
+        {
+          "start": "2014-04-05T05:14:00Z",
+          "end": "2014-04-05T05:14:39Z",
+          "label": "Sentinel-1A collision avoidance maneuver",
+          "source": "https://blogs.esa.int/eolaunches/2014/04/09/a-night-shift-like-never-before/"
+        }
+      ],
+      "predicted_events": [
+        {
+          "start_utc": "2014-04-06T11:33:26.221Z",
+          "end_utc": "2014-04-10T20:42:31.476Z",
+          "strongest_utc": "2014-04-10T20:42:31.476Z",
+          "max_wealth": 511849.4766189398,
+          "max_score": 13.435208513509984,
+          "physical_modes": [
+            "mixed-physical-support"
+          ]
+        }
+      ],
+      "decision_counts": {
+        "nominal": 8,
+        "candidate": 14,
+        "statistical-alert": 0,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "goce-propulsion-exhausted-2013-10",
+      "object_id": "34602",
+      "split": "test",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.esa.int/Applications/Observing_the_Earth/FutureEO/GOCE/GOCE_completes_its_mission",
+      "span_days": 13.792170160011574,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [],
+      "predicted_events": [
+        {
+          "start_utc": "2013-10-25T10:54:45.280Z",
+          "end_utc": "2013-11-02T03:46:50.272Z",
+          "strongest_utc": "2013-11-02T03:46:50.272Z",
+          "max_wealth": 453745221527.33636,
+          "max_score": 2695516.3662373195,
+          "physical_modes": [
+            "along-track",
+            "mixed-physical-support",
+            "radial"
+          ]
+        },
+        {
+          "start_utc": "2013-11-02T20:09:48.858Z",
+          "end_utc": "2013-11-03T09:00:05.020Z",
+          "strongest_utc": "2013-11-03T09:00:05.020Z",
+          "max_wealth": 28655653885255.27,
+          "max_score": 132503.84789838464,
+          "physical_modes": [
+            "along-track"
+          ]
+        },
+        {
+          "start_utc": "2013-11-03T20:48:15.999Z",
+          "end_utc": "2013-11-05T22:54:01.009Z",
+          "strongest_utc": "2013-11-05T22:54:01.009Z",
+          "max_wealth": 3.150108022924518e+18,
+          "max_score": 3010781.500627091,
+          "physical_modes": [
+            "along-track",
+            "cross-track"
+          ]
+        }
+      ],
+      "decision_counts": {
+        "nominal": 5,
+        "candidate": 37,
+        "statistical-alert": 10,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "galileo5-recovery-2014-11",
+      "object_id": "40128",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "orbit_profile": "MEO",
+      "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals",
+      "span_days": 8.04884833,
+      "abstained": true,
+      "abstention_reason": "no calibrated nominal model for MEO",
+      "truth_events": [
+        {
+          "start": "2014-11-12T00:00:00Z",
+          "end": "2014-11-29T23:59:59Z",
+          "label": "Galileo 5 recovery maneuver campaign",
+          "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals"
+        }
+      ],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 2
+      }
+    },
+    {
+      "case_id": "himawari9-stationkeeping-2024-07",
+      "object_id": "41836",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "GEO",
+      "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html",
+      "span_days": 11.4083305,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [
+        {
+          "start": "2024-07-04T22:15:00Z",
+          "end": "2024-07-04T22:50:00Z",
+          "label": "East-west station keeping",
+          "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html"
+        }
+      ],
+      "predicted_events": [
+        {
+          "start_utc": "2024-06-29T23:57:42.453Z",
+          "end_utc": "2024-07-08T22:20:42.605Z",
+          "strongest_utc": "2024-07-08T22:20:42.605Z",
+          "max_wealth": 90554761.89777423,
+          "max_score": 9594.931586311364,
+          "physical_modes": [
+            "along-track",
+            "cross-track"
+          ]
+        }
+      ],
+      "decision_counts": {
+        "nominal": 6,
+        "candidate": 24,
+        "statistical-alert": 0,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "meteosat8-passivated-2022-10",
+      "object_id": "27509",
+      "split": "test",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "GEO",
+      "source": "https://www.eumetsat.int/long-serving-european-weather-satellite-safely-moved-graveyard-orbit",
+      "span_days": 5.30620308,
+      "abstained": false,
+      "abstention_reason": null,
+      "truth_events": [],
+      "predicted_events": [
+        {
+          "start_utc": "2022-10-31T14:00:35.411Z",
+          "end_utc": "2022-11-01T14:54:27.455Z",
+          "strongest_utc": "2022-11-01T14:54:27.455Z",
+          "max_wealth": 175.5510103595012,
+          "max_score": 7.233991601393142,
+          "physical_modes": [
+            "along-track",
+            "cross-track",
+            "radial"
+          ]
+        }
+      ],
+      "decision_counts": {
+        "nominal": 6,
+        "candidate": 3,
+        "statistical-alert": 0,
+        "abstain": 0
+      }
+    },
+    {
+      "case_id": "integral-disposal-campaign-2015-01",
+      "object_id": "27540",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "HEO",
+      "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future",
+      "span_days": 15.012297860011573,
+      "abstained": true,
+      "abstention_reason": "no calibrated nominal model for HEO",
+      "truth_events": [
+        {
+          "start": "2015-01-24T00:00:00Z",
+          "end": "2015-01-24T23:59:59Z",
+          "label": "INTEGRAL large disposal burn",
+          "source": "https://blogs.esa.int/rocketscience/2015/01/24/burn-complete-update-at-1815-cet/"
+        },
+        {
+          "start": "2015-02-04T00:00:00Z",
+          "end": "2015-02-04T23:59:59Z",
+          "label": "INTEGRAL disposal burn",
+          "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future"
+        }
+      ],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 4
+      }
+    },
+    {
+      "case_id": "cluster-salsa-post-targeting-2024-02",
+      "object_id": "26411",
+      "split": "calibration",
+      "label_status": "unknown",
+      "label_confidence": "robustness-only",
+      "orbit_profile": "HEO",
+      "source": "https://www.esa.int/Science_Exploration/Space_Science/Cluster/Frequently_asked_questions_Cluster_s_Salsa_reentry",
+      "span_days": 9.04033282,
+      "abstained": true,
+      "abstention_reason": "no calibrated nominal model for HEO",
+      "truth_events": [],
+      "predicted_events": [],
+      "decision_counts": {
+        "nominal": 0,
+        "candidate": 0,
+        "statistical-alert": 0,
+        "abstain": 2
+      }
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+  function satrecForRecord(record) {
+    if (!window.satellite || !record) return null;
+    if (record._satrec) return record._satrec;
+    try {
+      if (record.line1 && record.line2) {
+        // satellite.js does not interpret the documented all-blank TLE exponent
+        // fields as zero. Normalise only its input, retaining the source record.
+        let line1 = record.line1;
+        for (const start of [44, 53]) {
+          if (line1.slice(start, start + 8).trim() === '') {
+            line1 = line1.slice(0, start) + ' 00000-0' + line1.slice(start + 8);
+          }
+        }
+        record._satrec = window.satellite.twoline2satrec(line1, record.line2);
+      } else {
+        // The bundled parser appends Z to explicit offsets; give it UTC while
+        // preserving epochRaw and epochUs for source display and ordering.
+        const omm = recordToOmm(record);
+        omm.EPOCH = record.t.toISOString();
+        record._satrec = window.satellite.json2satrec(omm);
+      }
+      return record._satrec;
+    } catch (error) {
+      record._satrecError = error && error.message ? error.message : String(error);
+      return null;
+    }
+  }

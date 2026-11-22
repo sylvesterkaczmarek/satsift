@@ -1,0 +1,821 @@
+{
+  "schema": "smd-baseline-benchmark-results-v1",
+  "detector_method": "v0.4",
+  "benchmark_version": "0.3",
+  "matching_tolerance_hours": 24,
+  "settings": {
+    "requestedWindow": 6,
+    "alpha": 0.1,
+    "minAbsDeltaA": 0.05,
+    "maximumStaleDays": 36500,
+    "maximumGapFactor": 3,
+    "orbitProfile": "auto",
+    "detectorMode": "multivariate"
+  },
+  "cases": [
+    {
+      "case_id": "iss-dragon-reboost-2024-11-08",
+      "object_id": "25544",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/",
+      "span_days": 14.75468524,
+      "abstained": false,
+      "classification": "Strong candidate event",
+      "quality_status": "usable with warnings",
+      "run_id": "smd-71cc34e710a189f1",
+      "truth_events": [
+        {
+          "start": "2024-11-08T17:50:00Z",
+          "end": "2024-11-08T18:02:30Z",
+          "label": "Dragon reboost demonstration",
+          "source": "https://www.nasa.gov/blogs/spacestation/2024/11/08/dragon-spacecraft-boosts-station-for-first-time/"
+        }
+      ],
+      "predicted_events": [
+        {
+          "event_id": "EVT-001",
+          "start_utc": "2024-11-02T14:27:19.747Z",
+          "end_utc": "2024-11-02T14:27:19.747Z",
+          "strongest_utc": "2024-11-02T14:27:19.747Z",
+          "tier": "Moderate",
+          "score": 2.1772362709817563,
+          "net_delta_a_km": 0.004209642342175357,
+          "supporting_features": [
+            "alongRate",
+            "crossRate"
+          ]
+        },
+        {
+          "event_id": "EVT-002",
+          "start_utc": "2024-11-04T14:25:20.231Z",
+          "end_utc": "2024-11-04T14:25:20.231Z",
+          "strongest_utc": "2024-11-04T14:25:20.231Z",
+          "tier": "Moderate",
+          "score": 2.9580770474913773,
+          "net_delta_a_km": 0.009179908982332563,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "alongRate",
+            "eccentricityVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-003",
+          "start_utc": "2024-11-05T13:36:12.282Z",
+          "end_utc": "2024-11-05T13:36:12.282Z",
+          "strongest_utc": "2024-11-05T13:36:12.282Z",
+          "tier": "Strong",
+          "score": 93.60415998317504,
+          "net_delta_a_km": -0.030509281313243264,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "alongRate",
+            "crossRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate",
+            "bstarRate"
+          ]
+        },
+        {
+          "event_id": "EVT-004",
+          "start_utc": "2024-11-09T04:07:06.144Z",
+          "end_utc": "2024-11-09T11:44:19.783Z",
+          "strongest_utc": "2024-11-09T04:07:06.144Z",
+          "tier": "Strong",
+          "score": 10.080168772873357,
+          "net_delta_a_km": -0.27504331658565206,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "crossRate",
+            "bstarRate",
+            "alongRate",
+            "inclinationVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-005",
+          "start_utc": "2024-11-10T21:39:46.304Z",
+          "end_utc": "2024-11-10T21:39:46.304Z",
+          "strongest_utc": "2024-11-10T21:39:46.304Z",
+          "tier": "Strong",
+          "score": 9.610236529765132,
+          "net_delta_a_km": -0.019129668105051678,
+          "supporting_features": [
+            "alongRate",
+            "crossRate",
+            "eccentricityVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-006",
+          "start_utc": "2024-11-12T05:47:25.801Z",
+          "end_utc": "2024-11-12T09:32:00.271Z",
+          "strongest_utc": "2024-11-12T09:32:00.271Z",
+          "tier": "Strong",
+          "score": 52.01312413556487,
+          "net_delta_a_km": -0.029718409399720258,
+          "supporting_features": [
+            "alongRate",
+            "crossRate",
+            "bstarRate",
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-007",
+          "start_utc": "2024-11-14T07:16:32.310Z",
+          "end_utc": "2024-11-14T11:04:27.099Z",
+          "strongest_utc": "2024-11-14T07:16:32.310Z",
+          "tier": "Strong",
+          "score": 200.20667860101463,
+          "net_delta_a_km": -3.893605806263622,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "alongRate",
+            "eccentricityVectorRate",
+            "bstarRate",
+            "crossRate",
+            "inclinationVectorRate"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "iss-progress-reboost-2023-07-27",
+      "object_id": "25544",
+      "split": "calibration",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/",
+      "span_days": 14.95794291,
+      "abstained": false,
+      "classification": "Strong candidate event",
+      "quality_status": "usable with warnings",
+      "run_id": "smd-38bac4904d36a5e0",
+      "truth_events": [
+        {
+          "start": "2023-07-27T00:00:00Z",
+          "end": "2023-07-27T23:59:59Z",
+          "label": "Progress 83P ISS reboost",
+          "source": "https://www.nasa.gov/blogs/stationreport/2023/07/27/iss-daily-summary-report-7-27-2023/"
+        }
+      ],
+      "predicted_events": [
+        {
+          "event_id": "EVT-001",
+          "start_utc": "2023-07-27T03:42:38.534Z",
+          "end_utc": "2023-07-27T03:42:38.534Z",
+          "strongest_utc": "2023-07-27T03:42:38.534Z",
+          "tier": "Strong",
+          "score": 3.6580541115242906,
+          "net_delta_a_km": -0.02672153968069324,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "alongRate",
+            "crossRate",
+            "inclinationVectorRate",
+            "bstarRate"
+          ]
+        },
+        {
+          "event_id": "EVT-002",
+          "start_utc": "2023-07-27T21:04:56.223Z",
+          "end_utc": "2023-07-27T22:41:14.883Z",
+          "strongest_utc": "2023-07-27T22:41:14.883Z",
+          "tier": "Strong",
+          "score": 60.211957528017166,
+          "net_delta_a_km": 0.7016856322297826,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "alongRate",
+            "eccentricityVectorRate",
+            "bstarRate"
+          ]
+        },
+        {
+          "event_id": "EVT-003",
+          "start_utc": "2023-07-28T19:56:42.746Z",
+          "end_utc": "2023-07-28T19:56:42.746Z",
+          "strongest_utc": "2023-07-28T19:56:42.746Z",
+          "tier": "Weak",
+          "score": 1.4898096919455295,
+          "net_delta_a_km": 0.01229695222900773,
+          "supporting_features": [
+            "radialRate",
+            "crossRate"
+          ]
+        },
+        {
+          "event_id": "EVT-004",
+          "start_utc": "2023-07-31T12:56:18.371Z",
+          "end_utc": "2023-07-31T12:56:18.371Z",
+          "strongest_utc": "2023-07-31T12:56:18.371Z",
+          "tier": "Moderate",
+          "score": 2.12820795172912,
+          "net_delta_a_km": -0.014195341539561923,
+          "supporting_features": [
+            "radialRate",
+            "alongRate",
+            "crossRate",
+            "eccentricityVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-005",
+          "start_utc": "2023-08-02T02:04:31.401Z",
+          "end_utc": "2023-08-02T02:04:31.401Z",
+          "strongest_utc": "2023-08-02T02:04:31.401Z",
+          "tier": "Strong",
+          "score": 16.14773993282924,
+          "net_delta_a_km": -0.013636232368298806,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "alongRate",
+            "crossRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate",
+            "bstarRate"
+          ]
+        },
+        {
+          "event_id": "EVT-006",
+          "start_utc": "2023-08-03T05:01:23.619Z",
+          "end_utc": "2023-08-03T14:00:56.589Z",
+          "strongest_utc": "2023-08-03T06:32:29.290Z",
+          "tier": "Strong",
+          "score": 18.29959199670849,
+          "net_delta_a_km": -0.06977904465838947,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "alongRate",
+            "crossRate",
+            "inclinationVectorRate",
+            "eccentricityVectorRate",
+            "bstarRate"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "ers2-passivated-2011-09",
+      "object_id": "23560",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.esa.int/Enabling_Support/Operations/ERS_satellite_missions_complete_after_20_years",
+      "span_days": 13.733801960011574,
+      "abstained": false,
+      "classification": "Strong candidate event",
+      "quality_status": "usable with warnings",
+      "run_id": "smd-edef41f79994de6f",
+      "truth_events": [],
+      "predicted_events": [
+        {
+          "event_id": "EVT-001",
+          "start_utc": "2011-09-08T19:00:03.290Z",
+          "end_utc": "2011-09-08T23:48:03.867Z",
+          "strongest_utc": "2011-09-08T23:48:03.867Z",
+          "tier": "Strong",
+          "score": 7.7110129736406465,
+          "net_delta_a_km": -0.17342254173945548,
+          "supporting_features": [
+            "radialRate",
+            "crossRate",
+            "inclinationVectorRate",
+            "bstarRate",
+            "alongRate",
+            "eccentricityVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-002",
+          "start_utc": "2011-09-11T17:24:14.287Z",
+          "end_utc": "2011-09-11T17:24:14.287Z",
+          "strongest_utc": "2011-09-11T17:24:14.287Z",
+          "tier": "Weak",
+          "score": 1.5338951456671654,
+          "net_delta_a_km": 0.2415129168120984,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "alongRate"
+          ]
+        },
+        {
+          "event_id": "EVT-003",
+          "start_utc": "2011-09-13T11:00:20.376Z",
+          "end_utc": "2011-09-13T11:00:20.376Z",
+          "strongest_utc": "2011-09-13T11:00:20.376Z",
+          "tier": "Weak",
+          "score": 1.5344148859777649,
+          "net_delta_a_km": 0.22934652024105162,
+          "supporting_features": [
+            "radialRate",
+            "alongRate",
+            "eccentricityVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-004",
+          "start_utc": "2011-09-15T14:12:27.444Z",
+          "end_utc": "2011-09-15T14:12:27.444Z",
+          "strongest_utc": "2011-09-15T14:12:27.444Z",
+          "tier": "Strong",
+          "score": 3.524727632340397,
+          "net_delta_a_km": -0.01304970097316982,
+          "supporting_features": [
+            "radialRate",
+            "crossRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-005",
+          "start_utc": "2011-09-16T07:48:28.665Z",
+          "end_utc": "2011-09-16T07:48:28.665Z",
+          "strongest_utc": "2011-09-16T07:48:28.665Z",
+          "tier": "Weak",
+          "score": 1.4721979409009385,
+          "net_delta_a_km": 0.12171203108209738,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "alongRate"
+          ]
+        },
+        {
+          "event_id": "EVT-006",
+          "start_utc": "2011-09-17T11:00:29.779Z",
+          "end_utc": "2011-09-17T22:12:30.200Z",
+          "strongest_utc": "2011-09-17T14:12:28.989Z",
+          "tier": "Strong",
+          "score": 4.894106736433406,
+          "net_delta_a_km": 0.2636102337792181,
+          "supporting_features": [
+            "crossRate",
+            "inclinationVectorRate",
+            "aRate",
+            "meanMotionRate",
+            "alongRate",
+            "eccentricityVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-007",
+          "start_utc": "2011-09-20T01:24:31.277Z",
+          "end_utc": "2011-09-20T01:24:31.277Z",
+          "strongest_utc": "2011-09-20T01:24:31.277Z",
+          "tier": "Weak",
+          "score": 1.5517305800347871,
+          "net_delta_a_km": 0.3109048081232686,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "alongRate",
+            "eccentricityVectorRate"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "giovea-switched-off-2021-12",
+      "object_id": "28922",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "MEO",
+      "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_prototype_GIOVE-A_switched_off_after_16_years_in_orbit",
+      "span_days": 0,
+      "abstained": true,
+      "classification": "Input error",
+      "quality_status": "unusable",
+      "run_id": null,
+      "truth_events": [],
+      "predicted_events": []
+    },
+    {
+      "case_id": "meteosat7-passivated-2017-05",
+      "object_id": "24932",
+      "split": "calibration",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "GEO",
+      "source": "https://www.eumetsat.int/features/life-and-times-meteosat-7",
+      "span_days": 13.22287955,
+      "abstained": false,
+      "classification": "Moderate candidate event",
+      "quality_status": "usable with warnings",
+      "run_id": "smd-4dbf79258ffdce1b",
+      "truth_events": [],
+      "predicted_events": [
+        {
+          "event_id": "EVT-001",
+          "start_utc": "2017-05-08T23:30:56.215Z",
+          "end_utc": "2017-05-09T23:55:36.371Z",
+          "strongest_utc": "2017-05-08T23:30:56.215Z",
+          "tier": "Moderate",
+          "score": 2.2741330142020804,
+          "net_delta_a_km": -0.1732477131736232,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate"
+          ]
+        },
+        {
+          "event_id": "EVT-002",
+          "start_utc": "2017-05-13T01:09:38.751Z",
+          "end_utc": "2017-05-15T01:59:02.699Z",
+          "strongest_utc": "2017-05-13T01:09:38.751Z",
+          "tier": "Weak",
+          "score": 1.5198712547337976,
+          "net_delta_a_km": 0.27928284908557544,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "inclinationVectorRate",
+            "eccentricityVectorRate"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "sentinel1a-collision-avoidance-2014-04-05",
+      "object_id": "39634",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://blogs.esa.int/eolaunches/2014/04/09/a-night-shift-like-never-before/",
+      "span_days": 6.90545813,
+      "abstained": false,
+      "classification": "Weak candidate event",
+      "quality_status": "usable",
+      "run_id": "smd-ffab3d67e16f780b",
+      "truth_events": [
+        {
+          "start": "2014-04-05T05:14:00Z",
+          "end": "2014-04-05T05:14:39Z",
+          "label": "Sentinel-1A collision avoidance maneuver",
+          "source": "https://blogs.esa.int/eolaunches/2014/04/09/a-night-shift-like-never-before/"
+        }
+      ],
+      "predicted_events": [
+        {
+          "event_id": "EVT-001",
+          "start_utc": "2014-04-08T04:37:55.457Z",
+          "end_utc": "2014-04-08T04:37:55.457Z",
+          "strongest_utc": "2014-04-08T04:37:55.457Z",
+          "tier": "Weak",
+          "score": 1.2226791168809525,
+          "net_delta_a_km": -0.0011377072705727187,
+          "supporting_features": [
+            "crossRate",
+            "inclinationVectorRate"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "goce-propulsion-exhausted-2013-10",
+      "object_id": "34602",
+      "split": "test",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "LEO",
+      "source": "https://www.esa.int/Applications/Observing_the_Earth/FutureEO/GOCE/GOCE_completes_its_mission",
+      "span_days": 13.792170160011574,
+      "abstained": false,
+      "classification": "Strong candidate event",
+      "quality_status": "usable with warnings",
+      "run_id": "smd-082c5780a2335689",
+      "truth_events": [],
+      "predicted_events": [
+        {
+          "event_id": "EVT-001",
+          "start_utc": "2013-10-26T03:05:33.999Z",
+          "end_utc": "2013-10-27T04:16:25.089Z",
+          "strongest_utc": "2013-10-27T04:16:25.089Z",
+          "tier": "Moderate",
+          "score": 2.6826413673731695,
+          "net_delta_a_km": -2.6149900325490307,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "alongRate",
+            "eccentricityVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-002",
+          "start_utc": "2013-10-28T14:02:19.350Z",
+          "end_utc": "2013-10-28T14:02:19.350Z",
+          "strongest_utc": "2013-10-28T14:02:19.350Z",
+          "tier": "Strong",
+          "score": 37.48171264787087,
+          "net_delta_a_km": -0.25881389911501174,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "crossRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate",
+            "bstarRate"
+          ]
+        },
+        {
+          "event_id": "EVT-003",
+          "start_utc": "2013-10-29T20:05:31.114Z",
+          "end_utc": "2013-10-29T20:05:31.114Z",
+          "strongest_utc": "2013-10-29T20:05:31.114Z",
+          "tier": "Strong",
+          "score": 14.614381344776538,
+          "net_delta_a_km": -0.04389284682383732,
+          "supporting_features": [
+            "radialRate",
+            "alongRate",
+            "crossRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate",
+            "bstarRate"
+          ]
+        },
+        {
+          "event_id": "EVT-004",
+          "start_utc": "2013-10-30T13:24:03.286Z",
+          "end_utc": "2013-10-30T13:24:03.286Z",
+          "strongest_utc": "2013-10-30T13:24:03.286Z",
+          "tier": "Moderate",
+          "score": 2.8804099309568003,
+          "net_delta_a_km": -0.1318950887880419,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate"
+          ]
+        },
+        {
+          "event_id": "EVT-005",
+          "start_utc": "2013-10-31T17:29:50.595Z",
+          "end_utc": "2013-10-31T19:28:16.703Z",
+          "strongest_utc": "2013-10-31T17:29:50.595Z",
+          "tier": "Strong",
+          "score": 8.3517293084561,
+          "net_delta_a_km": -0.32322221286904096,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "alongRate",
+            "crossRate",
+            "inclinationVectorRate",
+            "bstarRate"
+          ]
+        },
+        {
+          "event_id": "EVT-006",
+          "start_utc": "2013-11-03T09:00:05.020Z",
+          "end_utc": "2013-11-03T14:54:08.935Z",
+          "strongest_utc": "2013-11-03T09:00:05.020Z",
+          "tier": "Strong",
+          "score": 7.93368689905778,
+          "net_delta_a_km": -1.6799966994276474,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "crossRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate",
+            "bstarRate"
+          ]
+        },
+        {
+          "event_id": "EVT-007",
+          "start_utc": "2013-11-04T13:01:15.869Z",
+          "end_utc": "2013-11-05T04:04:45.956Z",
+          "strongest_utc": "2013-11-05T04:04:45.956Z",
+          "tier": "Strong",
+          "score": 6.702997605653531,
+          "net_delta_a_km": -3.9516030235281505,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "alongRate",
+            "crossRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate",
+            "bstarRate"
+          ]
+        },
+        {
+          "event_id": "EVT-008",
+          "start_utc": "2013-11-05T20:25:44.847Z",
+          "end_utc": "2013-11-05T20:25:44.847Z",
+          "strongest_utc": "2013-11-05T20:25:44.847Z",
+          "tier": "Strong",
+          "score": 4.533397756492995,
+          "net_delta_a_km": -0.018701531937949767,
+          "supporting_features": [
+            "radialRate",
+            "alongRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "galileo5-recovery-2014-11",
+      "object_id": "40128",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "medium-public-evidence",
+      "orbit_profile": "MEO",
+      "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals",
+      "span_days": 8.04884833,
+      "abstained": true,
+      "classification": "Abstain due to insufficient evaluated history",
+      "quality_status": "usable",
+      "run_id": "smd-4f638725b95fb92e",
+      "truth_events": [
+        {
+          "start": "2014-11-12T00:00:00Z",
+          "end": "2014-11-29T23:59:59Z",
+          "label": "Galileo 5 recovery maneuver campaign",
+          "source": "https://www.esa.int/Applications/Satellite_navigation/Galileo_satellite_recovered_and_transmitting_navigation_signals"
+        }
+      ],
+      "predicted_events": []
+    },
+    {
+      "case_id": "himawari9-stationkeeping-2024-07",
+      "object_id": "41836",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "GEO",
+      "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html",
+      "span_days": 11.4083305,
+      "abstained": false,
+      "classification": "Strong candidate event",
+      "quality_status": "usable with warnings",
+      "run_id": "smd-32f2cc76c12201af",
+      "truth_events": [
+        {
+          "start": "2024-07-04T22:15:00Z",
+          "end": "2024-07-04T22:50:00Z",
+          "label": "East-west station keeping",
+          "source": "https://www.ospo.noaa.gov/data/messages/2024/06/MSG_20240627_1300.html"
+        }
+      ],
+      "predicted_events": [
+        {
+          "event_id": "EVT-001",
+          "start_utc": "2024-07-01T18:45:40.368Z",
+          "end_utc": "2024-07-02T13:05:37.585Z",
+          "strongest_utc": "2024-07-01T18:45:40.368Z",
+          "tier": "Strong",
+          "score": 150.810054603208,
+          "net_delta_a_km": -0.16932743478537304,
+          "supporting_features": [
+            "radialRate",
+            "alongRate",
+            "crossRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate",
+            "aRate",
+            "meanMotionRate"
+          ]
+        },
+        {
+          "event_id": "EVT-002",
+          "start_utc": "2024-07-05T18:30:42.473Z",
+          "end_utc": "2024-07-05T18:30:42.473Z",
+          "strongest_utc": "2024-07-05T18:30:42.473Z",
+          "tier": "Strong",
+          "score": 97.44479635910889,
+          "net_delta_a_km": -0.9556701754700043,
+          "supporting_features": [
+            "aRate",
+            "meanMotionRate",
+            "radialRate",
+            "alongRate",
+            "crossRate",
+            "eccentricityVectorRate",
+            "inclinationVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-003",
+          "start_utc": "2024-07-07T03:53:42.705Z",
+          "end_utc": "2024-07-07T03:53:42.705Z",
+          "strongest_utc": "2024-07-07T03:53:42.705Z",
+          "tier": "Weak",
+          "score": 1.7280386459625794,
+          "net_delta_a_km": 0.000840984852402471,
+          "supporting_features": [
+            "crossRate",
+            "inclinationVectorRate"
+          ]
+        },
+        {
+          "event_id": "EVT-004",
+          "start_utc": "2024-07-08T00:34:42.716Z",
+          "end_utc": "2024-07-08T00:34:42.716Z",
+          "strongest_utc": "2024-07-08T00:34:42.716Z",
+          "tier": "Weak",
+          "score": 1.3572904227292417,
+          "net_delta_a_km": 0.0042049404146382585,
+          "supporting_features": [
+            "alongRate",
+            "inclinationVectorRate"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "meteosat8-passivated-2022-10",
+      "object_id": "27509",
+      "split": "test",
+      "label_status": "verified-quiet",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "GEO",
+      "source": "https://www.eumetsat.int/long-serving-european-weather-satellite-safely-moved-graveyard-orbit",
+      "span_days": 5.30620308,
+      "abstained": true,
+      "classification": "Abstain due to insufficient evaluated history",
+      "quality_status": "usable",
+      "run_id": "smd-45948fdcbeb27f65",
+      "truth_events": [],
+      "predicted_events": []
+    },
+    {
+      "case_id": "integral-disposal-campaign-2015-01",
+      "object_id": "27540",
+      "split": "test",
+      "label_status": "event-evidence",
+      "label_confidence": "high-public-evidence",
+      "orbit_profile": "HEO",
+      "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future",
+      "span_days": 15.012297860011573,
+      "abstained": true,
+      "classification": "Abstain due to insufficient evaluated history",
+      "quality_status": "usable",
+      "run_id": "smd-ed9ae904cfd0d0cb",
+      "truth_events": [
+        {
+          "start": "2015-01-24T00:00:00Z",
+          "end": "2015-01-24T23:59:59Z",
+          "label": "INTEGRAL large disposal burn",
+          "source": "https://blogs.esa.int/rocketscience/2015/01/24/burn-complete-update-at-1815-cet/"
+        },
+        {
+          "start": "2015-02-04T00:00:00Z",
+          "end": "2015-02-04T23:59:59Z",
+          "label": "INTEGRAL disposal burn",
+          "source": "https://www.esa.int/Enabling_Support/Operations/Integral_manoeuvres_for_the_future"
+        }
+      ],
+      "predicted_events": []
+    },
+    {
+      "case_id": "cluster-salsa-post-targeting-2024-02",
+      "object_id": "26411",
+      "split": "calibration",
+      "label_status": "unknown",
+      "label_confidence": "robustness-only",
+      "orbit_profile": "HEO",
+      "source": "https://www.esa.int/Science_Exploration/Space_Science/Cluster/Frequently_asked_questions_Cluster_s_Salsa_reentry",
+      "span_days": 9.04033282,
+      "abstained": true,
+      "classification": "Abstain due to insufficient evaluated history",
+      "quality_status": "usable",
+      "run_id": "smd-6bd3fed635f275b3",
+      "truth_events": [],
+      "predicted_events": []
+    }
+  ]
+}

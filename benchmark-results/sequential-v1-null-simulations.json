@@ -1,0 +1,49 @@
+{
+  "schema": "smd-sequential-v1-null-simulations",
+  "seed_rule": "20260815 + 1000003*replica + character-sum(name)",
+  "q0": 0.05,
+  "alpha": 0.05,
+  "wealth_threshold": 20.0,
+  "updates_per_path": 500,
+  "replicates": 3000,
+  "formal_interpretation": "Only scenarios whose conditional success probability never exceeds q0 satisfy the theorem assumption. Under that assumption Ville gives crossing probability <= alpha for an unbounded horizon; finite Monte Carlo estimates need not equal alpha.",
+  "failure_interpretation": "Clustered and misspecified scenarios deliberately violate the conditional bound and demonstrate why marginal calibration alone cannot justify a formal claim.",
+  "simulations": [
+    {
+      "name": "iid-boundary",
+      "replicates": 3000,
+      "crossings": 84,
+      "crossing_probability": 0.028,
+      "median_crossing_index": 10,
+      "median_maximum_wealth": 1.0,
+      "p95_maximum_wealth": 10.789247298579106
+    },
+    {
+      "name": "predictable-valid-nonstationary",
+      "replicates": 3000,
+      "crossings": 59,
+      "crossing_probability": 0.019666666666666666,
+      "median_crossing_index": 6,
+      "median_maximum_wealth": 1.0,
+      "p95_maximum_wealth": 7.241431846770869
+    },
+    {
+      "name": "clustered-same-marginal-conditional-bound-violated",
+      "replicates": 3000,
+      "crossings": 1548,
+      "crossing_probability": 0.516,
+      "median_crossing_index": 93,
+      "median_maximum_wealth": 24.847532081290687,
+      "p95_maximum_wealth": 2217862.319536893
+    },
+    {
+      "name": "misspecified-rate-1.5x-q0",
+      "replicates": 3000,
+      "crossings": 698,
+      "crossing_probability": 0.23266666666666666,
+      "median_crossing_index": 100,
+      "median_maximum_wealth": 3.4204349243587764,
+      "p95_maximum_wealth": 702.4511312791277
+    }
+  ]
+}
