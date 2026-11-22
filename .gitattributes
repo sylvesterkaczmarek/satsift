@@ -6,3 +6,4 @@
 /tests/fixtures/browser-equivalence-v1.json text eol=lf
 /tests/fixtures/browser-equivalence-v2.json text eol=lf
 /tests/fixtures/browser-equivalence-v3.json text eol=lf
+/tests/fixtures/browser-equivalence-v1/app-3.4.js text eol=lf
