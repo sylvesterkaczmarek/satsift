@@ -15,7 +15,8 @@ import time
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC = '/satellite-maneuver-detector'
+PUBLIC = '/satsift'
+LEGACY = '/satellite-maneuver-detector'
 PHYSICAL = '/tools/satellite-maneuver-detector'
 ASSET = '/app/common-012345abcdef.js'
 PRIVATE_MARKER = b'private-repository-probe'
@@ -56,7 +57,7 @@ def server(template, *, encoded_slashes='Off'):
         physical = document_root / 'tools/satellite-maneuver-detector'
         (physical / 'app').mkdir(parents=True)
         for name in ('index.html', 'docs.html', 'benchmark.html', 'accessibility.html',
-                     'history.php', 'benchmark-template.json', 'public-evidence-manifest-v0.1.json',
+                     'history.php', 'dependency-notices.txt', 'benchmark-template.json', 'public-evidence-manifest-v0.1.json',
                      'app-3.4.js', 'plotly-3.3.1.min.js', 'satellite-6.0.2.min.js'):
             (physical / name).write_bytes(PUBLIC_MARKER)
         (physical / ASSET.lstrip('/')).write_bytes(PUBLIC_MARKER)
@@ -156,7 +157,7 @@ class ApacheRouteBoundaryTest(unittest.TestCase):
         self.assertNotIn(PUBLIC_MARKER, body, path)
 
     def test_literal_public_routes_keep_headers_and_encoded_query_values(self):
-        for path in ('', '/docs', '/benchmark', '/accessibility', '/history',
+        for path in ('/', '/docs', '/benchmark', '/accessibility', '/history', '/dependency-notices.txt',
                      '/benchmark/manifest', '/benchmark/template', '/app-3.4.js',
                      '/plotly-3.3.1.min.js', '/satellite-6.0.2.min.js', ASSET):
             for query in ('', '?value=%2ftools%2fsatellite-maneuver-detector%20%3f&x=%73',
@@ -227,12 +228,51 @@ class ApacheRouteBoundaryTest(unittest.TestCase):
                 self.assertNotIn('strict-transport-security', headers)
 
     def test_canonical_redirects_remain_usable(self):
-        for path in ('/', '/docs/', '/benchmark/', '/accessibility/',
-                     '/benchmark/manifest/', '/benchmark/template/', '.html', '/docs.html'):
+        for path in ('', '//', '/docs/', '/benchmark/', '/accessibility/', '.html', '/docs.html'):
             with self.subTest(path=path):
                 status, headers, _body = request(self.port, PUBLIC + path)
                 self.assertEqual(status, 301)
                 self.assertTrue(headers['location'].startswith('https://www.sylvesterkaczmarek.com' + PUBLIC))
+
+    def test_legacy_pages_redirect_once_to_exact_canonical_and_keep_query(self):
+        for page in ('', '/docs', '/benchmark', '/accessibility'):
+            for ending in ('', '/', '.html'):
+                path = LEGACY + page + ending
+                for query in ('', '?norad=25544&from=2026-01-01', '?return=%2Fdocs&value=%73'):
+                    with self.subTest(path=path, query=query):
+                        status, headers, _body = request(self.port, path + query)
+                        self.assertEqual(status, 301)
+                        self.assertEqual(headers['location'],
+                                         'https://www.sylvesterkaczmarek.com' + PUBLIC + (page or '/') + query)
+
+    def test_legacy_machine_routes_remain_direct_and_noindex(self):
+        for path in ('/history', '/history/', '/benchmark/manifest', '/benchmark/template',
+                     '/app-3.4.js', '/plotly-3.3.1.min.js', '/satellite-6.0.2.min.js', ASSET):
+            with self.subTest(path=path):
+                status, headers, body = request(self.port, LEGACY + path + '?old=1%2F2')
+                self.assertEqual((status, body), (200, PUBLIC_MARKER))
+                self.assertNotIn('location', headers)
+                self.assertIn('noindex', headers['x-robots-tag'])
+
+    def test_missing_hash_cannot_poison_a_future_asset_cache(self):
+        for prefix in (PUBLIC, LEGACY):
+            for path in ('/app/common-000000000000.js', '/app/unknown-012345abcdef.js'):
+                status, headers, _body = request(self.port, prefix + path)
+                self.assertIn(status, (403, 404))
+                self.assertEqual(headers.get('cache-control'), 'no-store')
+            status, headers, _body = request(self.port, prefix + ASSET)
+            self.assertEqual(status, 200)
+            self.assertEqual(headers.get('cache-control'), 'public, max-age=31536000, immutable')
+
+    def test_nested_legacy_rules_cannot_rewrite_allowlisted_targets(self):
+        nested = self.physical / '.htaccess'
+        nested.write_text('RewriteEngine On\nRewriteRule ^ - [F,L]\n')
+        try:
+            for prefix, path in ((PUBLIC, '/'), (PUBLIC, '/history'), (LEGACY, ASSET)):
+                status, _headers, body = request(self.port, prefix + path)
+                self.assertEqual((status, body), (200, PUBLIC_MARKER))
+        finally:
+            nested.unlink()
 
     def test_encoded_slashes_fail_closed_when_host_accepts_them(self):
         with server(self.template, encoded_slashes='On') as (port, _physical):
@@ -243,8 +283,8 @@ class ApacheRouteBoundaryTest(unittest.TestCase):
                     self.assert_denied(path, port)
 
     def test_retained_immutable_block_preserves_the_boundary_on_rollback(self):
-        begin = '# BEGIN satellite-maneuver-detector immutable browser assets'
-        end = '# END satellite-maneuver-detector immutable browser assets'
+        begin = '# BEGIN satsift compatibility routes'
+        end = '# END satsift compatibility routes'
         block = self.template[self.template.index(begin):self.template.index(end) + len(end)]
         with server(block) as (port, _physical):
             status, headers, body = request(port, PUBLIC + ASSET)

@@ -10,7 +10,7 @@ import re
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from browser_assets import ROOT, ENTRY_SOURCE, asset_record, module_assets
+from browser_assets import ROOT, PUBLIC_PREFIX, ENTRY_SOURCE, asset_record, module_assets
 
 MODULE_BEGIN = '// BEGIN MODULE ASSETS'
 MODULE_END = '// END MODULE ASSETS'
@@ -39,7 +39,7 @@ def expected_files(repo: Path = ROOT) -> dict[str, str]:
     import base64
     bootstrap.update(
         target=f'app/bootstrap-{digest.hex()[:12]}.js',
-        url=f'/satellite-maneuver-detector/app/bootstrap-{digest.hex()[:12]}.js',
+        url=f'{PUBLIC_PREFIX}/app/bootstrap-{digest.hex()[:12]}.js',
         sha256=digest.hex(), integrity='sha256-' + base64.b64encode(digest).decode('ascii'),
     )
     scripts = '\n'.join(

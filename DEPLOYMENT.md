@@ -1,6 +1,6 @@
 # Deployment
 
-SatSift is deployed into a dedicated directory beneath the site root. The **private** source repository is `sylvesterkaczmarek/satsift`. The existing public website route stays `/satellite-maneuver-detector`, and the physical hosting directory retains that name for compatibility. Hosting paths and SSH connection details are supplied locally and are not part of this repository.
+SatSift is deployed into a dedicated directory beneath the site root. The public source repository is `sylvesterkaczmarek/satsift`, and the canonical workbench URL is `https://www.sylvesterkaczmarek.com/satsift/`. The previous public HTML routes redirect permanently. Existing machine URLs and the physical application directory retain compatibility with cached browser sessions and private history storage. Hosting paths and SSH connection details are supplied locally and are not part of this repository.
 
 ## Public files
 
@@ -10,7 +10,7 @@ The deployment tool uploads the application files beneath the configured site ro
 <site-root>/tools/satellite-maneuver-detector/
 ```
 
-The existing installation contains these ten mutable application files:
+The existing installation contains these ten required mutable application files:
 
 ```text
 index.html
@@ -24,6 +24,17 @@ public-evidence-manifest-v0.1.json
 plotly-3.3.1.min.js
 satellite-6.0.2.min.js
 ```
+
+The release also uploads the fixed public `dependency-notices.txt` bundle. It contains the complete project and browser-component notices, source attributions and inventories. The file may be absent before the first deployment that introduces it. The transaction records that initial absence and restores it on rollback. No licence source directory is exposed or recursively uploaded.
+
+Generate or check the committed bundle after changing its source notices:
+
+```bash
+python3 tools/build_browser_notices.py
+python3 tools/build_browser_notices.py --check
+```
+
+The builder validates every inventory-referenced path and digest, rejects symlinks and preserves each source file's original bytes inside a deterministic text bundle. Deployment refuses stale bundle bytes.
 
 Do not upload repository-only material such as `.github/`, `tests/`, `review/`, `config/`, `.gitignore`, `KNOWN-ISSUES.md` or this file into the public detector folder.
 
@@ -80,7 +91,7 @@ robots.txt
 sitemap.xml
 ```
 
-The deployment tool updates an existing installation. All ten mutable application files and the three site-root files must already exist so they can be backed up and restored. The immutable `app/` directory and new hash-named targets may be absent during the first module deployment. If a current hash-named target already exists, its full SHA-256 must match the source exactly; a collision or corrupted target stops deployment before an upload. Existing hash-named assets from earlier releases are retained.
+The deployment tool updates an existing installation. All ten required mutable application files and the three site-root files must already exist so they can be backed up and restored. The notice bundle is the only optional mutable target during its first installation; any existing target must be a regular non-symlink file. The immutable `app/` directory and new hash-named targets may be absent during the first module deployment. If a current hash-named target already exists, its full SHA-256 must match the source exactly; a collision or corrupted target stops deployment before an upload. Existing hash-named assets from earlier releases are retained.
 
 ## Load local deployment settings
 
@@ -110,13 +121,13 @@ python3 tools/deploy_production.py --execute
 
 A real deployment is accepted only from a clean `main` branch whose commit exactly matches both the local `origin/main` tracking ref and the authoritative `origin` branch reported by GitHub. The `origin` URL itself must be the canonical repository. Both modes report the full Git commit, require the named SSH profile, validate that the configured site root resolves exactly beneath the SSH home and that the application directory is beneath that site root, reject symlinked target directories and files, require strict host-key checking, disable SSH forwarding/local commands, and use individual allowlisted writes without `--delete`. No research, review, test, benchmark-result, private configuration or cache path can enter the application upload plan.
 
-Before site-root writes, the tool reads the existing `.htaccess`, `robots.txt` and `sitemap.xml` and prepares merged replacements in a temporary local directory. The detector-owned main `.htaccess` block is replaced in place and a separate, narrowly scoped immutable-asset route block is placed before the main rewrites, the detector directives are merged into the single existing `User-agent: *` robots policy, and only detector-owned URLs are replaced in the sitemap. Unrelated rules, crawler groups, sitemap URLs and XML comments are retained. Ambiguous or malformed site-root input stops the operation instead of being guessed at.
+Before site-root writes, the tool reads the existing `.htaccess`, `robots.txt` and `sitemap.xml` and prepares merged replacements in a temporary local directory. The detector-owned main `.htaccess` block is replaced in place and a separate, narrowly scoped compatibility route block is placed before the main rewrites, the detector directives are merged into the single existing `User-agent: *` robots policy, and only detector-owned URLs are replaced in the sitemap. Unrelated rules, crawler groups, sitemap URLs and XML comments are retained. Exact known legacy managed-marker names are migrated to SatSift names. Repeated merges are byte-idempotent. Ambiguous or malformed site-root input stops the operation instead of being guessed at.
 
-Immediately before a real upload, the tool atomically acquires `.satellite-maneuver-deploy.lock`, repeats the target and existing immutable-file checks, verifies that the three site-root files have not changed since they were read and creates a private backup of the ten mutable application files and three site-root files. The backup is stored under `.satellite-maneuver-deploy-backups/<commit-prefix>-<run-id>/`, in the SSH home, outside the configured site root and with a restrictive umask. Only after this backup does it create the fixed immutable asset directory if needed.
+Immediately before a real upload, the tool atomically acquires `.satellite-maneuver-deploy.lock`, repeats the target and existing immutable-file checks, verifies that the three site-root files have not changed since they were read and creates a private backup of the ten required mutable application files, the notice bundle if present, and three site-root files. A private absence marker records a notice target that does not yet exist. The backup is stored under `.satellite-maneuver-deploy-backups/<commit-prefix>-<run-id>/`, in the SSH home, outside the configured site root and with a restrictive umask. Only after this backup does it create the fixed immutable asset directory if needed.
 
 Dependencies and immutable browser assets are uploaded first, followed by site-root files and routing. All seven immutable browser assets must pass full SHA-256 verification before the mutable `app-3.4.js` alias is activated. `index.html` is the final upload. The complete release is then checked by SHA-256.
 
-An upload, interruption or hash failure restores the previous mutable application and site content. Rollback retains the approved immutable files already uploaded, earlier immutable releases and the independent narrow asset route block. This allows HTML or bootstrap bytes cached during the attempted release to continue resolving their recorded dependencies. In the first module migration, restored legacy `.htaccess` rules therefore keep this added route block and its asset-scoped CSP, `nosniff` and `noindex` headers. The previous main rules and unrelated host content are preserved; the exact original `.htaccess` also remains in the private backup. There is no automatic pruning of immutable assets.
+An upload, interruption or hash failure restores the previous mutable application and site content. Rollback retains the approved immutable files already uploaded, earlier immutable releases and the independent narrow compatibility route block. This allows HTML or bootstrap bytes cached during the attempted release to continue resolving their recorded dependencies. The retained block supports the new canonical pages, both public machine-resource namespaces and the same scoped security headers. Restored old main rules and cached new pages can therefore continue resolving resources without exposing the physical directory. The previous main rules and unrelated host content are preserved; the exact original `.htaccess` also remains in the private backup. There is no automatic pruning of immutable assets.
 
 Rollback validates the site, application and immutable-directory boundaries before writing restored files. If restoration cannot be confirmed, for example after a connection loss or a changed directory boundary, the command reports the private backup location, leaves the deployment lock as an incomplete-release signal and refuses to claim success. Static-file rollback does not modify retained history or reverse history-cache schema changes; the coordination requirements below still apply.
 
@@ -134,13 +145,13 @@ The deployer accepts only an absolute, non-symlink executable file owned by the 
 
 ## Site routing
 
-Use both marked blocks in `deployment/site-root.htaccess` as the detector-related baseline for `<site-root>/.htaccess`. Keep the independent immutable browser asset block before the main managed rules and any host rules that would otherwise reject those clean asset URLs.
+Use both marked blocks in `deployment/site-root.htaccess` as the detector-related baseline for `<site-root>/.htaccess`. Keep the independent compatibility block before the main managed rules and any host rules that would otherwise reject those clean public URLs.
 
-The immutable route accepts only the seven reviewed filename stems followed by a 12-character hexadecimal digest and `.js`. It requires a matching clean original request, an existing physical file and non-symlink asset/file paths. Missing targets, unrecognised names and canonical module sources remain unavailable. The same narrow block is retained when an earlier mutable release is restored.
+The immutable route accepts only the seven reviewed filename stems followed by a 12-character hexadecimal digest and `.js`. It requires a matching clean original request, an existing physical file and non-symlink asset/file paths. Missing targets, unrecognised names and canonical module sources remain unavailable. Immutable caching applies only to successful or not-modified module responses. Failed public requests receive `Cache-Control: no-store`, preventing a premature request from caching a missing future hash. The same narrow block is retained when an earlier mutable release is restored.
 
 If the site root contains unrelated rules, merge the detector rules carefully rather than deleting unrelated site configuration.
 
-There should be no `.htaccess` inside `tools/satellite-maneuver-detector/` for the current deployment model.
+A legacy application-directory `.htaccess` may still exist. Do not remove or rewrite it without inspecting its ownership and purpose. Explicit public mappings use Apache 2.4 `[END]` to stop subsequent per-directory rewrite processing; the first block denies direct physical requests before any mapping. The executable Apache regression includes a conflicting nested rule to verify this boundary.
 
 ## Private Space-Track configuration
 
@@ -190,7 +201,7 @@ Quota exhaustion returns HTTP 429 with a computed `Retry-After`. Lock contention
 
 ## Upgrading history coordination
 
-Before activating this endpoint revision, stop new history traffic and allow existing PHP requests to finish. Then replace the endpoint and restart or reload the affected workers. The old per-object lock files and new lock stripes must never be used concurrently by different deployed revisions. The deployment script does not drain workers automatically; coordinate this step with the hosting service.
+When changing history lock coordination or cache schemas, stop new history traffic and allow existing PHP requests to finish before activating the endpoint revision. The SatSift URL and interface migration preserves the existing cache and coordination model. Then replace the endpoint and restart or reload the affected workers. The old per-object lock files and new lock stripes must never be used concurrently by different deployed revisions. The deployment script does not drain workers automatically; coordinate this step with the hosting service.
 
 Keep the private cache and its existing `rate-limits.json` ledger. The previous ledger counted cache misses rather than individual upstream calls. When creating the separate `upstream-limits.json` operation ledger, the endpoint therefore observes a conservative cooldown until one hour after the latest valid legacy timestamp. The legacy ledger is retained unchanged. Cached reads remain available during that transition. A malformed legacy ledger blocks upstream work until an operator investigates it. Do not remove or reset quota files during an active budget window to bypass admission.
 
@@ -218,17 +229,18 @@ Run the read-only production verifier from the same commit that was deployed:
 python3 tools/verify_production.py
 ```
 
-It sends no-cache requests, bounds response sizes, rejects unexpected cross-origin redirects, derives all seven immutable browser URLs and the versioned satellite.js URL, checks ordered deferred scripts and their integrity attributes, compares every module, hashed bootstrap, legacy alias and pinned dependency with the repository bytes and checks Workbench 3.4.7, detector method 0.4, UTC-safe OMM parsing, precise TLE replay and versioned run identity, deterministic catalogue supersession, lazy Plotly loading, clean canonical routes, security headers, physical/private path denial, a deliberately invalid and non-secret-bearing history request, benchmark version wording, robots/sitemap policy and known stale implementation markers. It performs only HTTP GET requests and makes no deployment, cache or upstream Space-Track mutation.
+It sends no-cache requests, bounds response sizes, rejects unexpected cross-origin redirects, derives all seven immutable browser URLs and the versioned satellite.js URL, checks ordered deferred scripts and their integrity attributes, compares every module, hashed bootstrap, legacy alias and pinned dependency with the repository bytes and checks the workbench version declared in `package.json`, detector method 0.4, UTC-safe OMM parsing, precise TLE replay and versioned run identity, deterministic catalogue supersession, lazy Plotly loading, clean canonical routes, security headers, physical/private path denial, a deliberately invalid and non-secret-bearing history request, benchmark version wording, robots/sitemap policy and known stale implementation markers. It also verifies the complete notice bundle, the Plotly distribution bytes, one-hop permanent redirects with query preservation, and directly served legacy machine resources. It performs only HTTP GET requests and makes no deployment, cache or upstream Space-Track mutation.
 
 Check these routes:
 
 ```text
-/satellite-maneuver-detector
-/satellite-maneuver-detector/docs
-/satellite-maneuver-detector/benchmark
-/satellite-maneuver-detector/benchmark/manifest
-/satellite-maneuver-detector/benchmark/template
-/satellite-maneuver-detector/accessibility
+/satsift/
+/satsift/docs
+/satsift/benchmark
+/satsift/benchmark/manifest
+/satsift/benchmark/template
+/satsift/accessibility
+/satsift/dependency-notices.txt
 ```
 
 The public `/benchmark/manifest` route intentionally serves the small v0.1 Workbench seed/runner-format manifest. It is not the frozen publication benchmark v1.0 under `public-evidence-manifest-v1.0.json`; do not relabel or substitute one for the other during deployment.
@@ -236,11 +248,11 @@ The public `/benchmark/manifest` route intentionally serves the small v0.1 Workb
 Then verify:
 
 1. `?demo=leo` runs automatically and produces a result.
-2. A short historical request loads through `/satellite-maneuver-detector/history`.
+2. A short historical request loads through `/satsift/history`.
 3. The current CelesTrak snapshot loader works.
 4. Regression checks pass in the developer section.
 5. Direct `/tools/satellite-maneuver-detector/...` requests are rejected.
-6. Direct `.php`, `.md`, `.txt`, config and cache paths are not publicly exposed.
+6. Source `.php`, `.md`, config and cache paths remain unavailable. `dependency-notices.txt` is the sole allowlisted text download.
 7. Every public detector route returns CSP, `nosniff`, referrer, frame and permissions headers; detector responses also carry `Strict-Transport-Security: max-age=31536000`. The routing template supports TLS termination at a reverse proxy; browsers apply HSTS only when received over HTTPS.
 8. Canonical `/app/common.js` source URLs and unknown hash names remain unavailable. All seven intended immutable URLs return the exact repository bytes.
 9. The initial workbench response does not request Plotly; the pinned Plotly asset is requested on demand when analysis charts or 3D context are rendered.
@@ -257,6 +269,6 @@ python3 tests/apache_route_boundary_test.py
 
 This requires Apache 2.4 with its prefork, rewrite and headers modules. On Ubuntu, the `apache2-bin` package provides the binary and modules; on macOS the test also discovers the system Apache. A missing binary or module fails the check. The test creates synthetic files, a temporary configuration and a loopback listener. Apache runs in a separate process session, and cleanup signals only that session. It does not read hosting configuration, contact the live site or change a system service.
 
-Apache [matches RewriteRule patterns against decoded paths](https://httpd.apache.org/docs/2.4/mod/mod_rewrite.html#rewriterule), while `THE_REQUEST` retains the original request line. The retained immutable routing block therefore checks the decoded namespace against a literal public-route allowlist before any file mapping. The physical-path guard also decodes the original request using Apache's [unescape expression function](https://httpd.apache.org/docs/2.4/expr.html#functions). These checks reject encoded and traversal aliases without interpreting query values as paths. Intended trailing-slash and legacy-URL redirects remain usable.
+Apache [matches RewriteRule patterns against decoded paths](https://httpd.apache.org/docs/2.4/mod/mod_rewrite.html#rewriterule), while `THE_REQUEST` retains the original request line. The retained compatibility routing block therefore checks the decoded namespace against a literal public-route allowlist before any file mapping. The physical-path guard also decodes the original request using Apache's [unescape expression function](https://httpd.apache.org/docs/2.4/expr.html#functions). These checks reject encoded and traversal aliases without interpreting query values as paths. Intended trailing-slash and legacy-URL redirects remain usable.
 
-The regression exercises actual HTTP responses for clean routes and security headers, encoded queries, direct and encoded physical paths, traversal, immutable assets, symlinks, rollback routing and unrelated site rewrites. It also repeats encoded-slash checks with the hosting option enabled. This is a local routing check; the production verifier and a controlled deployment remain separate steps.
+The regression exercises actual HTTP responses for clean routes and security headers, encoded queries, direct and encoded physical paths, traversal, immutable assets, symlinks, rollback routing and unrelated site rewrites. It also checks both namespaces, exact permanent redirect destinations, query preservation, a conflicting nested `.htaccess`, and encoded slashes with the hosting option enabled. This is a local routing check; the production verifier and a controlled deployment remain separate steps.

@@ -105,7 +105,7 @@ CapturingURL.revokeObjectURL = () => {};
 
 const windowObject = {
   document,
-  location: { href: 'https://example.test/satellite-maneuver-detector', search: '' },
+  location: { href: 'https://example.test/satsift', search: '' },
   history: { replaceState() {} },
   setTimeout() { return 1; },
   clearTimeout() {},
@@ -236,7 +236,7 @@ let groups = 0;
   assert.strictEqual(calls, 1);
   const first = exported();
   const originalRunId = first.run_id;
-  assert.strictEqual(first.workbench_version, '3.4.9');
+  assert.strictEqual(first.workbench_version, '3.5.0');
   assert.strictEqual(first.package_schema_version, 1);
   assert.strictEqual(first.run_identity_version, 2);
   assert.strictEqual(first.data_provenance.schema_version, 1);

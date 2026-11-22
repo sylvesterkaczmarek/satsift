@@ -53,7 +53,7 @@ class DownloadURL extends URL {}
 DownloadURL.createObjectURL = blob => { capturedBlob = blob; return 'blob:catalogue-metadata-test'; };
 DownloadURL.revokeObjectURL = () => {};
 const windowObject = {
-  document, location: { href: 'https://example.test/satellite-maneuver-detector', search: '' },
+  document, location: { href: 'https://example.test/satsift', search: '' },
   history: { replaceState() {} }, setTimeout() { return 1; }, clearTimeout() {},
   scrollTo() {}, addEventListener() {}, removeEventListener() {}, innerWidth: 1440,
   devicePixelRatio: 1, Plotly: null, satellite: null

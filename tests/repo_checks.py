@@ -101,6 +101,10 @@ REQUIRED = {
     'tests/benchmark_tolerance_test.js',
     'tests/fixtures/browser-equivalence-v2.json',
     'tests/fixtures/browser-equivalence-v3.json',
+    'tests/fixtures/browser-presentation-v4.json',
+    'tests/console_browser_test.js',
+    'dependency-notices.txt',
+    'tools/build_browser_notices.py',
     'tests/tle_precision_roundtrip_test.js',
     'tests/tle_precision_reference_check.py',
     'tests/materializer_validation_test.py',
@@ -358,8 +362,8 @@ def check_html(files: set[str]) -> None:
                 if asset_sources[clean] not in files:
                     fail(f'{rel} references an untracked browser module {ref!r}')
                 continue
-            if clean.startswith('/satellite-maneuver-detector/'):
-                candidate = clean.removeprefix('/satellite-maneuver-detector/')
+            if clean.startswith('/satsift/'):
+                candidate = clean.removeprefix('/satsift/')
                 if '/' in candidate and not Path(candidate).suffix:
                     continue
                 if candidate and Path(candidate).suffix and candidate not in files:
@@ -374,7 +378,7 @@ def check_versions() -> None:
     index = (ROOT / 'index.html').read_text()
     app = read_browser_source(ROOT)
     satellite_version = hashlib.sha256((ROOT / 'satellite-6.0.2.min.js').read_bytes()).hexdigest()[:12]
-    if 'Workbench 3.4.9' not in index or "WORKBENCH_VERSION = '3.4.9'" not in app:
+    if 'SatSift 3.5.0' not in index or "WORKBENCH_VERSION = '3.5.0'" not in app:
         fail('Workbench version is inconsistent between index.html and browser modules')
     if 'Detector method 0.4' not in index or "METHOD_VERSION = 'v0.4'" not in app:
         fail('Detector method version is inconsistent')
@@ -389,30 +393,28 @@ def check_versions() -> None:
         positions.append(index.index(tag))
     if positions != sorted(positions):
         fail('index.html browser script order differs from the declared source inventory')
-    if f'/satellite-maneuver-detector/satellite-6.0.2.min.js?v={satellite_version}' not in index:
+    if f'/satsift/satellite-6.0.2.min.js?v={satellite_version}' not in index:
         fail('index.html does not load the content-versioned satellite.js script')
 
 
 def check_routing() -> None:
     htaccess = (ROOT / 'deployment/site-root.htaccess').read_text()
     broad_fragments = [
-        'RewriteRule ^satellite-maneuver-detector/(.+)$ tools/satellite-maneuver-detector/$1',
-        'RewriteRule ^satellite-maneuver-detector/(.*)$ tools/satellite-maneuver-detector/$1',
+        'RewriteRule ^satsift/(.+)$', 'RewriteRule ^satsift/(.*)$',
+        'RewriteRule ^satellite-maneuver-detector/(.+)$',
+        'RewriteRule ^satellite-maneuver-detector/(.*)$',
     ]
     for fragment in broad_fragments:
         if fragment in htaccess:
-            fail('deployment routing contains a broad detector catch-all rule')
-
+            fail('deployment routing contains a broad application catch-all rule')
+    shared = r'^(?:satsift|satellite-maneuver-detector)/'
     required_routes = [
-        'satellite-maneuver-detector/history',
-        'satellite-maneuver-detector/docs',
-        'satellite-maneuver-detector/benchmark/manifest',
-        'satellite-maneuver-detector/benchmark/template',
-        'satellite-maneuver-detector/benchmark',
-        'satellite-maneuver-detector/accessibility',
-        'satellite-maneuver-detector/app-3\\.4\\.js',
-        'satellite-maneuver-detector/plotly-3\\.3\\.1\\.min\\.js',
-        'satellite-maneuver-detector/satellite-6\\.0\\.2\\.min\\.js',
+        shared + r'history/?$', shared + r'benchmark/manifest/?$',
+        shared + r'benchmark/template/?$', shared + r'app-3\.4\.js$',
+        shared + r'plotly-3\.3\.1\.min\.js$', shared + r'satellite-6\.0\.2\.min\.js$',
+        shared + r'dependency-notices\.txt$',
+        '^satsift/$', '^satsift/docs$', '^satsift/benchmark$', '^satsift/accessibility$',
+        r'^satellite-maneuver-detector(?:\.html|/*)$ https://www.sylvesterkaczmarek.com/satsift/',
     ]
     for route in required_routes:
         if route not in htaccess:
@@ -433,7 +435,7 @@ def check_routing() -> None:
     if len(hsts_directives) != 1:
         fail('deployment routing must contain exactly one HSTS directive')
     hsts_directive = hsts_directives[0]
-    if r'%{THE_REQUEST} =~ m#\s/+satellite-maneuver-detector(?:[/?\s]|$)#' not in hsts_directive:
+    if r'%{THE_REQUEST} =~ m#\s/+(?:satsift|satellite-maneuver-detector)(?:[./?\s]|$)#' not in hsts_directive:
         fail('HSTS must remain scoped to the detector namespace')
     if any(signal.lower() in hsts_directive.lower() for signal in ('%{HTTPS}', 'X-Forwarded-Proto', 'Forwarded')):
         fail('HSTS must not depend on unreliable or client-supplied StackCP origin TLS signals')
@@ -635,14 +637,14 @@ def check_project_identity() -> None:
 
     pkg = json.loads((ROOT / 'package.json').read_text())
     lock = json.loads((ROOT / 'package-lock.json').read_text())
-    if pkg.get('name') != 'satsift' or pkg.get('version') != '3.4.9' or pkg.get('private') is not True or pkg.get('license') != 'Apache-2.0':
+    if pkg.get('name') != 'satsift' or pkg.get('version') != '3.5.0' or pkg.get('private') is not True or pkg.get('license') != 'Apache-2.0':
         fail('private SatSift npm package identity or licence is inconsistent')
     if pkg.get('repository') != {'type': 'git', 'url': 'https://github.com/sylvesterkaczmarek/satsift.git'}:
         fail('npm repository points to an unexpected owner or slug')
     if pkg.get('bugs') != {'url': 'https://github.com/sylvesterkaczmarek/satsift/issues'}:
         fail('npm issue destination is inconsistent')
-    if pkg.get('homepage') != 'https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/':
-        fail('hosted URL was unexpectedly renamed')
+    if pkg.get('homepage') != 'https://www.sylvesterkaczmarek.com/satsift/':
+        fail('npm homepage differs from the canonical SatSift URL')
     expected_keywords = {'satellite', 'satellite-maneuvers', 'orbital-mechanics',
                          'space-situational-awareness', 'sgp4', 'tle', 'anomaly-detection'}
     if not isinstance(pkg.get('keywords'), list) or not expected_keywords.issubset(set(pkg['keywords'])):
@@ -659,8 +661,8 @@ def check_project_identity() -> None:
         html = (ROOT / filename).read_text()
         if '<title>SatSift' not in html and '<title>SatSift ' not in html:
             fail('SatSift search title is missing from ' + filename)
-        if 'https://www.sylvesterkaczmarek.com/satellite-maneuver-detector' not in html:
-            fail('existing website canonical URL is missing from ' + filename)
+        if 'https://www.sylvesterkaczmarek.com/satsift/' not in html:
+            fail('canonical SatSift URL is missing from ' + filename)
     if '<h1>SatSift</h1>' not in (ROOT / 'index.html').read_text():
         fail('workbench name does not appear in the hero')
     deploy = (ROOT / 'tools/deploy_production.py').read_text()

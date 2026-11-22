@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC_PREFIX = '/satellite-maneuver-detector'
+PUBLIC_PREFIX = '/satsift'
 MODULE_SOURCES = (
     'app/common.js', 'app/orbital-input.js', 'app/benchmark.js',
     'app/packages.js', 'app/detection.js', 'app/interface.js',

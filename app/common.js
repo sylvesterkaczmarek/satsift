@@ -8,7 +8,7 @@ if (Object.prototype.hasOwnProperty.call(globalThis.SMDModules, "common")) {
 globalThis.SMDModules["common"] = function createCommon() {
   const MU = 398600.4418;
   const METHOD_VERSION = 'v0.4';
-  const WORKBENCH_VERSION = '3.4.9';
+  const WORKBENCH_VERSION = '3.5.0';
   const EVENT_MATCHING_VERSION = 'event-matching-v3';
   const PACKAGE_SCHEMA_VERSION = 1;
   const TLE_SOURCE_SCHEMA_VERSION = 1;
@@ -20,8 +20,9 @@ globalThis.SMDModules["common"] = function createCommon() {
   const MAX_PROVENANCE_BYTES = 65536;
   const PROPAGATION_CONTRACT = 'sgp4-exact-epoch-v1';
   const SATELLITE_JS_VERSION = '6.0.2';
-  const HISTORY_ENDPOINT = '/satellite-maneuver-detector/history';
-  const PLOTLY_ASSET_URL = '/satellite-maneuver-detector/plotly-3.3.1.min.js';
+  const HISTORY_ENDPOINT = '/satsift/history';
+  const PLOTLY_ASSET_URL = '/satsift/plotly-3.3.1.min.js';
+  const SATELLITE_ASSET_URL = '/satsift/satellite-6.0.2.min.js';
   const MAX_HISTORY_RANGE_DAYS = 31;
   const MIN_EVALUATED_POINTS = 5;
   const PUBLIC_CACHE_MS = 2 * 60 * 60 * 1000;
@@ -167,7 +168,7 @@ globalThis.SMDModules["common"] = function createCommon() {
     TLE_SOURCE_SCHEMA_VERSION, RUN_IDENTITY_VERSION, DATA_PROVENANCE_VERSION,
     INPUT_FINGERPRINT_ALGORITHM, MAX_PROVENANCE_SOURCES, MAX_PROVENANCE_ACQUISITIONS,
     MAX_PROVENANCE_BYTES, PROPAGATION_CONTRACT, SATELLITE_JS_VERSION, HISTORY_ENDPOINT,
-    PLOTLY_ASSET_URL, MAX_HISTORY_RANGE_DAYS, MIN_EVALUATED_POINTS, PUBLIC_CACHE_MS, DAY_MS,
+    PLOTLY_ASSET_URL, SATELLITE_ASSET_URL, MAX_HISTORY_RANGE_DAYS, MIN_EVALUATED_POINTS, PUBLIC_CACHE_MS, DAY_MS,
     CATALOGUE_REVISION_TOLERANCE_US, DEMO_ANCHOR_MS, EARTH_RADIUS_KM, J2, FEATURE_LABELS,
     PROFILE_LIBRARY, byId, escapeHtml, fmtTime, fmtNum, median, empiricalQuantile, stableStringify,
     fnv1a64, vectorSubtract, vectorDot, vectorCross, vectorNorm, vectorUnit, formatDateOnly, radians

@@ -19,6 +19,7 @@ import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from browser_assets import MODULE_SOURCES, ENTRY_SOURCE, browser_assets, validate_manifest
+from build_browser_notices import OUTPUT as NOTICE_BUNDLE, bundle_bytes
 from update_browser_assets import expected_files as expected_browser_files
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,8 +48,10 @@ LEGACY_APP_FILES = (
     "plotly-3.3.1.min.js",
     "satellite-6.0.2.min.js",
 )
-PUBLIC_APP_FILES = (*LEGACY_APP_FILES, *MODULE_SOURCES)
+OPTIONAL_APP_FILES = (NOTICE_BUNDLE,)
+PUBLIC_APP_FILES = (*LEGACY_APP_FILES, *OPTIONAL_APP_FILES, *MODULE_SOURCES)
 APP_UPLOAD_ORDER = (
+    NOTICE_BUNDLE,
     "plotly-3.3.1.min.js",
     "satellite-6.0.2.min.js",
     "benchmark-template.json",
@@ -67,26 +70,50 @@ SITE_FILES = {
     "sitemap.xml": "deployment/sitemap-detector-fragment.xml",
 }
 SITE_UPLOAD_ORDER = ("robots.txt", "sitemap.xml", ".htaccess")
-IMMUTABLE_BEGIN = "# BEGIN satellite-maneuver-detector immutable browser assets"
-IMMUTABLE_END = "# END satellite-maneuver-detector immutable browser assets"
-MANAGED_BEGIN = "# BEGIN satellite-maneuver-detector managed configuration"
-MANAGED_END = "# END satellite-maneuver-detector managed configuration"
-ROBOTS_BEGIN = "# BEGIN satellite-maneuver-detector managed policy"
-ROBOTS_END = "# END satellite-maneuver-detector managed policy"
+IMMUTABLE_BEGIN = "# BEGIN satsift compatibility routes"
+IMMUTABLE_END = "# END satsift compatibility routes"
+MANAGED_BEGIN = "# BEGIN satsift managed configuration"
+MANAGED_END = "# END satsift managed configuration"
+ROBOTS_BEGIN = "# BEGIN satsift managed policy"
+ROBOTS_END = "# END satsift managed policy"
 SITEMAP_URL = "https://www.sylvesterkaczmarek.com/sitemap.xml"
 PUBLIC_URLS = (
-    "https://www.sylvesterkaczmarek.com/satellite-maneuver-detector",
-    "https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/docs",
-    "https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/benchmark",
-    "https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/accessibility",
+    "https://www.sylvesterkaczmarek.com/satsift/",
+    "https://www.sylvesterkaczmarek.com/satsift/docs",
+    "https://www.sylvesterkaczmarek.com/satsift/benchmark",
+    "https://www.sylvesterkaczmarek.com/satsift/accessibility",
 )
 DETECTOR_ROBOTS_LINES = (
+    "Allow: /satsift",
+    "Disallow: /satsift/history",
+    "Disallow: /satsift/benchmark/manifest",
+    "Disallow: /satsift/benchmark/template",
     "Allow: /satellite-maneuver-detector",
     "Disallow: /satellite-maneuver-detector/history",
     "Disallow: /satellite-maneuver-detector/benchmark/manifest",
     "Disallow: /satellite-maneuver-detector/benchmark/template",
     "Disallow: /tools/satellite-maneuver-detector/",
 )
+LEGACY_MARKERS = {
+    "# BEGIN satellite-maneuver-detector immutable browser assets": IMMUTABLE_BEGIN,
+    "# END satellite-maneuver-detector immutable browser assets": IMMUTABLE_END,
+    "# BEGIN satellite-maneuver-detector managed configuration": MANAGED_BEGIN,
+    "# END satellite-maneuver-detector managed configuration": MANAGED_END,
+    "# BEGIN satellite-maneuver-detector managed policy": ROBOTS_BEGIN,
+    "# END satellite-maneuver-detector managed policy": ROBOTS_END,
+}
+
+
+def normalise_managed_markers(text: str) -> str:
+    # Only exact, recognised marker lines can be migrated. Duplicate or mixed
+    # generations are rejected by the ordinary block validation afterwards.
+    return "\n".join(LEGACY_MARKERS.get(line.strip(), line) for line in text.split("\n"))
+
+
+def owned_public_path(value: str) -> bool:
+    return any(value == prefix or value.startswith(prefix + "/") or value.startswith(prefix + ".")
+               for prefix in ("/satsift", "/satellite-maneuver-detector", "/tools/satellite-maneuver-detector"))
+
 
 
 def public_asset_files(repo: Path = ROOT) -> list[tuple[str, str]]:
@@ -161,6 +188,11 @@ def configure_target(site_root: str | None = None, ssh_alias: str | None = None)
             f"test -f {shlex.quote(str(app / name))}; test ! -L {shlex.quote(str(app / name))}"
             for name in LEGACY_APP_FILES
         ],
+        *[
+            f"test ! -L {shlex.quote(str(app / name))}; "
+            f"if test -e {shlex.quote(str(app / name))}; then test -f {shlex.quote(str(app / name))}; fi"
+            for name in OPTIONAL_APP_FILES
+        ],
         f"test ! -L {shlex.quote(str(app / 'app'))}",
         f"if test -e {shlex.quote(str(app / 'app'))}; then test -d {shlex.quote(str(app / 'app'))}; fi",
         *[
@@ -227,7 +259,7 @@ def validate_repository(repo: Path, *, execute: bool) -> tuple[str, str]:
     if execute:
         origin_url = git_text(repo, "remote", "get-url", "origin")
         if origin_url not in EXPECTED_ORIGIN_URLS:
-            raise DeploymentError("origin is not the canonical satellite-maneuver-detector repository")
+            raise DeploymentError("origin is not the canonical SatSift repository")
         try:
             tracking_commit = git_text(repo, "rev-parse", "refs/remotes/origin/main")
         except DeploymentError as exc:
@@ -251,10 +283,13 @@ def validate_allowlist(repo: Path) -> None:
     try:
         validate_manifest(repo)
         expected_browser = expected_browser_files(repo)
+        expected_notices = bundle_bytes(repo)
     except (ValueError, OSError) as exc:
         raise DeploymentError('browser asset manifest or source validation failed') from exc
     if any((repo / name).read_text() != content for name, content in expected_browser.items()):
         raise DeploymentError('browser asset identities are stale; run tools/update_browser_assets.py')
+    if (repo / NOTICE_BUNDLE).read_bytes() != expected_notices:
+        raise DeploymentError('browser notice bundle is stale; run tools/build_browser_notices.py')
     expected = set(PUBLIC_APP_FILES)
     if len(expected) != len(PUBLIC_APP_FILES):
         raise DeploymentError("public application allowlist contains a duplicate")
@@ -417,6 +452,7 @@ def _extract_managed_block(source: str) -> str:
 
 
 def _merge_main_htaccess(remote: str, source: str) -> str:
+    remote = normalise_managed_markers(remote)
     block = _extract_managed_block(source)
     begin_count = remote.count(MANAGED_BEGIN)
     end_count = remote.count(MANAGED_END)
@@ -427,10 +463,12 @@ def _merge_main_htaccess(remote: str, source: str) -> str:
             raise DeploymentError("remote .htaccess has malformed or duplicate detector managed markers")
         end += len(MANAGED_END)
         outside = remote[:start] + remote[end:]
-        if "satellite-maneuver-detector" in outside.lower():
+        if any(name in outside.lower() for name in ("satellite-maneuver-detector", "satsift")):
             raise DeploymentError("remote .htaccess contains detector rules outside the managed block")
-        return (remote[:start].rstrip() + "\n\n" + block + "\n" + remote[end:].lstrip()).rstrip() + "\n"
-    if "satellite-maneuver-detector" in remote.lower():
+        prefix, suffix = remote[:start].rstrip(), remote[end:].lstrip()
+        return ((prefix + "\n\n" if prefix else "") + block +
+                ("\n\n" + suffix if suffix else "\n")).rstrip() + "\n"
+    if any(name in remote.lower() for name in ("satellite-maneuver-detector", "satsift")):
         unmarked = block.replace(MANAGED_BEGIN, "", 1).replace(MANAGED_END, "", 1).strip()
         if remote.strip() == unmarked:
             return block + "\n"
@@ -443,6 +481,7 @@ def _merge_main_htaccess(remote: str, source: str) -> str:
 
 
 def _separate_immutable_routes(text: str, *, required: bool = False) -> tuple[str, str | None]:
+    text = normalise_managed_markers(text)
     first, last = text.find(IMMUTABLE_BEGIN), text.find(IMMUTABLE_END)
     counts = (text.count(IMMUTABLE_BEGIN), text.count(IMMUTABLE_END))
     if counts == (0, 0) and not required:
@@ -464,11 +503,11 @@ def retain_immutable_routes(remote: str, source: str) -> str:
     cleaned, _previous = _separate_immutable_routes(remote)
     _source_main, block = _separate_immutable_routes(source, required=True)
     _merge_main_htaccess(cleaned, source)  # Validate ownership/markers without replacing the old main block.
-    return block + '\n\n' + cleaned
+    return block + '\n\n' + cleaned.lstrip()
 
 
 def merge_robots(remote: str) -> str:
-    lines = remote.splitlines()
+    lines = normalise_managed_markers(remote).splitlines()
     output: list[str] = []
     in_managed = False
     found_managed = False
@@ -493,14 +532,29 @@ def merge_robots(remote: str) -> str:
         if lower.startswith(("allow:", "disallow:")):
             _, _, value = stripped.partition(":")
             path = value.strip()
-            if path.startswith("/satellite-maneuver-detector") or path.startswith(
-                "/tools/satellite-maneuver-detector"
-            ):
+            if owned_public_path(path):
                 continue
         output.append(line)
     if in_managed:
         raise DeploymentError("remote robots.txt has an unterminated managed policy block")
 
+    # A wildcard header can share a rule group with adjacent User-agent
+    # headers. Inserting before the next header would silently split that
+    # shared policy. Require an unambiguous standalone wildcard group.
+    agent_headers: list[str] = []
+    for line in output:
+        stripped = line.strip()
+        if not stripped or stripped.startswith('#'):
+            continue
+        field, separator, value = stripped.partition(':')
+        if field.lower() == 'sitemap':
+            continue
+        if separator and field.lower() == 'user-agent':
+            agent_headers.append(value.strip())
+            if '*' in agent_headers and len(agent_headers) > 1:
+                raise DeploymentError('remote robots.txt wildcard group shares User-agent headers; review the policy before merging')
+        else:
+            agent_headers = []
     star_groups = [
         index for index, line in enumerate(output)
         if line.strip().lower() == "user-agent: *"
@@ -513,8 +567,15 @@ def merge_robots(remote: str) -> str:
         if output[later].strip().lower().startswith("user-agent:"):
             group_end = later
             break
-    block = [ROBOTS_BEGIN, *DETECTOR_ROBOTS_LINES, ROBOTS_END]
-    output[group_end:group_end] = ([""] if group_end and output[group_end - 1].strip() else []) + block
+    # Remove only blank separators adjacent to our insertion point. Without
+    # this normalisation, every repeated merge grows another blank line.
+    while group_end > group_start + 1 and not output[group_end - 1].strip():
+        del output[group_end - 1]
+        group_end -= 1
+    block = ["", ROBOTS_BEGIN, *DETECTOR_ROBOTS_LINES, ROBOTS_END]
+    if group_end < len(output):
+        block.append("")
+    output[group_end:group_end] = block
     while output and not output[-1].strip():
         output.pop()
     output.extend(["", f"Sitemap: {SITEMAP_URL}"])
@@ -535,11 +596,9 @@ def merge_sitemap(remote: bytes) -> bytes:
     for url in list(root.findall(url_tag)):
         loc = url.find(loc_tag)
         value = (loc.text or "").strip() if loc is not None else ""
-        clean_prefix = "https://www.sylvesterkaczmarek.com/satellite-maneuver-detector"
-        physical_prefix = "https://www.sylvesterkaczmarek.com/tools/satellite-maneuver-detector"
-        owned_clean = value == clean_prefix or value.startswith(clean_prefix + "/") or value.startswith(clean_prefix + ".")
-        owned_physical = value == physical_prefix or value.startswith(physical_prefix + "/")
-        if owned_clean or owned_physical:
+        origin = "https://www.sylvesterkaczmarek.com"
+        owned = value.startswith(origin) and owned_public_path(value[len(origin):])
+        if owned:
             root.remove(url)
     for value in PUBLIC_URLS:
         url = ET.SubElement(root, url_tag)
@@ -634,7 +693,7 @@ def rsync_commands(
 
 def remote_targets(repo: Path = ROOT) -> list[tuple[PurePosixPath, PurePosixPath]]:
     # Immutable targets are never overwritten or pruned, including on rollback.
-    targets = [(REMOTE_APP_ROOT / name, PurePosixPath('app') / name) for name in LEGACY_APP_FILES]
+    targets = [(REMOTE_APP_ROOT / name, PurePosixPath('app') / name) for name in (*LEGACY_APP_FILES, *OPTIONAL_APP_FILES)]
     targets.extend((REMOTE_SITE_ROOT / name, PurePosixPath('site') / name) for name in SITE_FILES)
     return targets
 
@@ -671,8 +730,15 @@ def backup_release(
         f"test ! -L {shlex.quote(str(backup_dir))}; "
         f"mkdir -- {shlex.quote(str(backup_dir / 'app'))} {shlex.quote(str(backup_dir / 'site'))}"
     )
-    copies = [f"cp -p -- {shlex.quote(str(destination))} {shlex.quote(str(backup_dir / relative))}"
-              for destination, relative in remote_targets(repo)]
+    copies = []
+    for destination, relative in remote_targets(repo):
+        target = shlex.quote(str(destination))
+        saved = shlex.quote(str(backup_dir / relative))
+        if relative.parts[0] == 'app' and relative.name in OPTIONAL_APP_FILES:
+            absent = shlex.quote(str(backup_dir / (str(relative) + '.absent')))
+            copies.append(f"if test -e {target}; then cp -p -- {target} {saved}; else : > {absent}; fi")
+        else:
+            copies.append(f"cp -p -- {target} {saved}")
     copies.append(f"printf '%s' {shlex.quote(retained)} > {shlex.quote(str(backup_dir / 'retained-routes.htaccess'))}")
     protected_work = 'set -eu; ' + '; '.join(checks) + '; ' + setup + '; ' + '; '.join(copies)
     command = (
@@ -699,9 +765,21 @@ def restore_release(ssh_config: Path | None, backup_dir: PurePosixPath, commit: 
     for destination, backup_relative in remote_targets(repo):
         temporary = destination.parent / f'.{destination.name}.smd-restore-{commit[:12]}'
         saved = backup_dir / ('retained-routes.htaccess' if backup_relative == PurePosixPath('site/.htaccess') else backup_relative)
-        commands.append(f'test ! -L {shlex.quote(str(destination))}; test -f {shlex.quote(str(saved))}; test ! -L {shlex.quote(str(saved))}')
-        commands.append(f'cp -p -- {shlex.quote(str(saved))} {shlex.quote(str(temporary))}')
-        commands.append(f'mv -f -- {shlex.quote(str(temporary))} {shlex.quote(str(destination))}')
+        target, original, staging = map(lambda path: shlex.quote(str(path)), (destination, saved, temporary))
+        commands.append(f'test ! -L {target}; test ! -L {staging}; test ! -e {staging}')
+        if backup_relative.parts[0] == 'app' and backup_relative.name in OPTIONAL_APP_FILES:
+            absent = shlex.quote(str(backup_dir / (str(backup_relative) + '.absent')))
+            commands.append(
+                f'if test -f {original}; then test ! -L {original}; test ! -e {absent}; '
+                f'cp -p -- {original} {staging}; mv -f -- {staging} {target}; '
+                f'else test -f {absent}; test ! -L {absent}; '
+                f'if test -e {target}; then test -f {target}; rm -- {target}; fi; fi'
+            )
+        else:
+            commands.append(f'test -f {original}; test ! -L {original}')
+            commands.append(f'cp -p -- {original} {staging}')
+            commands.append(f'mv -f -- {staging} {target}')
+
     run_remote_script(ssh_config, '; '.join(commands),
                       safe_error='automatic restoration from the private release backup failed')
 

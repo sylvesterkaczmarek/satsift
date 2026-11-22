@@ -9,12 +9,14 @@ import sys
 from urllib.parse import urlsplit
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from browser_assets import browser_assets, source_for_route
+from browser_assets import browser_assets
 
 ROOT = Path(__file__).resolve().parents[1]
-PREFIX = "/satellite-maneuver-detector"
+PREFIX = "/satsift"
+LEGACY_PREFIX = "/satellite-maneuver-detector"
 ROUTES = {
-    "": ("index.html", "text/html"),
+    "/": ("index.html", "text/html"),
+    "/dependency-notices.txt": ("dependency-notices.txt", "text/plain"),
     "/docs": ("docs.html", "text/html"),
     "/benchmark": ("benchmark.html", "text/html"),
     "/accessibility": ("accessibility.html", "text/html"),
@@ -25,8 +27,7 @@ ROUTES = {
     "/plotly-3.3.1.min.js": ("plotly-3.3.1.min.js", "text/javascript"),
 }
 
-ROUTES.update({asset["url"][len(PREFIX):]: (asset["source"], "text/javascript")
-               for asset in browser_assets(ROOT)})
+
 
 
 class WorkbenchHTTPServer(ThreadingHTTPServer):
@@ -40,14 +41,27 @@ class WorkbenchHandler(BaseHTTPRequestHandler):
         self.do_GET()
 
     def do_GET(self) -> None:
-        path = urlsplit(self.path).path.rstrip("/")
-        if path == "":
-            self.send_response(302)
-            self.send_header("Location", PREFIX)
-            self.end_headers()
+        parsed = urlsplit(self.path)
+        path = parsed.path
+        query = ("?" + parsed.query) if parsed.query else ""
+        if path == "/":
+            self.redirect(302, PREFIX + "/" + query)
             return
-        route = path[len(PREFIX):] if path.startswith(PREFIX) else None
-        if route == "/history":
+        prefix = next((candidate for candidate in (PREFIX, LEGACY_PREFIX)
+                       if path == candidate or path.startswith(candidate + "/")
+                       or path == candidate + ".html"), None)
+        route = path[len(prefix):] if prefix else None
+        pages = ("", "/docs", "/benchmark", "/accessibility")
+        if route is not None:
+            for page in pages:
+                aliases = (page, page + ".html", page + "/")
+                if route in aliases:
+                    canonical = PREFIX + (page or "/")
+                    if path != canonical:
+                        self.redirect(301, canonical + query)
+                        return
+                    break
+        if route in ("/history", "/history/"):
             self.respond(503, "application/json", (
                 b'{"code":"LOCAL_PREVIEW","message":"Historical retrieval is unavailable '
                 b'in local preview. Import your own TLE or OMM history, or try a built-in example. '
@@ -55,7 +69,8 @@ class WorkbenchHandler(BaseHTTPRequestHandler):
             ))
         elif route is not None and route.startswith('/app/'):
             try:
-                source = source_for_route(ROOT, urlsplit(self.path).path)
+                assets = {"/" + asset["target"]: asset["source"] for asset in browser_assets(ROOT)}
+                source = assets.get(route)
             except (ValueError, OSError):
                 self.respond(503, 'text/plain', b'Browser assets are unavailable.\n')
                 return
@@ -63,11 +78,20 @@ class WorkbenchHandler(BaseHTTPRequestHandler):
                 self.respond(404, 'text/plain', b'Not found.\n')
             else:
                 self.respond(200, 'text/javascript', (ROOT / source).read_bytes())
-        elif route in ROUTES:
-            name, content_type = ROUTES[route]
-            self.respond(200, content_type, (ROOT / name).read_bytes())
         else:
-            self.respond(404, "text/plain", b"Not found.\n")
+            if route in ("/benchmark/manifest/", "/benchmark/template/"):
+                route = route[:-1]
+            if route in ROUTES:
+                name, content_type = ROUTES[route]
+                self.respond(200, content_type, (ROOT / name).read_bytes())
+            else:
+                self.respond(404, "text/plain", b"Not found.\n")
+
+    def redirect(self, status: int, location: str) -> None:
+        self.send_response(status)
+        self.send_header("Location", location)
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def respond(self, status: int, content_type: str, body: bytes) -> None:
         self.send_response(status)
@@ -92,7 +116,7 @@ def main() -> None:
     if not 0 <= args.port <= 65535:
         parser.error("port must be between 0 and 65535")
     with WorkbenchHTTPServer(("127.0.0.1", args.port), WorkbenchHandler) as server:
-        print(f"Open http://127.0.0.1:{server.server_port}{PREFIX}", flush=True)
+        print(f"Open http://127.0.0.1:{server.server_port}{PREFIX}/", flush=True)
         try:
             server.serve_forever()
         except KeyboardInterrupt:

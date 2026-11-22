@@ -2,7 +2,7 @@
 
 ## Release scope
 
-SatSift 3.4.9 is a source release for research screening and technical evaluation. It includes input-admission repairs, a tested Apache routing boundary, source-only packaging, dependency notices and a separate verification record. Original source code and documentation use [Apache License 2.0](LICENSE). The public repository starts from a reviewed source snapshot with new Git history; the original development repository and its service records remain private.
+SatSift 3.5.0 is a source release for research screening and technical evaluation. It includes the analysis console, the SatSift URL migration, tested compatibility routing, source-only packaging and complete dependency notices. Original source code and documentation use [Apache License 2.0](LICENSE). The public repository starts from a reviewed source snapshot with new Git history; the original development repository and its service records remain private.
 
 The historical physics-ML method failed its confirmatory gate with 0 true positives and 41 false negatives. The consumed holdout, run lock, archived evaluator and result hashes remain intact. Publishing this source does not qualify the workbench for operational use. See [known limitations](KNOWN-ISSUES.md) and [the release verification](review/CLEAN-RELEASE-VERIFICATION.md).
 
@@ -19,7 +19,7 @@ The package contains no inherited commits, branches, tags, author metadata or Gi
 Start from a clean checkout at the reviewed commit. Uncommitted and untracked files stop the build; ignored local configuration is neither read nor copied. The destination must be a new directory outside the checkout.
 
 ~~~sh
-python3 tools/source_release.py build --output ../release-candidates/v3.4.9
+python3 tools/source_release.py build --output ../release-candidates/v3.5.0
 ~~~
 
 The output directory contains:
@@ -30,30 +30,30 @@ The output directory contains:
 
 Use --deny-file with a private, newline-delimited list of additional literals when preparing an owner-specific release. Keep that file outside source control and outside the candidate. It supplements the built-in scan.
 
-Repeated exports of the same commit produce identical archives. The candidate manifest is a release artefact, ignored by Git so it cannot become stale provenance in a later source commit. Published downloads use versioned filenames such as `satsift-3.4.9-source.tar.gz`; their companion checksum names the downloadable file. Renaming the archive does not change its bytes or checksum.
+Repeated exports of the same commit produce identical archives. The candidate manifest is a release artefact, ignored by Git so it cannot become stale provenance in a later source commit. Published downloads use versioned filenames such as `satsift-3.5.0-source.tar.gz`; their companion checksum names the downloadable file. Renaming the archive does not change its bytes or checksum.
 
 ## Verify the exact package
 
-Check the archive checksum against the independently recorded release receipt. For the published 3.4.9 download, use:
+Check the archive checksum against the independently recorded release receipt. For a versioned 3.5.0 download, use:
 
 ~~~sh
-shasum -a 256 -c satsift-3.4.9-source.tar.gz.sha256
-mkdir satsift-3.4.9-check
-tar -xzf satsift-3.4.9-source.tar.gz -C satsift-3.4.9-check
+shasum -a 256 -c satsift-3.5.0-source.tar.gz.sha256
+mkdir satsift-3.5.0-check
+tar -xzf satsift-3.5.0-source.tar.gz -C satsift-3.5.0-check
 ~~~
 
 For a locally built candidate, use the exporter's filenames instead:
 
 ~~~sh
 shasum -a 256 -c satsift-source-candidate.tar.gz.sha256
-mkdir ../v3.4.9-check
-tar -xzf satsift-source-candidate.tar.gz -C ../v3.4.9-check
+mkdir ../v3.5.0-check
+tar -xzf satsift-source-candidate.tar.gz -C ../v3.5.0-check
 ~~~
 
 Verify the extracted tree with `tools/source_release.py`, using the extraction directory for the archive you downloaded or built. The example below uses the local candidate directory. Supply the source tree and commit identifiers from the independent receipt rather than relying solely on the manifest shipped inside the archive. The commit claim is checked only when --expected-commit is supplied.
 
 ~~~sh
-python3 tools/source_release.py verify ../release-candidates/v3.4.9-check/satsift --expected-tree REVIEWED_TREE_HASH --expected-commit REVIEWED_COMMIT_HASH
+python3 tools/source_release.py verify ../release-candidates/v3.5.0-check/satsift --expected-tree REVIEWED_TREE_HASH --expected-commit REVIEWED_COMMIT_HASH
 ~~~
 
 Verification requires every declared file, checks its bytes and mode, reconstructs the Git tree identifier without a Git repository, and rejects unexpected files, directories and links. SHA-256 checks detect changes relative to the trusted receipt; they do not provide a digital signature or establish upstream data authenticity.

@@ -4,10 +4,10 @@ const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 const fs = require('node:fs/promises');
 
-const WORKBENCH = '/satellite-maneuver-detector';
+const WORKBENCH = '/satsift';
 
 async function openWorkbench(page) {
-  await page.goto(WORKBENCH);
+  await page.goto(WORKBENCH + '/');
   await expect(page.locator('#status')).toHaveText('Waiting for input');
 }
 
@@ -77,6 +77,8 @@ for (const scenario of [
 test('invalid input displays its explanation and removes the previous result until repaired', async ({ page }) => {
   await openWorkbench(page);
   await runExample(page);
+  await page.locator('#executiveSummary .summary-details > summary').click();
+  await expect(page.locator('#executiveSummary .summary-grid')).toBeVisible();
   const original = await page.locator('#tles').inputValue();
   await page.locator('#manualInputDetails > summary').click();
   await page.locator('#tles').fill('{broken json');
@@ -376,20 +378,20 @@ test('cached documents recover through the compatibility entry and immutable mod
     const pathname = new URL(request.url()).pathname;
     if (pathname.startsWith(WORKBENCH + '/app/')) modules.push(pathname);
   });
-  await page.route('**/satellite-maneuver-detector', async route => {
+  await page.route('**/satsift/', async route => {
     const response = await route.fetch();
     const current = await response.text();
-    const script = /<script\b[^>]*src="\/satellite-maneuver-detector\/app\/[^\"]+"[^>]*><\/script>/g;
+    const script = /<script\b[^>]*src="\/satsift\/app\/[^\"]+"[^>]*><\/script>/g;
     const tags = current.match(script) || [];
     expect(tags).toHaveLength(7);
     const body = current.replace(script, '').replace('</body>',
-      '<script defer src="/satellite-maneuver-detector/app-3.4.js?v=c8eb05db9c48"></script>\n</body>');
+      '<script defer src="/satsift/app-3.4.js?v=c8eb05db9c48"></script>\n</body>');
     await route.fulfill({ response, body });
   });
   await openWorkbench(page);
   await runExample(page, 'leo');
   const saved = await downloadPackage(page);
-  expect(saved.workbench_version).toBe('3.4.9');
+  expect(saved.workbench_version).toBe('3.5.0');
   expect(saved.normalized_input_omm).toHaveLength(16);
   expect(modules).toHaveLength(6);
   expect(new Set(modules).size).toBe(6);

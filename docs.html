@@ -6,13 +6,18 @@
   <title>SatSift Documentation | Satellite Maneuver Screening</title>
   <meta name="description" content="SatSift documentation for satellite maneuver screening, TLE and OMM histories, SGP4 evidence, results, reproducible exports and scientific limitations." />
   <meta name="robots" content="index, follow" />
-  <link rel="canonical" href="https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/docs" />
+  <link rel="canonical" href="https://www.sylvesterkaczmarek.com/satsift/docs" />
   <meta property="og:title" content="SatSift Documentation | Satellite Maneuver Screening" />
   <meta property="og:description" content="How to use SatSift for satellite orbital change screening and interpret candidate maneuvers and evidence limits." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/docs" />
-  <meta property="og:site_name" content="Sylvester Kaczmarek" />
-  <style>
+  <meta property="og:url" content="https://www.sylvesterkaczmarek.com/satsift/docs" />
+  <meta property="og:site_name" content="SatSift" />
+  <meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SatSift Documentation | Satellite Maneuver Screening">
+<meta name="twitter:description" content="SatSift documentation for satellite maneuver screening, TLE and OMM histories, SGP4 evidence, results, reproducible exports and scientific limitations.">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"SatSift Documentation | Satellite Maneuver Screening","description":"SatSift documentation for satellite maneuver screening, TLE and OMM histories, SGP4 evidence, results, reproducible exports and scientific limitations.","url":"https://www.sylvesterkaczmarek.com/satsift/docs","inLanguage":"en-GB","isPartOf":{"@type":"WebSite","name":"SatSift","url":"https://www.sylvesterkaczmarek.com/satsift/"}}</script>
+<style>
     :root {
       --ink: #0f172a;
       --muted: #4b5563;
@@ -228,15 +233,15 @@
 <body>
   <header class="hero">
     <div class="badge-row" aria-label="Documentation status">
-      <span class="badge">Workbench 3.4.9</span>
+      <span class="badge">Workbench 3.5.0</span>
       <span class="badge">Detector method 0.4</span>
       <span class="badge">Research prototype</span>
     </div>
     <h1>SatSift documentation</h1>
     <p class="hero-copy">How to use SatSift to screen satellite orbital histories, interpret candidate events, retrieve data and understand the scientific limits.</p>
     <div class="actions">
-      <a class="button-link primary" href="/satellite-maneuver-detector">Open workbench</a>
-      <a class="button-link" href="/satellite-maneuver-detector?demo=leo">Run LEO demonstration</a>
+      <a class="button-link primary" href="/satsift/">Open workbench</a>
+      <a class="button-link" href="/satsift/?demo=leo">Run LEO demonstration</a>
     </div>
   </header>
 
@@ -245,6 +250,7 @@
       <strong>Contents</strong>
       <nav>
         <a href="#quick-start">Quick start</a>
+        <a href="#console">Analysis console</a>
         <a href="#analysis-paths">Analysis paths</a>
         <a href="#historical-data">Historical data</a>
         <a href="#input-formats">Input formats</a>
@@ -263,6 +269,13 @@
     </aside>
 
     <main class="content">
+      <section class="card" id="console">
+        <h2>Analysis console</h2>
+        <p>The header summarises the loaded object, NORAD identifier, orbit regime, latest source epoch, data quality and analysis state. These values describe the supplied history. The workbench does not receive live spacecraft telemetry.</p>
+        <p>On a wide screen, input and screening controls sit beside the evidence plots and event inspector. On smaller screens, these panels stack in reading order. Select the light or dark theme using the header control; the choice is retained in this browser when local storage is available.</p>
+        <p>Zooming a time-series plot updates the corresponding time window in the other plot. Time inspection, calibration intervals and excluded gaps help distinguish a screening result from a break in the data. Select a candidate event to inspect its measured features, thresholds, source orbital records and quality notes. Epochs are shown in UTC.</p>
+        <p>Candidate scores are screening statistics. They are not calibrated probabilities of a manoeuvre. Use the accessible data table and reproducibility export for detailed review; the three-dimensional view supplies additional orbital context.</p>
+      </section>
       <section class="card" id="quick-start">
         <h2>Quick start</h2>
         <div class="quick-grid">
@@ -397,7 +410,7 @@
         <h2>Exports and reproducibility</h2>
         <p><strong>Download analysis package</strong> is the recommended export. It contains normalised input records, detector settings, method and workbench versions, quality checks, event results and the deterministic run identifier.</p>
         <p>Exports keep missing element-set identifiers absent and preserve supplied values, including <code>0</code> and <code>999</code>. Appending the same orbital solution with better catalogue metadata retains the new metadata.</p>
-        <p>Workbench 3.4.9 preserves full fractional-day epoch precision and the original validated pair from new TLE imports through normalisation, append operations and saved packages. Reopening a new package retains the same TLE propagation input and evaluates common-epoch residuals at precise elapsed times. Retained lines are checked against the normalised fields before import.</p>
+        <p>Workbench 3.5.0 preserves full fractional-day epoch precision and the original validated pair from new TLE imports through normalisation, append operations and saved packages. Reopening a new package retains the same TLE propagation input and evaluates common-epoch residuals at precise elapsed times. Retained lines are checked against the normalised fields before import.</p>
         <p>Choose <strong>Replace current input</strong> to reopen a package and restore its input and settings. Legacy packages remain importable and receive a recomputed current run identifier. The importer reports when original TLE precision cannot be recovered. Older exports may also contain an invented <code>999</code> or have lost their TLE origin; reimport the original source to recover missing information.</p>
         <p>Native OMM timestamps retain microseconds for ordering and target-epoch comparisons. Satellite.js still initialises native OMM orbital models through millisecond-resolution JavaScript dates.</p>
         <details>
@@ -425,7 +438,7 @@
           <li>A labelled benchmark runner</li>
         </ul>
         <p>The benchmark runner reports event-level precision, recall, F1, false events per object-month, detection delay and abstentions when supplied with a suitable labelled dataset.</p>
-        <p>Workbench 3.4.9 matches the largest possible number of prediction and truth events, then minimises total distance from each prediction's strongest point to the matched truth interval midpoint. A prediction is eligible when its interval overlaps the truth interval expanded by the selected tolerance, including the boundaries. Detection delay is measured from truth onset to prediction onset; strongest-point delay is a separate diagnostic.</p>
+        <p>Workbench 3.5.0 matches the largest possible number of prediction and truth events, then minimises total distance from each prediction's strongest point to the matched truth interval midpoint. A prediction is eligible when its interval overlaps the truth interval expanded by the selected tolerance, including the boundaries. Detection delay is measured from truth onset to prediction onset; strongest-point delay is a separate diagnostic.</p>
         <p>New benchmark reports identify these rules and strict truth timestamp admission as <code>event-matching-v3</code>. Previously recorded research results retain their original scoring. Truth boundaries must be complete strings such as <code>2026-01-02T03:04:05.123456Z</code> or the equivalent with a numeric offset. Use uppercase <code>T</code> and <code>Z</code>, no surrounding whitespace and at most six fractional digits. Invalid calendar dates, values without a timezone and non-string values are rejected.</p>
         <p>Supply <code>matching_tolerance_hours</code> as a JSON number from 0 to 168, including either boundary. Omit the field to use 24 hours. Numeric strings, null, booleans, arrays, objects and non-finite values are rejected.</p>
         <p>Omit <code>end</code> for a point event. A supplied empty or null end is invalid, and end must not precede start after conversion to UTC. Accepted truth boundaries retain microseconds and are reported in UTC, independently of the computer timezone.</p>
@@ -468,14 +481,14 @@
           <li>Open <strong>Accessible chart data</strong> below the charts for the underlying values.</li>
           <li>All primary actions use native buttons, links, inputs and disclosure controls.</li>
         </ul>
-        <p class="small muted">An internal WCAG 2.2 AA-oriented review and automated smoke test are included in Workbench 3.4. This is not a formal Section 508 certification or third-party Accessibility Conformance Report. See the <a href="/satellite-maneuver-detector/accessibility">accessibility statement</a>.</p>
+        <p class="small muted">An internal WCAG 2.2 AA-oriented review and automated smoke test are included in Workbench 3.4. This is not a formal Section 508 certification or third-party Accessibility Conformance Report. See the <a href="/satsift/accessibility">accessibility statement</a>.</p>
       </section>
 
 
       <section class="card" id="benchmark-status">
         <h2>Benchmark status</h2>
         <p>The workbench includes a browser benchmark runner, a small public v0.1 seed manifest covering LEO, MEO, GEO and HEO examples, a same-site builder that retrieves OMM histories, reporting by orbit profile and a deterministic missing-data sensitivity check. The public manifest route serves that seed and runner format; it is not publication benchmark v1.0.</p>
-        <p>Frozen publication benchmark v1.0 contains 40 satellite-disjoint development, calibration and confirmatory cases, including 10 verified-quiet controls and 154 documented event intervals. Its one-shot confirmatory partition has already been consumed and is permanently closed to retuning as untouched evidence. Physics-ML v1.0 failed the predeclared gate and was not integrated; detector 0.4 remains the public scientific method. Review the <a href="/satellite-maneuver-detector/benchmark">benchmark status and evidence distinctions</a> before citing any result.</p>
+        <p>Frozen publication benchmark v1.0 contains 40 satellite-disjoint development, calibration and confirmatory cases, including 10 verified-quiet controls and 154 documented event intervals. Its one-shot confirmatory partition has already been consumed and is permanently closed to retuning as untouched evidence. Physics-ML v1.0 failed the predeclared gate and was not integrated; detector 0.4 remains the public scientific method. Review the <a href="/satsift/benchmark">benchmark status and evidence distinctions</a> before citing any result.</p>
       </section>
 
       <section class="card" id="dependencies">
@@ -512,8 +525,8 @@
   </div>
 
   <footer class="footer">
-    Documentation for <a href="/satellite-maneuver-detector">SatSift</a> by <a href="https://sylvesterkaczmarek.com/">Sylvester Kaczmarek</a>.<br />
-    Workbench 3.4.9 · Detector method 0.4 · Last updated November 2026
-  </footer>
+    Documentation for <a href="/satsift/">SatSift</a> by <a href="https://sylvesterkaczmarek.com/">Sylvester Kaczmarek</a>.<br />
+    Workbench 3.5.0 · Detector method 0.4 · Last updated November 2026
+  <br><a href="/satsift/dependency-notices.txt">Licence and dependency notices</a></footer>
 </body>
 </html>

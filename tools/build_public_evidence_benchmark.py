@@ -14,7 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = ROOT / 'public-evidence-manifest-v1.0.json'
 DEFAULT_OUTPUT = ROOT / 'benchmark-data' / 'public-evidence-benchmark-v1.0.json'
-DEFAULT_ENDPOINT = 'https://www.sylvesterkaczmarek.com/satellite-maneuver-detector/history'
+DEFAULT_ENDPOINT = 'https://www.sylvesterkaczmarek.com/satsift/history'
 ALLOWED_SPLITS = {'development', 'calibration', 'confirmatory', 'test'}
 RUNTIME_LABEL_STATUSES = {'event-evidence', 'confirmed-quiet', 'fully-labelled', 'unknown'}
 RUNTIME_LABEL_ALIASES = {'verified-quiet': 'confirmed-quiet'}

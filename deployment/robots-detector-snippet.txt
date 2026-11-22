@@ -1,13 +1,11 @@
-# Satellite Maneuver Detector indexing policy
-# Merge these directives into the site-root User-agent: * group in /robots.txt.
-# Do not retain a broader `Disallow: /satellite-maneuver-detector/` rule, because
-# it would block the public documentation, benchmark and accessibility pages.
-
+# SatSift rules for the existing User-agent: * group.
+Allow: /satsift
+Disallow: /satsift/history
+Disallow: /satsift/benchmark/manifest
+Disallow: /satsift/benchmark/template
 Allow: /satellite-maneuver-detector
 Disallow: /satellite-maneuver-detector/history
 Disallow: /satellite-maneuver-detector/benchmark/manifest
 Disallow: /satellite-maneuver-detector/benchmark/template
 Disallow: /tools/satellite-maneuver-detector/
-
-# The site-root robots.txt should also contain exactly one sitemap declaration:
-# Sitemap: https://www.sylvesterkaczmarek.com/sitemap.xml
+Sitemap: https://www.sylvesterkaczmarek.com/sitemap.xml
