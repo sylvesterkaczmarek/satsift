@@ -35,7 +35,7 @@
       --control-line: #50677e;
       --blue: #73d4e6;
       --primary: #16758b;
-      --primary-hover: #1b879f;
+      --primary-hover: #126a7d;
       --focus: #8ce4f3;
       --green-bg: #12332b;
       --green-line: #2a7059;
@@ -216,6 +216,7 @@
     .summary-card { display: none; }
     .summary-card.visible { display: block; }
     .post-analysis:has(.summary-card.visible) .empty-analysis,
+    .post-analysis:not(:has(.summary-card.visible)) #chartCard,
     .post-analysis:not(:has(.summary-card.visible)) #orbitDetails,
     .post-analysis:not(:has(.summary-card.visible)) #exportCard,
     .post-analysis:has(.analysis-error) #chartCard,
@@ -388,7 +389,7 @@
       .result-grid, .grid3 { grid-template-columns: minmax(0, 1fr); }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+      *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
     }
     @media print {
       :root, :root[data-theme] { color-scheme: light; --page: #fff; --surface: #fff; --surface-raised: #fff; --soft: #fff; --ink: #172d40; --muted: #4e6275; --line: #ccd7e1; --blue: #076980; }
