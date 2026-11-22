@@ -62,6 +62,13 @@ class MockState:
         self.login_delay = 0.0
         self.history_delay = 0.0
         self.padding = 0
+        self.cookie_number = 0
+        self.session_cookie = None
+
+    def next_cookie(self):
+        self.cookie_number += 1
+        self.session_cookie = f'synthetic-session-{self.cookie_number}'
+        return self.session_cookie
 
     def snapshot(self):
         with self.lock:
@@ -80,6 +87,8 @@ class MockHandler(BaseHTTPRequestHandler):
             self.send_response(status)
             self.send_header('Content-Type', 'application/json')
             self.send_header('Content-Length', str(len(body)))
+            if status == 200 and getattr(self, 'response_cookie', None) is not None:
+                self.send_header('Set-Cookie', f'satsift_test_session={self.response_cookie}; Path=/; HttpOnly')
             self.send_header('Connection', 'close')
             self.close_connection = True
             self.end_headers()
@@ -97,6 +106,8 @@ class MockHandler(BaseHTTPRequestHandler):
         with state.lock:
             state.calls.append({'operation': 'login'})
             status, delay = state.login_status, state.login_delay
+            if status == 200:
+                self.response_cookie = state.next_cookie()
         if delay:
             time.sleep(delay)
         self.send_json(status, {'ok': status == 200})
@@ -110,8 +121,14 @@ class MockHandler(BaseHTTPRequestHandler):
         start, end = match[2].split('--', 1)
         state = self.server.state
         with state.lock:
-            state.calls.append({'operation': 'history', 'norad': norad, 'start': start, 'end': end})
+            authenticated = state.session_cookie is not None and self.headers.get('Cookie') == f'satsift_test_session={state.session_cookie}'
+            state.calls.append({'operation': 'history', 'norad': norad, 'start': start, 'end': end, 'authenticated': authenticated})
             status, delay, padding = state.history_status, state.history_delay, state.padding
+            if authenticated and status == 200:
+                self.response_cookie = state.next_cookie()
+        if not authenticated:
+            self.send_json(403, {'error': 'a current synthetic session cookie is required'})
+            return
         if delay:
             time.sleep(delay)
         if status != 200:
@@ -122,9 +139,10 @@ class MockHandler(BaseHTTPRequestHandler):
 
 
 class Endpoint:
-    def __init__(self, constants=None, *, credentials=True):
+    def __init__(self, constants=None, *, credentials=True, retain_handles=False):
         self.constants = constants or {}
         self.credentials = credentials
+        self.retain_handles = retain_handles
         self.state = MockState()
 
     def __enter__(self):
@@ -155,6 +173,18 @@ class Endpoint:
             source, count = re.subn(r'^const ' + re.escape(name) + r' = [^;\n]+;', f'const {name} = {value};', source, flags=re.MULTILINE)
             if count != 1:
                 raise AssertionError(f'Missing or ambiguous test limit {name}')
+        if self.retain_handles:
+            # Keep history handles alive after curlRequest returns, then release
+            # them after the endpoint unlinks its jar, before sending a response.
+            # This makes destructor-time writes observable without timing waits.
+            retain_marker = "    $body = '';\n    $headerBytes = 0;"
+            release_marker = '    releaseHistoryLock($missLock);'
+            if source.count(retain_marker) != 1 or source.count(release_marker) != 1:
+                raise AssertionError('Missing or ambiguous cURL lifecycle test boundary')
+            source = source.replace(retain_marker,
+                "    if (strpos($url, '/basicspacedata/') !== false) { $GLOBALS['test_retained_history_handles'][] = $handle; }\n" + retain_marker)
+            source = source.replace(release_marker,
+                "    unset($GLOBALS['test_retained_history_handles']);\n" + release_marker)
         (self.document_root / 'history.php').write_text(source)
         env = os.environ.copy()
         for key in ('SPACETRACK_IDENTITY', 'SPACETRACK_PASSWORD', 'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'http_proxy', 'https_proxy', 'all_proxy'):
@@ -263,6 +293,7 @@ class AdmissionTests(unittest.TestCase):
         self.assertEqual(len(state['global']), previous + expected)
         self.assertEqual(sum(len(entries) for entries in state['clients'].values()), previous + expected)
         self.assertEqual(len(endpoint.state.snapshot()), expected)
+        self.assertTrue(all(item['authenticated'] for item in endpoint.state.snapshot() if item['operation'] == 'history'))
         self.assertEqual(set(state), {'version', 'clients', 'global'})
         self.assert_clean(endpoint)
 
@@ -608,6 +639,35 @@ class AdmissionTests(unittest.TestCase):
             (endpoint.cache / 'request-limits.json.tmp').rmdir()
             self.assert_status(endpoint.request(), 200)
             self.assert_charged(endpoint, 2)
+
+    def test_deferred_handles_preserve_authentication_limits_and_cleanup(self):
+        scenarios = (
+            ('success', {}, 200, 4),
+            ('oversized-body', {'MAX_UPSTREAM_RESPONSE_BYTES': 1024}, 413, 2),
+            ('deadline', {'UPSTREAM_BUDGET_SECONDS': 1}, 503, 2),
+            ('cookie-limit', {'MAX_COOKIE_BYTES': 1}, 413, 1),
+        )
+        for scenario, constants, status, calls in scenarios:
+            with self.subTest(scenario=scenario), Endpoint(constants, retain_handles=True) as endpoint:
+                store = self.fragmented_store(endpoint)
+                original = store.read_bytes()
+                if scenario == 'oversized-body':
+                    endpoint.state.padding = 4096
+                elif scenario == 'deadline':
+                    endpoint.state.login_delay = endpoint.state.history_delay = 0.6
+                response = endpoint.request()
+                self.assert_status(response, status)
+                if status != 200:
+                    self.assertEqual(store.read_bytes(), original)
+                if status == 503:
+                    self.assert_retry(response)
+                    self.assertLess(response[3], 2.0)
+                self.assert_charged(endpoint, calls)
+                if scenario in ('oversized-body', 'deadline'):
+                    endpoint.state.padding = 0
+                    endpoint.state.login_delay = endpoint.state.history_delay = 0
+                    self.assert_status(endpoint.request(), 200)
+                    self.assert_charged(endpoint, calls + 4)
 
     def test_oversized_body_aborts_before_partial_commit_and_cleans_session(self):
         with Endpoint({'MAX_UPSTREAM_RESPONSE_BYTES': 1024}) as endpoint:
