@@ -55,11 +55,12 @@ function legacyApiNames(source) {
     .concat([...source.matchAll(/^  const ([A-Z][A-Z_0-9]*) = /gm)].map(match => match[1]));
 }
 
-function loadBrowserApp(context, { root = process.cwd(), start = true, hooks = '', configureModules = null } = {}) {
+function loadBrowserApp(context, { root = process.cwd(), start = true, hooks = '', configureModules = null, configureLegacySource = null } = {}) {
   const files = sourceFiles(root);
   if (files.length === 1) {
     // Kept for read-only comparison with an explicitly selected historical snapshot.
-    const source = fs.readFileSync(path.join(root, files[0]), 'utf8');
+    const originalSource = fs.readFileSync(path.join(root, files[0]), 'utf8');
+    const source = configureLegacySource ? configureLegacySource(originalSource) : originalSource;
     const cutoff = source.indexOf("  byId('run').addEventListener");
     const closing = source.lastIndexOf('\n})();');
     assert(cutoff > 0 && closing > cutoff, 'Historical application boundaries are required.');

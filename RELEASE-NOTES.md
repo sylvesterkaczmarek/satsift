@@ -30,6 +30,14 @@ A deterministic source exporter reads a clean committed Git tree, preserves file
 
 Bundled component notices and external-label/provider attribution have been added in companion files, preserving all vendored and frozen scientific bytes. The reviewed source is distributed with a file inventory, checksum and verification receipt. See [the release procedure](RELEASE.md) and [verification record](review/CLEAN-RELEASE-VERIFICATION.md).
 
+### Portable browser verification
+
+Browser equivalence now executes the exact original 3.4.7 application beside the maintained modules in each runtime. Complete analyses, exports and reopened results must match exactly for all seven synthetic cases and all three release identities. The original v1/v2/v3 fixtures and source pins remain unchanged, with their recorded numerical hashes additionally required on their documented Node 26 macOS ARM64 profile. This resolves runtime-dependent numerical hash failures in Node 22 verification without introducing tolerances or changing production calculations; altered source and dependency wiring remain rejected. See [the runtime verification boundary](BROWSER-ARCHITECTURE.md#exact-comparisons-across-runtimes).
+
+### Temporary session cleanup
+
+The history endpoint now explicitly saves session cookies after a completed upstream transfer and resets the cURL handle before releasing it. A handle retained after a transfer abort can no longer recreate the cookie file after request cleanup. Regression tests require a valid rotating synthetic session cookie, deliberately defer handle destruction, and verify successful retrieval, deadline and size-limit responses, unchanged cache and quota behaviour, and immediate cleanup. This endpoint repair has not been deployed to the live website.
+
 ## Workbench 3.4.8
 
 The combined implementation was independently checked from a fresh source worktree on 22 November 2026. At that review, the maintained engineering candidate was in the **private development repository**, pending a separate clean-history publication release. No live deployment or model retraining was performed.

@@ -592,8 +592,13 @@ function curlRequest(string $url, array $options, array $context): array
         if ($result === false) {
             throw new RuntimeException($error !== '' ? $error : 'The upstream request failed.');
         }
+        // Persist login or updated cookies before the next handle needs them.
+        if (isset($options[CURLOPT_COOKIEJAR]) && !curl_setopt($handle, CURLOPT_COOKIELIST, 'FLUSH')) {
+            throw new RuntimeException('The upstream session could not be saved.');
+        }
     } finally {
-        // Releasing the handle flushes its cookie jar on supported PHP versions.
+        // Clear COOKIEJAR and callbacks before any deferred destructor can run.
+        curl_reset($handle);
         unset($handle);
     }
     if (isset($options[CURLOPT_COOKIEJAR])) {
