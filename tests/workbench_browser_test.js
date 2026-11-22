@@ -389,7 +389,7 @@ test('cached documents recover through the compatibility entry and immutable mod
   await openWorkbench(page);
   await runExample(page, 'leo');
   const saved = await downloadPackage(page);
-  expect(saved.workbench_version).toBe('3.4.9');
+  expect(saved.workbench_version).toBe('3.5.0');
   expect(saved.normalized_input_omm).toHaveLength(16);
   expect(modules).toHaveLength(6);
   expect(new Set(modules).size).toBe(6);

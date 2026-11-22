@@ -33,6 +33,7 @@ jobs:
           node --check tools/load_browser_app.js
           node --check tests/browser_module_equivalence_test.js
           node --check tests/browser_module_loader_test.js
+          node --check tests/console_browser_test.js
           node --check tests/catalogue_revision_test.js
           node --check tests/catalogue_metadata_roundtrip_test.js
           node --check tests/catalogue_identifier_test.js
@@ -54,6 +55,7 @@ jobs:
       - name: Browser module contracts and equivalence
         run: |
           python3 tools/update_browser_assets.py --check
+          python3 tools/build_browser_notices.py --check
           node tests/browser_module_equivalence_test.js
           node tests/browser_module_loader_test.js
 

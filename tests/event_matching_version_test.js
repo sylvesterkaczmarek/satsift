@@ -21,7 +21,8 @@ const REVIEWED_SCORING_SHA256 = Object.freeze({
 // timestamp arithmetic remain v3; retain its original full-surface fingerprint.
 // The equivalence test independently compares all unchanged scoring bodies.
 const REVIEWED_ADMISSION_SHA256 = Object.freeze({
-  '3.4.9/event-matching-v3': '1708e27be17c3be442f0c0a2ab6d458a33caba48be9db4b0e33d435fc76d1b7a'
+  '3.4.9/event-matching-v3': '1708e27be17c3be442f0c0a2ab6d458a33caba48be9db4b0e33d435fc76d1b7a',
+  '3.5.0/event-matching-v3': '1708e27be17c3be442f0c0a2ab6d458a33caba48be9db4b0e33d435fc76d1b7a'
 });
 
 function definition(text, name) {
@@ -82,6 +83,6 @@ if (process.argv.includes('--fingerprint')) {
     assert.throws(() => verify(mutated), assert.AssertionError);
   }
   assert.throws(() => verify(source.replace("EVENT_MATCHING_VERSION = 'event-matching-v3'", "EVENT_MATCHING_VERSION = 'unreviewed-version'")), assert.AssertionError);
-  assert.throws(() => verify(source.replace("WORKBENCH_VERSION = '3.4.9'", "WORKBENCH_VERSION = '3.4.8'")), assert.AssertionError);
+  assert.throws(() => verify(source.replace("WORKBENCH_VERSION = '3.5.0'", "WORKBENCH_VERSION = '3.4.8'")), assert.AssertionError);
   console.log('Browser event-matching and versioned admission verified; ' + (mutations.length + 2) + ' mutation checks passed.');
 }

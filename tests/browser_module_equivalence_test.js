@@ -14,6 +14,8 @@ const FIXTURE = path.join(__dirname, 'fixtures/browser-equivalence-v3.json');
 const ORIGINAL_FIXTURE_SHA256 = '980d62fc9fe22a061c7fda35520049a8144f2feab6fc803eaf8f562bb3c53a41';
 const PRIOR_FIXTURE_SHA256 = '1a596ee8b07949eed9d07d499e20d985e05d58fbd02998fcd10d5c440027f454';
 const FIXTURE_SHA256 = 'fd9910e1065c9f057c3e5ee0657cfdc3f03653c636e2ba97b6e49416932fbac4';
+const PRESENTATION_FIXTURE = path.join(__dirname, 'fixtures/browser-presentation-v4.json');
+const PRESENTATION_SHA256 = '186206bdd4383ee81aff68aa9431d63c8ba193e07154ab678ed5082253e900f8';
 const ORIGINAL_SOURCE_ROOT = path.join(__dirname, 'fixtures/browser-equivalence-v1');
 const ORIGINAL_SOURCE_SHA256 = 'c8eb05db9c48c1357cdf59e019c82a94c82d4f9150a68291bcfbd0a0e6030098';
 const RECORDED_RUNTIME = Object.freeze({
@@ -41,12 +43,21 @@ function usesRecordedRuntime() {
 
 function prepareHistoricalSource(source, comparisonVersion) {
   assert.equal(hash(source), ORIGINAL_SOURCE_SHA256, 'The historical application source must remain unchanged.');
-  assert(comparisonVersion === null || ['3.4.7', '3.4.8', '3.4.9'].includes(comparisonVersion));
+  assert(comparisonVersion === null || ['3.4.7', '3.4.8', '3.4.9', '3.5.0'].includes(comparisonVersion));
   const marker = "  const WORKBENCH_VERSION = '3.4.7';";
   assert.equal(source.split(marker).length, 2, 'The historical release identity must be unique.');
-  // Verify the original bytes first; rebind only this one literal in memory.
-  return comparisonVersion === null ? source
+  // Verify the original bytes before rebinding release metadata in memory.
+  let configured = comparisonVersion === null ? source
     : source.replace(marker, `  const WORKBENCH_VERSION = '${comparisonVersion}';`);
+  if (comparisonVersion === '3.5.0') {
+    for (const asset of ['plotly-3.3.1.min.js', 'satellite-6.0.2.min.js']) {
+      const key = asset.startsWith('plotly') ? 'plotly' : 'satellite_js';
+      const literal = `${key}: '/satellite-maneuver-detector/${asset}'`;
+      assert.equal(configured.split(literal).length, 2, 'The historical dependency URL must be unique.');
+      configured = configured.replace(literal, `${key}: '/satsift/${asset}'`);
+    }
+  }
+  return configured;
 }
 
 function recordedInvariants(snapshot) {
@@ -96,7 +107,13 @@ function captureSnapshot(root = process.cwd(), comparisonVersion = null,
   const configureModules = modules => {
     if (comparisonVersion !== null) {
       const original = modules.common;
-      modules.common = () => Object.freeze({ ...original(), WORKBENCH_VERSION: comparisonVersion });
+      modules.common = () => {
+        const prefix = comparisonVersion === '3.5.0' ? '/satsift' : '/satellite-maneuver-detector';
+        return Object.freeze({ ...original(), WORKBENCH_VERSION: comparisonVersion,
+          HISTORY_ENDPOINT: prefix + '/history',
+          PLOTLY_ASSET_URL: prefix + '/plotly-3.3.1.min.js',
+          SATELLITE_ASSET_URL: prefix + '/satellite-6.0.2.min.js' });
+      };
     }
     if (configureAdditionalModules) configureAdditionalModules(modules);
   };
@@ -158,7 +175,7 @@ function checkOracleRejections(actual, historical) {
   } });
   assert.deepEqual(recordedInvariants(changed), recordedInvariants(actual),
     'The wiring counterexample must retain source identities and every recorded invariant.');
-  assert.throws(() => assertSameRuntimeOutputs(changed, historical, '3.4.9'),
+  assert.throws(() => assertSameRuntimeOutputs(changed, historical, '3.5.0'),
     /Complete same-runtime analyses, exports or reopened results changed/);
 }
 
@@ -186,31 +203,50 @@ function main() {
   assert.equal(fixture.baseline_commit, 'c1a2efb7aceae4cbf5ee7ca96b447f430dffd43c');
   assert.equal(fixture.workbench_version, '3.4.9');
   assert.equal(fixture.prior_oracle_sha256, PRIOR_FIXTURE_SHA256);
-  assert.deepEqual(fixture.source_files_sha256, Object.fromEntries(sourceFiles()
-    .map(name => [name, hash(fs.readFileSync(name))])), 'The maintenance oracle must identify its actual production source.');
+  const presentationBytes = fs.readFileSync(PRESENTATION_FIXTURE);
+  assert.equal(hash(presentationBytes), PRESENTATION_SHA256, 'The reviewed presentation fixture must remain unchanged.');
+  const presentation = JSON.parse(presentationBytes);
+  assert.equal(presentation.schema, 'smd-browser-presentation-v4');
+  assert.equal(presentation.workbench_version, '3.5.0');
+  assert.equal(presentation.prior_oracle_sha256, FIXTURE_SHA256);
+  assert.equal(presentation.baseline_commit, '6bfdaac56386030cb57ef3d054a703b2aa794b6a');
+  assert.deepEqual(presentation.source_files_sha256, Object.fromEntries(sourceFiles()
+    .map(name => [name, hash(fs.readFileSync(name))])), 'The presentation fixture must identify its actual production source.');
+  for (const name of ['app/detection.js', 'app/orbital-input.js', 'app/benchmark.js']) {
+    assert.equal(presentation.source_files_sha256[name], fixture.source_files_sha256[name],
+      'Numerical and admission modules must retain the reviewed source bytes: ' + name);
+  }
   const actual = captureSnapshot();
-  assert.deepEqual(recordedInvariants(actual), recordedInvariants(fixture.expected),
-    'Current browser source identities or recorded invariant decisions changed.');
+  assert.deepEqual(recordedInvariants(actual), recordedInvariants(presentation.expected),
+    'Current source identities or recorded invariant decisions changed.');
   const historical = captureSnapshot(process.cwd(), null, { historical: true });
   assert.deepEqual(recordedInvariants(historical), recordedInvariants(original.expected),
     'Historical execution must expose the original functions, constants and invariant decisions.');
   if (usesRecordedRuntime()) {
-    assert.deepEqual(actual, fixture.expected, 'Current browser module behaviour diverged from reviewed release.');
+    assert.deepEqual(actual, presentation.expected, 'Current browser module behaviour diverged from reviewed release.');
     assert.deepEqual(historical, original.expected, 'Historical execution diverged from the original recorded outputs.');
   }
-  assert.deepEqual(Object.keys(actual.functions), Object.keys(prior.expected.functions));
+  assert.deepEqual(Object.keys(actual.functions).sort(),
+    [...Object.keys(prior.expected.functions), ...presentation.added_api_functions].sort());
+  const presentationChanges = new Set(presentation.changed_ui_functions);
+  assert.deepEqual(presentation.changed_metadata_functions, ['buildMachineReadableResult']);
+  presentationChanges.add('buildMachineReadableResult');
+  for (const [name, digest] of Object.entries(fixture.expected.functions)) {
+    if (!presentationChanges.has(name)) assert.equal(actual.functions[name], digest,
+      'Unexpected function change during presentation work: ' + name);
+  }
   const maintained = new Set(['resolveCatalogueRevisions', 'normaliseBenchmarkDefinition', 'compareCatalogueIdentifier']);
   for (const [name, digest] of Object.entries(prior.expected.functions)) {
-    if (!maintained.has(name)) assert.equal(actual.functions[name], digest, 'Unexpected function change since 3.4.8: ' + name);
+    if (!maintained.has(name) && !presentationChanges.has(name)) assert.equal(actual.functions[name], digest, 'Unexpected function change since 3.4.8: ' + name);
   }
   for (const [name, digest] of Object.entries(original.expected.functions)) {
-    if (!maintained.has(name) && !['parseTlePair', 'parseOmmRecord'].includes(name)) {
+    if (!maintained.has(name) && !presentationChanges.has(name) && !['parseTlePair', 'parseOmmRecord'].includes(name)) {
       assert.equal(actual.functions[name], digest, 'Unexpected scientific function change: ' + name);
     }
   }
   for (const baseline of [original, prior]) {
     for (const [name, digest] of Object.entries(baseline.expected.constants)) {
-      if (name !== 'WORKBENCH_VERSION') {
+      if (!['WORKBENCH_VERSION', 'HISTORY_ENDPOINT', 'PLOTLY_ASSET_URL'].includes(name)) {
         assert.equal(actual.constants[name], digest, 'Unexpected scientific constant change: ' + name);
       }
     }
@@ -219,7 +255,7 @@ function main() {
   }
   let currentHistorical;
   for (const [version, baseline] of [['3.4.7', original], ['3.4.8', prior], ['3.4.9', fixture]]) {
-    const comparable = version === fixture.workbench_version ? actual : captureSnapshot(process.cwd(), version);
+    const comparable = captureSnapshot(process.cwd(), version);
     const reference = version === '3.4.7' ? historical
       : captureSnapshot(process.cwd(), version, { historical: true });
     assertSameRuntimeOutputs(comparable, reference, version);
@@ -229,8 +265,11 @@ function main() {
       assert.deepEqual(comparable.cases, baseline.expected.cases,
         'Complete recorded analyses, exports or reopened results changed beyond release identity: ' + version);
     }
-    if (version === fixture.workbench_version) currentHistorical = reference;
+
   }
+  currentHistorical = captureSnapshot(process.cwd(), '3.5.0', { historical: true });
+  assertSameRuntimeOutputs(actual, currentHistorical, '3.5.0');
+  assert.equal(actual.constants.SATELLITE_ASSET_URL, hash(canonical('/satsift/satellite-6.0.2.min.js')));
   checkOracleRejections(actual, currentHistorical);
   const source = readBrowserSource();
   const declared = [...source.matchAll(/^  (?:async )?function ([A-Za-z_$][\w$]*)\(/gm)].map(match => match[1]);
@@ -238,8 +277,8 @@ function main() {
     assert.equal(declared.filter(item => item === name).length, 1, `Original definition must be unique: ${name}`);
   }
   assert.deepEqual(declared.filter(name => !Object.hasOwn(fixture.expected.functions, name)).sort(),
-    sourceFiles().length === 1 ? [] : ['canonicalCatalogId', 'loadModule', 'moduleReady', 'reportLoadFailure', 'start', 'startApplication'], 'Unknown application functions need explicit review.');
-  console.log(`Browser module equivalence passed: ${Object.keys(actual.functions).length} runtime functions, ${Object.keys(actual.constants).length} constants, seven complete analyses/export/reopen paths for all three release identities against the pinned same-runtime historical application; source and wiring mutations rejected.`);
+    sourceFiles().length === 1 ? [] : [...['canonicalCatalogId', 'loadModule', 'moduleReady', 'reportLoadFailure', 'start', 'startApplication'], ...presentation.added_ui_functions].sort(), 'Unknown application functions need explicit review.');
+  console.log(`Browser module equivalence passed: ${Object.keys(actual.functions).length} runtime functions, ${Object.keys(actual.constants).length} constants, seven complete analyses/export/reopen paths for all four release identities against the pinned same-runtime historical application; source and wiring mutations rejected.`);
   console.log(usesRecordedRuntime()
     ? 'Original v1/v2/v3 recorded-output hashes also verified on their reference runtime.'
     : `Original v1/v2/v3 fixtures and invariant outputs verified; recorded numerical hashes apply to ${RECORDED_RUNTIME.node} ${RECORDED_RUNTIME.platform}/${RECORDED_RUNTIME.arch}, V8 ${RECORDED_RUNTIME.v8}.`);

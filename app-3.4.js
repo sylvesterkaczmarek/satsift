@@ -11,33 +11,33 @@
   const MODULE_ASSETS = Object.freeze([
   {
     "name": "common",
-    "url": "/satellite-maneuver-detector/app/common-bc423f074a86.js",
-    "integrity": "sha256-vEI/B0qG4V6Uu4TybLzdwSXKj8y1IqxGTkhxTDYn+5w="
+    "url": "/satsift/app/common-6d34ec926310.js",
+    "integrity": "sha256-bTTskmMQuzILx/m5yqkF/Fm65l6IczmtZ80IuQiFToM="
   },
   {
     "name": "orbital-input",
-    "url": "/satellite-maneuver-detector/app/orbital-input-e1b787fca1e2.js",
+    "url": "/satsift/app/orbital-input-e1b787fca1e2.js",
     "integrity": "sha256-4beH/KHil20I0a8aBwkrIknvj1vn0wHMABUzvUpXfj0="
   },
   {
     "name": "benchmark",
-    "url": "/satellite-maneuver-detector/app/benchmark-91d4848f8ca3.js",
+    "url": "/satsift/app/benchmark-91d4848f8ca3.js",
     "integrity": "sha256-kdSEj4yjucZ20x1rnOklD6cGVP5mnpHe3U6jKN3WOhU="
   },
   {
     "name": "packages",
-    "url": "/satellite-maneuver-detector/app/packages-1ca01aa7ed42.js",
-    "integrity": "sha256-HKAap+1CX7Einb16WS6hjDq25oaM11FR5yAvrS+L0WU="
+    "url": "/satsift/app/packages-f8bcaa054802.js",
+    "integrity": "sha256-+LyqBUgCSYgUO0UsA3QZFvsFBElYgsKD82n11GtVO7w="
   },
   {
     "name": "detection",
-    "url": "/satellite-maneuver-detector/app/detection-133da300883d.js",
+    "url": "/satsift/app/detection-133da300883d.js",
     "integrity": "sha256-Ez2jAIg9dFkhj/iGC/CUokXNEdpX+j6k+cfPey5R+zg="
   },
   {
     "name": "interface",
-    "url": "/satellite-maneuver-detector/app/interface-3a88f4921deb.js",
-    "integrity": "sha256-Ooj0kh3rNIFAFoTTdRnW5mW+mq3aDHQxFUaio11Z/vQ="
+    "url": "/satsift/app/interface-4fdf7bcb6714.js",
+    "integrity": "sha256-T997y2cU271KYjLgNNWp7YVLmZvlKeAqOQf/FWtKYgY="
   }
 ]);
 // END MODULE ASSETS

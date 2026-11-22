@@ -34,7 +34,7 @@ Repeated exports of the same commit produce identical archives. The candidate ma
 
 ## Verify the exact package
 
-Check the archive checksum against the independently recorded release receipt. For the published 3.5.0 download, use:
+Check the archive checksum against the independently recorded release receipt. For a versioned 3.5.0 download, use:
 
 ~~~sh
 shasum -a 256 -c satsift-3.5.0-source.tar.gz.sha256
