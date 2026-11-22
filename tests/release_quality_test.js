@@ -103,7 +103,7 @@ CapturingURL.revokeObjectURL = () => {};
 
 const windowObject = {
   document,
-  location: { href: 'https://example.test/satellite-maneuver-detector', search: '' },
+  location: { href: 'https://example.test/satsift', search: '' },
   history: { replaceState() {} },
   setTimeout(handler) { if (typeof handler === 'function') handler(); return 1; },
   clearTimeout() {},
@@ -148,10 +148,10 @@ vm.createContext(context);
 const indexHtml = fs.readFileSync('index.html', 'utf8');
 assert(!/<script[^>]+plotly-3\.3\.1\.min\.js/i.test(indexHtml), 'Plotly must not be loaded eagerly by index.html.');
 assert(/<script[^>]+satellite-6\.0\.2\.min\.js/i.test(indexHtml), 'satellite.js must remain available at startup for detector method 0.4.');
-assert(indexHtml.includes('/satellite-maneuver-detector/satellite-6.0.2.min.js?v=14488fc91092'), 'satellite.js must use its content-versioned CDN key.');
+assert(indexHtml.includes('/satsift/satellite-6.0.2.min.js?v=14488fc91092'), 'satellite.js must use its content-versioned CDN key.');
 const assets = browserAssets();
 const scriptTags = indexHtml.match(/<script\b[^>]*>/g) || [];
-let previousPosition = indexHtml.indexOf('/satellite-maneuver-detector/satellite-6.0.2.min.js?v=');
+let previousPosition = indexHtml.indexOf('/satsift/satellite-6.0.2.min.js?v=');
 for (const asset of assets) {
   const matching = scriptTags.filter(tag => tag.includes('src="' + asset.url + '"'));
   assert.strictEqual(matching.length, 1, 'Each module must have exactly one content-addressed script tag: ' + asset.name);
@@ -161,7 +161,7 @@ for (const asset of assets) {
   assert(position > previousPosition, 'Browser dependencies must precede their entry point.');
   previousPosition = position;
 }
-assert(!indexHtml.includes('/satellite-maneuver-detector/app-3.4.js?v='), 'New pages must use the immutable bootstrap URL.');
+assert(!indexHtml.includes('/satsift/app-3.4.js?v='), 'New pages must use the immutable bootstrap URL.');
 
 const satelliteSource = fs.readFileSync('satellite-6.0.2.min.js', 'utf8');
 vm.runInContext(satelliteSource, context, { filename: 'satellite-6.0.2.min.js' });
@@ -238,7 +238,7 @@ async function assertExactDownload(payload) {
   assert.strictEqual(appendedScripts.length, 0, 'Plotly should not be appended before it is requested.');
   const loadPromise = api.ensurePlotlyLoaded();
   assert.strictEqual(appendedScripts.length, 1, 'Plotly loader should append exactly one script.');
-  assert.strictEqual(appendedScripts[0].src, '/satellite-maneuver-detector/plotly-3.3.1.min.js', 'Plotly loader must use the pinned same-site asset.');
+  assert.strictEqual(appendedScripts[0].src, '/satsift/plotly-3.3.1.min.js', 'Plotly loader must use the pinned same-site asset.');
   windowObject.Plotly = { version: '3.3.1' };
   appendedScripts[0].handlers.load();
   await loadPromise;

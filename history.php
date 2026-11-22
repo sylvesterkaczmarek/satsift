@@ -537,7 +537,7 @@ function curlRequest(string $url, array $options, array $context): array
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_CONNECTTIMEOUT_MS => min(UPSTREAM_CONNECT_TIMEOUT_SECONDS * 1000, $remainingMilliseconds),
             CURLOPT_TIMEOUT_MS => $remainingMilliseconds,
-            CURLOPT_USERAGENT => 'SatelliteManeuverWorkbench/3.4.7 (+https://www.sylvesterkaczmarek.com/satellite-maneuver-detector)',
+            CURLOPT_USERAGENT => 'SatSift/3.5.0 (+https://www.sylvesterkaczmarek.com/satsift/)',
             CURLOPT_HTTPHEADER => ['Accept: application/json'],
             CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
             CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,

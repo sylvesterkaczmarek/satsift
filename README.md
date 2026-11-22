@@ -14,17 +14,17 @@ cd satsift
 python3 tools/serve_workbench.py
 ```
 
-Open [the local workbench](http://127.0.0.1:8000/satellite-maneuver-detector) and select **Try a synthetic example**, or import a TLE history or OMM JSON file. The examples demonstrate a candidate event, a quiet history and insufficient data.
+Open [the local workbench](http://127.0.0.1:8000/satsift/) and select **Try a synthetic example**, or import a TLE history or OMM JSON file. The examples demonstrate a candidate event, a quiet history and insufficient data.
 
 The server binds to the loopback interface and serves the public application routes. Imported files are processed in your browser. Current CelesTrak snapshots require an internet connection; authenticated historical retrieval requires the PHP configuration described in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Current implementation
 
-- Workbench release: 3.4.9
+- Workbench release: 3.5.0
 - Project licence: [Apache License 2.0](LICENSE) for original source; third-party and data-specific terms remain separate
 - Detector method: 0.4
 - Intended use: research screening and technical evaluation
-- [Hosted workbench](https://www.sylvesterkaczmarek.com/satellite-maneuver-detector)
+- [Hosted workbench](https://www.sylvesterkaczmarek.com/satsift/)
 - [User documentation](docs.html)
 - [Known limitations](KNOWN-ISSUES.md)
 - [Publication review and prioritised repairs](review/PUBLICATION-REVIEW.md)
@@ -35,13 +35,21 @@ The server binds to the loopback interface and serves the public application rou
 
 The baseline combines common-epoch SGP4 propagation, radial/along-track/cross-track residuals, orbital-element changes, orbit-specific thresholds, event grouping and explicit abstention. The interface provides UTC charts, orbital context, catalogue-revision diagnostics, JSON and CSV exports, and reproducibility packages.
 
-The maintained release preserves catalogue metadata, original TLE precision, saved-package identity and acquisition provenance. Version 3.4.9 adds deterministic handling of mixed exact/near-epoch TLE and OMM records, strict benchmark-tolerance admission and a repaired Apache routing boundary. Detector 0.4 and its thresholds remain unchanged. The [release notes](RELEASE-NOTES.md) record the version boundaries and earlier repairs.
+The maintained release preserves catalogue metadata, original TLE precision, saved-package identity and acquisition provenance. Workbench 3.5.0 adds a compact analysis console, light and dark themes, linked chart inspection and event evidence, and moves the public workbench to `/satsift/`. Older public page URLs redirect to the corresponding SatSift pages; existing history and asset URLs remain compatible. Detector 0.4 and its thresholds remain unchanged. The [release notes](RELEASE-NOTES.md) record the version boundaries and earlier repairs.
 
 ### Browser source organisation
 
 The browser implementation is organised into plain JavaScript modules for orbital input, benchmark scoring, reproducibility packages, detection and interface state, with shared utilities and a small entry script. The [browser architecture](BROWSER-ARCHITECTURE.md) identifies the responsibilities, dependency composition and verification boundaries. Local startup still requires only Python; there is no build step.
 
 The document and compatibility loader use content-addressed script URLs with integrity metadata. The server and deployment tools expose only declared assets. The original module refactor retained Workbench 3.4.7 and its computation contract. Subsequent input-admission repairs preserve detector 0.4, scoring, package schema and propagation methods, with explicit release identity in new runs. The module refactor is checked against a synthetic fixture captured from the preceding implementation.
+
+## Analysis console
+
+The workbench places inputs and screening settings beside the evidence plots and selected-event inspector. The status strip reports the loaded object, catalogue identifier, orbit regime, latest source epoch, data quality and analysis state. It reports the supplied history and does not imply a live telemetry connection.
+
+Choose the light or dark theme from the console header. Both retain labelled states, keyboard focus and tabular chart data. Chart zoom and time inspection are linked across the two-dimensional evidence views. Calibration intervals and excluded gaps remain visible, and selecting an event opens its measured features, screening thresholds, source records and quality notes. The three-dimensional orbit view provides supplementary context.
+
+The current public address is [SatSift](https://www.sylvesterkaczmarek.com/satsift/). Earlier page addresses redirect to their corresponding pages. Previous asset and history URLs remain available for saved links and cached documents. New packages identify dependencies at the current public address; historical acquisition URLs and frozen benchmark references retain their recorded values.
 
 ## Working with orbital histories
 

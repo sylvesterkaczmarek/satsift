@@ -105,7 +105,7 @@ CapturingURL.revokeObjectURL = () => {};
 
 const windowObject = {
   document,
-  location: { href: 'https://example.test/satellite-maneuver-detector', search: '' },
+  location: { href: 'https://example.test/satsift', search: '' },
   history: { replaceState() {} },
   setTimeout() { return 1; },
   clearTimeout() {},

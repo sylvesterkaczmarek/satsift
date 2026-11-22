@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 const fs = require('node:fs/promises');
 
-const WORKBENCH = '/satellite-maneuver-detector';
+const WORKBENCH = '/satsift/';
 
 async function openWorkbench(page) {
   await page.goto(WORKBENCH);
@@ -376,14 +376,14 @@ test('cached documents recover through the compatibility entry and immutable mod
     const pathname = new URL(request.url()).pathname;
     if (pathname.startsWith(WORKBENCH + '/app/')) modules.push(pathname);
   });
-  await page.route('**/satellite-maneuver-detector', async route => {
+  await page.route('**/satsift', async route => {
     const response = await route.fetch();
     const current = await response.text();
-    const script = /<script\b[^>]*src="\/satellite-maneuver-detector\/app\/[^\"]+"[^>]*><\/script>/g;
+    const script = /<script\b[^>]*src="\/satsift\/app\/[^\"]+"[^>]*><\/script>/g;
     const tags = current.match(script) || [];
     expect(tags).toHaveLength(7);
     const body = current.replace(script, '').replace('</body>',
-      '<script defer src="/satellite-maneuver-detector/app-3.4.js?v=c8eb05db9c48"></script>\n</body>');
+      '<script defer src="/satsift/app-3.4.js?v=c8eb05db9c48"></script>\n</body>');
     await route.fulfill({ response, body });
   });
   await openWorkbench(page);

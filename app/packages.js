@@ -10,7 +10,7 @@ globalThis.SMDModules["packages"] = function createPackages(common, orbitalInput
     METHOD_VERSION, WORKBENCH_VERSION, PACKAGE_SCHEMA_VERSION, TLE_SOURCE_SCHEMA_VERSION,
     RUN_IDENTITY_VERSION, DATA_PROVENANCE_VERSION, INPUT_FINGERPRINT_ALGORITHM,
     MAX_PROVENANCE_SOURCES, MAX_PROVENANCE_ACQUISITIONS, MAX_PROVENANCE_BYTES, PROPAGATION_CONTRACT,
-    SATELLITE_JS_VERSION, MAX_HISTORY_RANGE_DAYS, MIN_EVALUATED_POINTS, DAY_MS, FEATURE_LABELS,
+    SATELLITE_JS_VERSION, PLOTLY_ASSET_URL, SATELLITE_ASSET_URL, MAX_HISTORY_RANGE_DAYS, MIN_EVALUATED_POINTS, DAY_MS, FEATURE_LABELS,
     fmtTime, fmtNum, median, stableStringify, fnv1a64
   } = common;
   const {
@@ -454,8 +454,8 @@ The 3D view is approximate visual context only and is not an operational propaga
         omm_initialisation_precision: 'milliseconds (satellite.js 6.0.2 Date-based initialisation)',
         legacy_tle_precision: 'Original precision cannot be recovered from packages without retained TLE lines',
         dependency_assets: {
-          plotly: '/satellite-maneuver-detector/plotly-3.3.1.min.js',
-          satellite_js: '/satellite-maneuver-detector/satellite-6.0.2.min.js',
+          plotly: PLOTLY_ASSET_URL,
+          satellite_js: SATELLITE_ASSET_URL,
           orbit_context: 'Plotly 3D; Cesium dependency removed in Workbench 3.4'
         }
       };

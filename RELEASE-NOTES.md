@@ -1,8 +1,26 @@
 # Release notes
 
+## Workbench 3.5.0
+
+### Public address and discoverability
+
+The canonical workbench address is `/satsift/`. Documentation, benchmark status and accessibility pages use the same namespace. Earlier HTML page addresses redirect permanently to their corresponding pages; retained history endpoints, downloads and immutable assets continue to support saved links and cached documents. Canonical tags, social metadata, structured data, the sitemap, crawler policy, runtime links and current documentation use SatSift consistently.
+
+The deployment keeps private configuration and existing history storage in place. It exposes only reviewed public files. Complete project and dependency notices are served as a deterministic text bundle, including the original licence texts for bundled components. Site-file merging preserves unrelated policies and is checked for repeatability.
+
+### Analysis console and event review
+
+The compact console places the object identity, source epoch, quality and analysis state above the input, evidence and event-inspection panels. Light and dark themes retain labelled states and keyboard focus. Linked time inspection and zoom, calibration and data-gap overlays, selected-event markers and an evidence inspector make the analysis easier to review. Three-dimensional orbital context remains supplementary to the measured evidence.
+
+The workbench still uses native HTML, CSS and JavaScript, with its existing PHP history service and Python tooling. Detector 0.4, its thresholds, event matching, propagation and package schema remain unchanged. The release version and current dependency URLs appear in newly generated packages. Historical acquisition provenance retains its original values.
+
+### Verification boundary
+
+The original browser fixtures and frozen research records retain their exact bytes. A separate presentation fixture records the reviewed interface, release identity and public-URL changes. Complete synthetic analysis and export comparisons continue to use the pinned historical implementation with matching release identity and dependency URLs. No research rerun or new performance claim is part of this release.
+
 ## SatSift project identity
 
-SatSift is the name of this research-screening workbench and the public source repository `sylvesterkaczmarek/satsift`. Original source code and documentation are licensed under [Apache License 2.0](LICENSE). The GitHub description, topics and npm package metadata use the same name. The existing hosted URL and its physical deployment route are retained for compatibility. This naming and licensing update does not change detector 0.4, Workbench 3.4.9, stored evaluations or the consumed confirmatory partition.
+SatSift is the name of this research-screening workbench and the public source repository `sylvesterkaczmarek/satsift`. Original source code and documentation are licensed under [Apache License 2.0](LICENSE). The GitHub description, topics and npm package metadata use the same name. At this initial naming stage, the existing hosted URL and physical deployment route were retained for compatibility. This naming and licensing update does not change detector 0.4, Workbench 3.4.9, stored evaluations or the consumed confirmatory partition.
 
 The first public source release uses a new repository with one initial commit. The original development repository, earlier commits and service records remain private. The publication adds no new detection-performance claim and does not update the live website.
 
@@ -22,7 +40,7 @@ The reviewed maintenance surfaces have new current fingerprints while the previo
 
 The root deployment template now rejects percent-encoded or normalised aliases that could expose the physical source directory or serve a public page without the intended response headers. Literal public routes, encoded query values, immutable browser assets, unrelated site routes and retained rollback compatibility remain supported. The HSTS documentation now describes the proxy-aware header behaviour accurately.
 
-The executable Apache suite uses synthetic files and an isolated loopback process. It demonstrates the former bypass against the original template and passes against the repaired template. This source change has not been deployed to a live server.
+The executable Apache suite uses synthetic files and an isolated loopback process. It demonstrates the former bypass against the original template and passes against the repaired template. The source review preceded the Workbench 3.4.9 live deployment on 22 November 2026.
 
 ### Source packaging and attribution
 
@@ -36,7 +54,7 @@ Browser equivalence now executes the exact original 3.4.7 application beside the
 
 ### Temporary session cleanup
 
-The history endpoint now explicitly saves session cookies after a completed upstream transfer and resets the cURL handle before releasing it. A handle retained after a transfer abort can no longer recreate the cookie file after request cleanup. Regression tests require a valid rotating synthetic session cookie, deliberately defer handle destruction, and verify successful retrieval, deadline and size-limit responses, unchanged cache and quota behaviour, and immediate cleanup. This endpoint repair has not been deployed to the live website.
+The history endpoint now explicitly saves session cookies after a completed upstream transfer and resets the cURL handle before releasing it. A handle retained after a transfer abort can no longer recreate the cookie file after request cleanup. Regression tests require a valid rotating synthetic session cookie, deliberately defer handle destruction, and verify successful retrieval, deadline and size-limit responses, unchanged cache and quota behaviour, and immediate cleanup. This repair was subsequently included in the Workbench 3.4.9 live deployment on 22 November 2026.
 
 ## Workbench 3.4.8
 

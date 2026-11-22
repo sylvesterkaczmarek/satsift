@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-const PREFIX = '/satellite-maneuver-detector/app/';
+const PREFIX = '/satsift/app/';
 const MODULE_SOURCES = Object.freeze(['app/common.js', 'app/orbital-input.js', 'app/benchmark.js',
   'app/packages.js', 'app/detection.js', 'app/interface.js']);
 

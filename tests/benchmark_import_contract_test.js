@@ -35,7 +35,7 @@ const document = {
 };
 const windowObject = {
   document,
-  location: { href: 'https://example.test/satellite-maneuver-detector', search: '' },
+  location: { href: 'https://example.test/satsift', search: '' },
   history: { replaceState() {} },
   setTimeout(handler) { if (typeof handler === 'function') handler(); return 1; },
   clearTimeout() {}, scrollTo() {}, addEventListener() {}, removeEventListener() {},

@@ -82,7 +82,7 @@ async function main() {
     snapshot => fs.appendFileSync(path.join(snapshot, files[1]), '\n// Changed asset bytes.\n'),
     snapshot => {
       const filename = path.join(snapshot, 'index.html');
-      fs.writeFileSync(filename, fs.readFileSync(filename, 'utf8').replace(assets[0].url, '/satellite-maneuver-detector/app/missing-000000000000.js'));
+      fs.writeFileSync(filename, fs.readFileSync(filename, 'utf8').replace(assets[0].url, '/satsift/app/missing-000000000000.js'));
     },
     snapshot => {
       const filename = path.join(snapshot, 'index.html');

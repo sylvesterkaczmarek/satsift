@@ -22,7 +22,7 @@ The history endpoint applies separate incoming-request and upstream-operation qu
 
 ## Public routes
 
-Production routing must use the explicit allowlist in `deployment/site-root.htaccess`. Do not restore a general rule that maps arbitrary `/satellite-maneuver-detector/...` paths into the physical project directory.
+Production routing must use the explicit allowlist in `deployment/site-root.htaccess`. Do not restore a general rule that maps arbitrary `/satsift/...` or legacy application paths into the physical project directory.
 
 Encoded route aliases and traversal paths are rejected before public routing; supported canonical redirects remain usable. The physical project namespace is checked against both the decoded route and the decoded original request, while allowlisted internal rewrites remain usable.
 
